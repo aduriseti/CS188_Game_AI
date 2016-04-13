@@ -30,3 +30,5 @@ Choosing allies... not all can survive, but more than 1 could....
 Mice would have to learn to navigate different structures like loops in mazes and avoiding running into walls.
 
 Could be mouse traps loaded with cheese, maybe some already sprung (could learn to recognize)
+
+.
