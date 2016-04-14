@@ -16,8 +16,8 @@ Maze = {
   -- Copied from BasicEntity.lua
   Properties = {
      bUsable = 0,
-	 iWidth = 3,
-     iHeight = 3,
+	 iWidth = 20,
+     iHeight = 20,
 	 object_Model = "objects/default/primitive_cube.cgf",
      
      --Copied from BasicEntity.lua
@@ -56,23 +56,40 @@ MakeUsable(Maze);
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                     Entity State Function                  ---------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
-function Maze:OnInit()
-    self:OnReset();
-end
+-- Order of Events: (Spawn) -> (Init)
 
+--[[
 function Maze:OnSpawn()
-    self:OnReset();
+    Log("OnSpawn is running");
+    --self:OnReset();
+end
+]]
+
+function Maze:OnInit()
+    --Log("OnInit is running");
+    self:OnReset()
 end
 
 function Maze:OnPropertyChange()
+    Log("OnPropertyChange is running");
+    self:SetFromProperties();
     self:OnReset();
 end
 
 function Maze:OnReset()
+    Log("OnReset is running");
+    self:SetupModel()
+    self:New()
+end
 
-    self:Activate(1); -- I dunno what? Activate?
-    
-	local Properties = self.Properties;
+----------------------------------------------------------------------------------------------------------------------------------
+-------------------------                     State Helper Function                  ---------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------
+
+function Maze:SetupModel()
+        
+    local Properties = self.Properties;
+
     if(Properties.object_Model ~= "") then          -- Make sure objectModel is specified
         self:LoadObject(0,Properties.object_Model)  -- Load model into main entity
 
@@ -80,14 +97,10 @@ function Maze:OnReset()
             self:PhysicalizeThis();
         end
         
-        self:New();  -- OOOO YEAH, MAKE THAT MAZE BITCHES
     end
-	
+    
+        Log("Width = %d, Height = %d", Properties.iWidth, Properties.iHeight)
 end
-
-----------------------------------------------------------------------------------------------------------------------------------
--------------------------                     State Helper Function                  ---------------------------------------------
-----------------------------------------------------------------------------------------------------------------------------------
 
 function Maze:PhysicalizeThis() -- Helper function to physicalize, Copied from BasicEntity.lua
     -- Init physics.
@@ -96,6 +109,17 @@ function Maze:PhysicalizeThis() -- Helper function to physicalize, Copied from B
 		Physics = Physics_DX9MP_Simple;
 	end
 	EntityCommon.PhysicalizeRigid( self,0,Physics,self.bRigidBodyActive );
+end
+
+function Maze:SetFromProperties()
+	local Properties = self.Properties;
+	
+	if (Properties.object_Model == "") then
+		do return end;
+	end
+	
+	self:SetupModel();
+
 end
 
 
@@ -425,14 +449,14 @@ end
 
 -- Returns number of open room (no walls/walls inf thin) wide
 function Maze:width()
-    local Properties = Maze.Properties;
+    local Properties = self.Properties;
     local width = Properties.iWidth
     return width
 end
 
 -- Returns number of open room high
 function Maze:height()
-    local Properties = Maze.Properties;
+    local Properties = self.Properties;
     local height = Properties.iHeight
     return height
 end
@@ -456,7 +480,7 @@ end
 function Maze:GrowingTree(selector)
 
     selector = selector or function (list) return random(#list) end
-    local cell = { x = random(self.width()), y = random(self.height()) } -- Select a random cell (Step 1)
+    local cell = { x = random(self:width()), y = random(self:height()) } -- Select a random cell (Step 1)
     self[cell.y][cell.x].visited = true -- Mark as visited
     local list = { cell } -- Add random cell to list (also step 1)
     
