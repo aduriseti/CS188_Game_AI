@@ -12,12 +12,16 @@ Maze = {
         south = {x = 0, y = 1},
         west = {x = -1, y = 0},
     },
+    
+  -- Instance vars
+  Width = 0,
+  Height = 0,
 
   -- Copied from BasicEntity.lua
   Properties = {
      bUsable = 0,
-	 iWidth = 20,
-     iHeight = 20,
+	 iM_Width = 20,
+     iM_Height = 20,
 	 object_Model = "objects/default/primitive_cube.cgf",
      
      --Copied from BasicEntity.lua
@@ -31,7 +35,7 @@ Maze = {
      },
   },
   
- 
+  
 
   -- optional editor information taken from BasicEntity.lua
   Editor = {
@@ -66,12 +70,15 @@ end
 ]]
 
 function Maze:OnInit()
-    --Log("OnInit is running");
+    Log("OnInit is running");
+    self.Width = self.Properties.iM_Width
+    self.Height = self.Properties.iM_Height
     self:OnReset()
 end
 
 function Maze:OnPropertyChange()
     Log("OnPropertyChange is running");
+    
     self:SetFromProperties();
     self:OnReset();
 end
@@ -99,7 +106,7 @@ function Maze:SetupModel()
         
     end
     
-        Log("Width = %d, Height = %d", Properties.iWidth, Properties.iHeight)
+        --Log("Width = %d, Height = %d", Properties.iM_Width, Properties.iM_Height)
 end
 
 function Maze:PhysicalizeThis() -- Helper function to physicalize, Copied from BasicEntity.lua
@@ -112,13 +119,32 @@ function Maze:PhysicalizeThis() -- Helper function to physicalize, Copied from B
 end
 
 function Maze:SetFromProperties()
+    Log("In SetFromProperties")
+    
 	local Properties = self.Properties;
 	
 	if (Properties.object_Model == "") then
 		do return end;
 	end
+    
+    -- Free Slots no longer in use
+    local width, height = Properties.iM_Width, Properties.iM_Height
+    Log("local width = %d, local height = %d", width, height)
+    Log("Old Width = %d, Old Height = %d", self.Width, self.Height)
+   
+    if (width < self.Width) or (height < self.Height) then 
+	   --self:FreeAllSlots();
+       local totalSlots = (self.Width*2+1)*(self.Height*2+1)
+       for i=1, totalSlots do
+           self:FreeSlot(i)
+       end
+       Log("Freed all slots")
+    end
 	
-	self:SetupModel();
+    self.Width = width
+    self.Height = height
+    
+    self:SetupModel();
 
 end
 
@@ -450,14 +476,14 @@ end
 -- Returns number of open room (no walls/walls inf thin) wide
 function Maze:width()
     local Properties = self.Properties;
-    local width = Properties.iWidth
+    local width = Properties.iM_Width
     return width
 end
 
 -- Returns number of open room high
 function Maze:height()
     local Properties = self.Properties;
-    local height = Properties.iHeight
+    local height = Properties.iM_Height
     return height
 end
 
