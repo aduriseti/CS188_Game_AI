@@ -1,0 +1,115 @@
+<BehaviorTree>
+  <Variables>
+   <Variable name="Hungry"/>
+   <Variable name="AwareOfEnemy"/>
+   <Variable name="SeenByEnemy" />
+   <Variable name="AwareOfFood"/>
+  </Variables>
+  
+  <SignalVariables>
+    <Signal name="OnEnemySeen" variable="AwareOfEnemy" value="true"/>
+    <Signal name="OnMealComplete" variable="Hungry" value="false" />
+    <Signal name="OnNoTargetAwareness" variable="AwareOfEnemy" value="false" />
+  </SignalVariables>
+  
+  <Timestamps />
+  
+  <Root>
+    <StateMachine>
+
+      <!--
+      =================================================
+          SEARCH FOR FOODS
+      =================================================
+      -->
+      <State name="MouseSearch">
+      
+        <Transitions>
+          <Transition to= "MouseSleep" onEvent="OnMealComplete" />
+          <Transition to= "MouseAvoid" onEvent="OnEnemySeen" />
+        </Transitions>
+        
+        <BehaviorTree>
+        
+          <Sequence>
+          
+            <Log message="IM SEARCHING: Where my food at?"/>
+
+            <SetAlertness value="0"/>
+
+            <!--
+            <Stance name="Run"/> 
+            -->
+
+            <ExecuteLua code="entity:Search()"/>  
+          
+          </Sequence>
+        
+        </BehaviorTree>
+        
+        </State>
+        
+      <!--
+      =================================================
+          SLEEP: SUCCESS WINNER WINNER CHICKEN DINNER
+      =================================================
+      -->
+      <State name="MouseSleep">
+      
+        <Transitions>
+          
+        </Transitions>
+        
+        <BehaviorTree>
+        
+          <Sequence>
+          
+            <Log message="SLEEPING: I'm full... zzzzz..."/>
+
+            <SetAlertness value="0"/>
+
+            <!--
+            <Stance name="Sleeping"/>
+            -->
+
+            <ExecuteLua code="entity:Sleep()"/>
+          
+          </Sequence>
+        
+        </BehaviorTree>
+        
+        </State>
+
+        <!--
+        =================================================
+            DANGER: SNEAK PAST OR AVOID SNAKES
+        =================================================
+        -->
+        <State name= "MouseAvoid">
+        
+          <Transitions>
+            <Transition to= "MouseSearch" onEvent="OnNoTargetAwareness" />
+          </Transitions>
+          
+          <BehaviorTree>
+          
+            <Sequence>
+            
+            <Log message="DANGER: Oh shit!"/>
+
+            <SetAlertness value="2"/>
+
+            <ExecuteLua code="entity:Avoid()"/>
+            
+            </Sequence>
+          
+          </BehaviorTree>
+        
+        </State>
+      
+      
+    
+    </StateMachine>
+  </Root>
+ 
+</BehaviorTree>
