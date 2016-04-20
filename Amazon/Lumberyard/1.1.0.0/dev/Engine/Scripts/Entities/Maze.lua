@@ -73,20 +73,25 @@ function Maze:OnInit()
     Log("OnInit is running");
     self.Width = self.Properties.iM_Width
     self.Height = self.Properties.iM_Height
-    self:OnReset()
+    --self:OnReset()
+    
+    self:SetupModel()
+    self:New()
 end
 
 function Maze:OnPropertyChange()
     Log("OnPropertyChange is running");
     
     self:SetFromProperties();
-    self:OnReset();
+    --self:OnReset();
+    self:SetupModel()
+    self:New()
 end
 
 function Maze:OnReset()
     Log("OnReset is running");
-    self:SetupModel()
-    self:New()
+    --self:SetupModel()
+    --self:New()
 end
 
 ----------------------------------------------------------------------------------------------------------------------------------
