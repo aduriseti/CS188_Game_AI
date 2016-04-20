@@ -10,6 +10,7 @@ local Behavior = CreateAIBehavior("MouseSleep",
         Log("...ZZZZZZ...")
         Log("=======")
         AI.SetBehaviorVariable(entity.id, "Hungry", false);
+        AI.SetBehaviorVariable(entity.id, "AwareOfEnemy", false);
         entity:SelectPipe(0,"mouse_sleep");
     end,
 

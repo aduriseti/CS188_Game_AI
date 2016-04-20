@@ -6,7 +6,7 @@ local Behavior = CreateAIBehavior("MouseAvoid",
 
     Constructor = function (self, entity)
         Log("=======")
-        Log("FUCK ME")
+        Log("RUUUNNN")
         Log("=======")        
         AI.SetBehaviorVariable(entity.id, "AwareOfEnemy", true);
         entity:SelectPipe(0,"mouse_avoid");

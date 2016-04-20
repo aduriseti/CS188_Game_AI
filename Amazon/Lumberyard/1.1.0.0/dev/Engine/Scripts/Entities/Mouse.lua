@@ -10,6 +10,11 @@ Mouse = {
 
   Properties =
   {
+
+    soclasses_SmartObjectClass = "Human, Actor",
+    esModularBehaviorTree = "Mouse",
+    esNavigationType = "MediumSizedCharacters",
+
     Movement =
     {
       SpeedMin = 1,
@@ -42,6 +47,17 @@ Mouse = {
     {
       
     },
+
+    Status = 
+    {
+      hunger = 10,
+      foodAte = 0,
+      health = 100,
+    },
+
+    Hungry = true,
+
+    AwareOfEnemy = false,
 
   },
 
