@@ -50,9 +50,9 @@ Mouse = {
 
     Status = 
     {
-      hunger = 10,
-      foodAte = 0,
-      health = 100,
+      Hunger = 10,
+      FoodAte = 0,
+      Health = 100,
     },
 
     Hungry = true,
