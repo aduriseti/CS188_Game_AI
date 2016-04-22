@@ -1,114 +1,113 @@
 <BehaviorTree>
   <Variables>
-   <Variable name="Hungry"/>
-   <Variable name="AwareOfEnemy"/>
-   <Variable name="SeenByEnemy" />
-   <Variable name="AwareOfFood"/>
+    <Variable name="Hungry"/>
+    <Variable name="AwareOfEnemy"/>
+    <Variable name="SeenByEnemy" />
+    <Variable name="AwareOfFood"/>
+    <Variable name="ExecuteSequence" />
+    <Variable name="ExecuteInterruptibleSequence" />
   </Variables>
   
   <SignalVariables>
     <Signal name="OnEnemySeen" variable="AwareOfEnemy" value="true"/>
     <Signal name="OnMealComplete" variable="Hungry" value="false" />
-    <Signal name="OnNoTargetAwareness" variable="AwareOfEnemy" value="false" />
+    <Signal name="OnNoTarget" variable="AwareOfEnemy" value="false" />
   </SignalVariables>
   
   <Timestamps />
   
   <Root>
+
     <StateMachine>
 
       <!--
       =================================================
-          SEARCH FOR FOODS
+          Idle
       =================================================
       -->
-      <State name="MouseSearch">
-      
+
+      <State name="Idle">
+
         <Transitions>
-          <Transition to= "MouseSleep" onEvent="OnMealComplete" />
-          <Transition to= "MouseAvoid" onEvent="OnEnemySeen" />
+          <Transition to="MouseAvoid" onEvent="OnEnemySeen"/>
+          <Transition to="MouseEat" onEvent="OnObjectSeen"/>
         </Transitions>
-        
+
         <BehaviorTree>
-        
+
           <Sequence>
-          
-            <Log message="IM SEARCHING: Where my food at?"/>
 
             <SetAlertness value="0"/>
 
-            <!--
-            <Stance name="Run"/> 
-            -->
+            <!--<ExecuteLua code="entity:MouseIdle()"/>-->
+            <Bubble message="Idle" duration="3" />
 
-            <ExecuteLua code="entity:Search()"/>  
-          
+            <Stance name="Relaxed"/>
+
+
+            <Halt/>
+
           </Sequence>
-        
+
         </BehaviorTree>
-        
-        </State>
-        
-      <!--
-      =================================================
-          SLEEP: SUCCESS WINNER WINNER CHICKEN DINNER
-      =================================================
-      -->
-      <State name="MouseSleep">
-      
+
+      </State>
+
+
+      <State name="MouseAvoid">
+
         <Transitions>
-          
+          <Transition to="Idle" onEvent="OnLostSightOfTarget"/>
+          <Transition to="MouseEat" onEvent="OnObjectSeen"/>
         </Transitions>
-        
+
         <BehaviorTree>
-        
+
           <Sequence>
-          
-            <Log message="SLEEPING: I'm full... zzzzz..."/>
 
-            <SetAlertness value="0"/>
-
-            <!--
-            <Stance name="Sleeping"/>
-            -->
-
-            <ExecuteLua code="entity:Sleep()"/>
-          
-          </Sequence>
-        
-        </BehaviorTree>
-        
-        </State>
-
-        <!--
-        =================================================
-            DANGER: SNEAK PAST OR AVOID SNAKES
-        =================================================
-        -->
-        <State name= "MouseAvoid">
-        
-          <Transitions>
-            <Transition to= "MouseSearch" onEvent="OnNoTargetAwareness" />
-          </Transitions>
-          
-          <BehaviorTree>
-          
-            <Sequence>
-            
-            <Log message="DANGER: Oh shit!"/>
 
             <SetAlertness value="2"/>
 
-            <ExecuteLua code="entity:Avoid()"/>
-            
-            </Sequence>
-          
-          </BehaviorTree>
-        
-        </State>
-      
-      
-    
+            <Stance name="Alerted"/>
+
+            <!--<ExecuteLua code="entity:MouseAvoid()"/>-->
+            <Bubble message="Avoid" duration="3" />
+
+            <Halt />
+
+          </Sequence>
+
+        </BehaviorTree>
+
+      </State>
+
+      <State name="MouseEat">
+
+        <Transitions>
+          <Transition to="MouseAvoid" onEvent="OnEnemySeen"/>
+          <Transition to="Idle" onEvent="OnLostSightOfTarget"/>
+        </Transitions>
+
+        <BehaviorTree>
+
+          <Sequence>
+
+
+            <SetAlertness value="2"/>
+
+            <Stance name="Relaxed"/>
+
+            <!--<ExecuteLua code="entity:MouseEat()"/>-->
+            <Bubble message="Eat" duration="3" />
+
+            <Halt />
+
+          </Sequence>
+
+        </BehaviorTree>
+
+      </State>
+
     </StateMachine>
   </Root>
  
