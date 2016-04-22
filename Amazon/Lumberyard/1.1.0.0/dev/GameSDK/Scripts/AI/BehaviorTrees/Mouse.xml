@@ -1,15 +1,17 @@
 <BehaviorTree>
   <Variables>
-   <Variable name="Hungry"/>
-   <Variable name="AwareOfEnemy"/>
-   <Variable name="SeenByEnemy" />
-   <Variable name="AwareOfFood"/>
+    <Variable name="Hungry"/>
+    <Variable name="AwareOfEnemy"/>
+    <Variable name="SeenByEnemy" />
+    <Variable name="AwareOfFood"/>
+    <Variable name="ExecuteSequence" />
+    <Variable name="ExecuteInterruptibleSequence" />
   </Variables>
   
   <SignalVariables>
     <Signal name="OnEnemySeen" variable="AwareOfEnemy" value="true"/>
     <Signal name="OnMealComplete" variable="Hungry" value="false" />
-    <Signal name="OnNoTargetAwareness" variable="AwareOfEnemy" value="false" />
+    <Signal name="OnNoTarget" variable="AwareOfEnemy" value="false" />
   </SignalVariables>
   
   <Timestamps />
@@ -22,6 +24,15 @@
           SEARCH FOR FOODS
       =================================================
       -->
+      <State name="Idle">
+        <Transition to="MouseSearch" onEvent="OnForcedExecute" />
+          <BehaviorTree>  
+            <Sequence>
+              <Log message="Mouse is idle..." />
+            </Sequence>
+          </BehaviorTree>
+      </State>
+
       <State name="MouseSearch">
       
         <Transitions>
