@@ -726,4 +726,6 @@ function Maze:LinesToWorld(map_lines)
         end
     end
     
+    self:PhysicalizeWallSlots();
+    
 end
