@@ -7,9 +7,9 @@ Maze = {
 
   -- Directions in maze (For example: Going north from current position means going up 1 in y axis)
     directions = {
-        north = {x = 0, y = -1},
+        north = {x = 0, y = 1},
         east = {x = 1, y = 0},
-        south = {x = 0, y = 1},
+        south = {x = 0, y = -1},
         west = {x = -1, y = 0},
     },
     
@@ -23,6 +23,9 @@ Maze = {
 	 iM_Width = 20,
      iM_Height = 20,
 	 object_Model = "objects/default/primitive_cube.cgf",
+     
+     map_txt = "map",
+
      
      --Copied from BasicEntity.lua
      Physics = {
@@ -42,6 +45,9 @@ Maze = {
 	 	Icon = "physicsobject.bmp",
 		IconOnTop=1,
   },
+  
+    -- Read in Maze File to lines:
+  Lines = {},
 };
 
 -- I DUNNO WTF THIS IS I COPIED FROM BasicEntity.lua
@@ -55,7 +61,7 @@ local Physics_DX9MP_Simple = {
 }
 
 -- I dunno, make it usable?
-MakeUsable(Maze);
+--MakeUsable(Maze);
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                     Entity State Function                  ---------------------------------------------
@@ -76,7 +82,7 @@ function Maze:OnInit()
     --self:OnReset()
     
     self:SetupModel()
-    self:New()
+    self:New()    
 end
 
 function Maze:OnPropertyChange()
@@ -336,65 +342,78 @@ end
 
 -- Alright, main maze gen code that calls other helper function
 function Maze:New()
-    obj = obj or {}         -- Our 2d array that is the graph version of the maze with infinitesimally thin walls... so (1,1) is actually Room 1, which is really at (2,2) in the world
-    setmetatable(obj, self)
-    self.__index = self
+    Log("In New");
     
-    local width = self:width()   -- Returns width of graph with infinitesimally thin walls, so essentially its #rooms wide, not actual width which would be width*2+1
-    local height = self:height() -- #rooms tall
-    
-    self:Border(); -- Fill in border cells with walls
-    
-    -- Setup Maze
-        -- For each room in 2d array, record that there is a closed door (i.e. wall) in each direction
-        -- Effectively doing what DoorSpawn() does, filling in remaining walls
-    for y = 1, height do
-        obj[y] = {}
-        for x = 1, width do
-            obj[y][x] = { east = obj:CreateDoor(closed,2*y, 2*x+1 ), south = obj:CreateDoor(closed,2*y+1,2*x)}
-            --CreateDoor records that there is a wall there via bool value in 2d array that is obj[y][x], and fills wall in in actual 3D real world graph
-                                        
-        -- Doors are shared beetween the cells to avoid out of sync conditions and data dublication
-        if x ~= 1 then obj[y][x].west = obj[y][x - 1].east
-        else obj[y][x].west = obj:CreateDoor(closed,2*y,2*x-1) end
-        
-        if y ~= 1 then obj[y][x].north = obj[y - 1][x].south
-        else obj[y][x].north = obj:CreateDoor(closed,2*y-1,2*x) end
-        end
+    local Properties = self.Properties;
+	local success = false;
+	if (Properties.map_txt ~= "") then
+        Log("Map property isn't empty");
+        success = self:ReadMaze();
+        Properties.map_txt = "";
     end
     
-    --[[
-        At this point we have setup the following in the world:
-
-         y-axis  _____________________________
-               7 |_B_|_D_|_B_|_D_|_B_|_D_|_B_|
-               6 |_D_|_7_|_D_|_8_|_D_|_9_|_D_|
-               5 |_B_|_D_|_B_|_D_|_B_|_D_|_B_|
-               4 |_D_|_4_|_D_|_5_|_D_|_6_|_D_|
-               3 |_B_|_D_|_B_|_D_|_B_|_D_|_B_|
-               2 |_D_|_1_|_D_|_2_|_D_|_3_|_D_|
-               1 |_B_|_D_|_B_|_D_|_B_|_D_|_B_|
-                   1   2   3   4   5   6   7    x-axis
-               
-               Where all the every non room cell is now a wall 
-               (B and D are both walls and are essentially the same. 
-               B is what was filled in in the createBorder function, D is what was filled in here)
+    if (not success) then
+        Log("Map property was empty");
+        obj = obj or {}         -- Our 2d array that is the graph version of the maze with infinitesimally thin walls... so (1,1) is actually Room 1, which is really at (2,2) in the world
+        setmetatable(obj, self)
+        self.__index = self
         
-        The obj 2d array representation we are using in the code actually would look someting like:
-                c stands for a closed door
-                # are implicit walls, not actually stated anywhere, just to make illustration more understandable...
-                
-           y-axis   # c # c # c #
-                3   c 7 c 8 c 9 c
-                2   c 4 c 5 c 6 c
-                1   c 1 c 2 c 3 c
-                    # c # c # c #
-                      1   2   3   x-axis
-    ]]
-     
-    obj:GrowingTree(); -- This function calls the growing tree algorithm to start opening doors to create a maze 
+        local width = self:width()   -- Returns width of graph with infinitesimally thin walls, so essentially its #rooms wide, not actual width which would be width*2+1
+        local height = self:height() -- #rooms tall
+        
+        self:Border(); -- Fill in border cells with walls
+        
+        -- Setup Maze
+            -- For each room in 2d array, record that there is a closed door (i.e. wall) in each direction
+            -- Effectively doing what DoorSpawn() does, filling in remaining walls
+        for y = 1, height do
+            obj[y] = {}
+            for x = 1, width do
+                obj[y][x] = { east = obj:CreateDoor(true,2*y, 2*x+1 ), north = obj:CreateDoor(true,2*y+1,2*x)}
+                --CreateDoor records that there is a wall there via bool value in 2d array that is obj[y][x], and fills wall in in actual 3D real world graph
+                                            
+            -- Doors are shared beetween the cells to avoid out of sync conditions and data dublication
+            if x ~= 1 then obj[y][x].west = obj[y][x - 1].east
+            else obj[y][x].west = obj:CreateDoor(true,2*y,2*x-1) end
+            
+            if y ~= 1 then obj[y][x].south = obj[y -1 ][x].north
+            else obj[y][x].south = obj:CreateDoor(true,2*y-1,2*x) end
+            end
+        end
+        
+        --[[
+            At this point we have setup the following in the world:
 
-    obj:PhysicalizeWallSlots(); -- The maze has been complete, make the walls of the maze actually physical (i.e. cant go walk them)
+            y-axis  _____________________________
+                7 |_B_|_D_|_B_|_D_|_B_|_D_|_B_|
+                6 |_D_|_7_|_D_|_8_|_D_|_9_|_D_|
+                5 |_B_|_D_|_B_|_D_|_B_|_D_|_B_|
+                4 |_D_|_4_|_D_|_5_|_D_|_6_|_D_|
+                3 |_B_|_D_|_B_|_D_|_B_|_D_|_B_|
+                2 |_D_|_1_|_D_|_2_|_D_|_3_|_D_|
+                1 |_B_|_D_|_B_|_D_|_B_|_D_|_B_|
+                    1   2   3   4   5   6   7    x-axis
+                
+                Where all the every non room cell is now a wall 
+                (B and D are both walls and are essentially the same. 
+                B is what was filled in in the createBorder function, D is what was filled in here)
+            
+            The obj 2d array representation we are using in the code actually would look someting like:
+                    c stands for a closed door
+                    # are implicit walls, not actually stated anywhere, just to make illustration more understandable...
+                    
+            y-axis   # c # c # c #
+                    3   c 7 c 8 c 9 c
+                    2   c 4 c 5 c 6 c
+                    1   c 1 c 2 c 3 c
+                        # c # c # c #
+                        1   2   3   x-axis
+        ]]
+        
+        obj:GrowingTree(); -- This function calls the growing tree algorithm to start opening doors to create a maze 
+
+        obj:PhysicalizeWallSlots(); -- The maze has been complete, make the walls of the maze actually physical (i.e. cant go walk them)
+   end
 end
 
 --Door class/ called to create doors
@@ -500,8 +519,8 @@ end
             2) Choose a cell from C, and open door to any unvisited adjacent room of that cell, adding that neighbor to C as well. If there are no unvisited neighbors, remove the cell from C.
             3) Repeat #2 until C is empty.
             
-            fun lies in how you choose the cells from C, in step #2. If you always choose the newest cell (the one most recently added), you’ll get the recursive backtracker. 
-            If you always choose a cell at random, you get Prim’s. It’s remarkably fun to experiment with other ways to choose cells from C.
+            fun lies in how you choose the cells from C, in step #2. If you always choose the newest cell (the one most recently added), you�ll get the recursive backtracker. 
+            If you always choose a cell at random, you get Prim�s. It�s remarkably fun to experiment with other ways to choose cells from C.
             " 
                 - The Buck Blog
                 
@@ -509,7 +528,7 @@ end
              The default is a random Cell, which gives us Prim's algorithm
         ]]
 function Maze:GrowingTree(selector)
-
+    Log("In GrowingTree");
     selector = selector or function (list) return random(#list) end
     local cell = { x = random(self:width()), y = random(self:height()) } -- Select a random cell (Step 1)
     self[cell.y][cell.x].visited = true -- Mark as visited
@@ -558,8 +577,13 @@ function Maze:GrowingTree(selector)
         end
 
     end
-    
-   
+        
+        
+        
+               self:PrintMaze();
+               
+               
+
 end
 
 function Maze:PhysicalizeWallSlots()  
@@ -571,4 +595,135 @@ function Maze:PhysicalizeWallSlots()
             end
     end 
  
+end
+
+
+    -- Takes what is in obj and prints it out to a txt file
+function Maze:PrintMaze(txtName)
+    Log("In PrintMaze");
+    local width = self:width()--*2+1;
+    local height = self:height()--*2+1;
+    
+    local txt = txtName or "map"
+    Log("txt is: "..txt);
+    local start_path = "C:\\Amazon\\Lumberyard\\1.1.0.0\\dev\\GameSDK\\Scripts\\Entities\\maps\\";
+    local path = start_path..txt..".txt";
+    Log("path is: "..path);
+    local file = io.open(path, "a");
+    
+    io.output(file)
+     
+   -- Top border
+    for x = 1, width*2+1 do
+        file:write("X");
+    end
+    file:write("\n");
+    
+    -- Insides
+    for y = height, 1, -1 do 
+        -- 
+        for x = 1, width do
+
+        
+            -- Fill in walls by checking if there is a door to the west
+            if(self[y][x].west.closed) then 
+                file:write("XO")
+            else
+                file:write("OO")
+            end
+            
+            -- Edge case (Must fill in right vertical border)
+            if(x == width) then
+                file:write("X")
+            end 
+            
+        end
+        
+        -- Next Line, vertical border left side
+        file:write("\n");
+        file:write("X");
+        
+        for x = 1, width do 
+            
+            if(self[y][x].south:IsClosed()) then 
+                file:write("XX")
+            else 
+                file:write("OX")
+            end 
+            
+        end 
+        
+        file:write("\n");
+        
+    end
+    
+    io.close(file)
+    
+    local Properties = self.Properties;
+    Properties.map_txt = "map";
+    
+end
+
+-- Reads in a txt file maze and creates it in the world
+function Maze:ReadMaze(my_maze_file)
+    Log("In ReadMaze");
+    
+    local file_str;
+    local Properties = self.Properties;
+    
+    -- Open a file for read and test that it worked
+    local file_str = my_maze_file or self.Properties.map_txt;
+    local path = "C:\\Amazon\\Lumberyard\\1.1.0.0\\dev\\GameSDK\\Scripts\\Entities\\maps\\"..file_str..".txt";
+    local file, err = io.open(path, "r");
+    if err then print("Maze file does not exist");  return false; end
+    
+    Log("Opened Map.txt");
+    
+    io.input(file);
+    -- Line by line
+    local lines = {}
+    for line in io.lines() do 
+        lines[#lines + 1] = line
+    end
+    
+    if #lines > 0 then
+        Maze.Lines = lines
+    end 
+        
+    --file:close();
+    io.close(file);
+    
+    -- Set iWidth and iHeight
+    Properties.iM_Height = (#lines-1)/2 
+    Properties.iM_Width = (#lines[1]-1)/2
+    
+    -- Call setFromProperties
+    self:SetFromProperties();
+    
+    self:LinesToWorld(lines);
+    
+    return true;
+end
+
+-- takes a 2D array Maze and creates it in world
+function Maze:LinesToWorld(map_lines)
+    
+    Log("In LinesToWorld");
+    
+    local lines = map_lines or Maze.Lines;
+    local width = #lines[1]
+    local height = #lines
+    
+    for k,v in pairs(lines) do
+        --print('line[' .. k .. ']', v)
+        for i = 1, #v do
+            local c = v:sub(i,i)
+            
+            if (c == "X" ) then
+                self:Wall(i, height+1-k);
+            end
+            
+        end
+    end
+    
 end
