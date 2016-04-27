@@ -17,6 +17,9 @@ Maze = {
   Width = 0,
   Height = 0,
   Map = "",
+  Model_Width = 0,
+  Model_Height = 0,
+  Model = "",
   
   -- Copied from BasicEntity.lua
   Properties = {
@@ -81,10 +84,12 @@ function Maze:OnInit()
     self.Width = self.Properties.iM_Width
     self.Height = self.Properties.iM_Height
     self.Map = self.Properties.file_map_txt
+    self.Model = self.Properties.object_Model
     --self:OnReset()
     
     self:SetupModel()
     self:New()    
+    
 end
 
 function Maze:OnPropertyChange()
@@ -112,7 +117,10 @@ function Maze:SetupModel()
 
     if(Properties.object_Model ~= "") then          -- Make sure objectModel is specified
         self:LoadObject(0,Properties.object_Model)  -- Load model into main entity
-
+        
+            local v1, v2 = self:GetLocalBBox()
+            self:GetModelDimensions(v1,v2);
+        
         if (Properties.Physics.bPhysicalize == 1) then -- Physicalize it
             self:PhysicalizeThis();
         end
@@ -141,12 +149,12 @@ function Maze:SetFromProperties()
 	end
     
     -- Free Slots no longer in use
-    local width, height, map = Properties.iM_Width, Properties.iM_Height, Properties.file_map_txt
+    local width, height, map, model = Properties.iM_Width, Properties.iM_Height, Properties.file_map_txt, Properties.object_Model
     Log("local width = %d, local height = %d", width, height)
     Log("Old Width = %d, Old Height = %d", self.Width, self.Height)
     Log("Old Map: "..self.Map..", New Map: "..map);
    
-    if (width < self.Width) or (height < self.Height) or (self.Map ~= map) then 
+    if (width < self.Width) or (height < self.Height) or (self.Map ~= map) or (model ~= self.Model) then 
 	   --self:FreeAllSlots();
        local totalSlots = (self.Width*2+1)*(self.Height*2+1)
        for i=1, totalSlots do
@@ -158,6 +166,7 @@ function Maze:SetFromProperties()
     self.Width = width
     self.Height = height
     self.Map = map
+    self.Model = model
     
     self:SetupModel();
 
@@ -321,9 +330,16 @@ function Maze:Wall(w, h)
         local width = self:width()*2+1
         local nSlot = (h-1)*width + w;
         
+        local objX = self.Model_Width;
+        local objY = self.Model_Height;
+        
+        Log("ObjX %d, ObjY %d", objX, objY);
+        
         self:LoadObject(nSlot, Properties.object_Model);
         -- So guess what, actual world coordinates requires further manipulation
-        self:SetSlotPos(nSlot, {x=2*(w-1),y=2*(h-1),z=0});
+        --self:SetSlotPos(nSlot, {x=2*(w-1),y=2*(h-1),z=0});
+        self:SetSlotPos(nSlot, {x=objX*(w-1),y=objY*(h-1),z=0});
+
         --[[
             This is because the block object model we use is actually 2x2
             thus, we have to multiply by 2 so the blocks don't overlap
@@ -739,6 +755,14 @@ function Maze:LinesToWorld(map_lines)
     
     self:PhysicalizeWallSlots();
     
+end
+
+function Maze:GetModelDimensions(v1, v2)
+    local v = { x=0, y=0, z=0}
+    SubVectors(v, v2, v1)
+    self.Model_Width = v.x
+    self.Model_Height = v.y;
+    Log("Model_Width = %d, Model_Height = %d", v.x, v.y);
 end
 
 -- Determine Map numbers 
