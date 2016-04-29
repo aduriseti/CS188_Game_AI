@@ -674,7 +674,10 @@ function Maze:PrintMaze(txtName) -- Optional parameter to name map
     local file = io.open(path, "w");
     
     io.output(file)
-     
+    local corSize = self.CorridorSize;
+    local corridorSizeSetting = "S= "..corSize.."\n"
+    file:write(corridorSizeSetting)
+    
    -- Top border
     for x = 1, realWidth do
         file:write("X");
@@ -780,9 +783,19 @@ function Maze:ReadMaze(my_maze_file)
     --file:close();
     io.close(file);
     
+    -- Get CorSize if it exists
+    local corSize = 1
+    local h, w = 0,0
+    local cSizeSetting = lines[1]
+    if (cSizeSetting.sub(1, 3) == "S= ") then
+        h = 1
+        corSize = tonumber(cSizeSetting.sub(3, -1))
+    end
+    
     -- Set iWidth and iHeight
-    Properties.iM_Height = (#lines-1)/2 
-    Properties.iM_Width = (#lines[1]-1)/2
+    Properties.iM_Height =   ((#lines - h)-1)/(corSize+1)
+    Properties.iM_Width = (#lines[2]-1)/(corSize+1)
+    Properties.iM_CorridorSize = corSize
     
     -- Call setFromProperties
     self:SetFromProperties();
