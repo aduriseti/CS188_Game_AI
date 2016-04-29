@@ -20,6 +20,7 @@ Maze = {
   Model_Width = 0,
   Model_Height = 0,
   Model = "",
+  CorridorSize = 0,
   
   -- Copied from BasicEntity.lua
   Properties = {
@@ -29,7 +30,8 @@ Maze = {
 	 object_Model = "objects/default/primitive_cube.cgf",
      
      file_map_txt = "Scripts\\Entities\\maps\\map_default.txt",
-     bMap_Save_TXT = 0;
+     bMap_Save_TXT = 0,
+     iM_CorridorSize = 1,
      
      --Copied from BasicEntity.lua
      Physics = {
@@ -85,6 +87,7 @@ function Maze:OnInit()
     self.Height = self.Properties.iM_Height
     self.Map = self.Properties.file_map_txt
     self.Model = self.Properties.object_Model
+    self.CorridorSize = self.Properties.iM_CorridorSize
     --self:OnReset()
     
     self:SetupModel()
@@ -97,7 +100,7 @@ function Maze:OnPropertyChange()
     
     self:SetFromProperties();
     --self:OnReset();
-    self:SetupModel()
+   -- self:SetupModel()
     self:New()
 end
 
@@ -149,12 +152,17 @@ function Maze:SetFromProperties()
 	end
     
     -- Free Slots no longer in use
-    local width, height, map, model = Properties.iM_Width, Properties.iM_Height, Properties.file_map_txt, Properties.object_Model
+    local width, height, map, model, corSize = Properties.iM_Width, Properties.iM_Height, Properties.file_map_txt, Properties.object_Model, Properties.iM_CorridorSize
     Log("local width = %d, local height = %d", width, height)
     Log("Old Width = %d, Old Height = %d", self.Width, self.Height)
     Log("Old Map: "..self.Map..", New Map: "..map);
    
-    if (width < self.Width) or (height < self.Height) or (self.Map ~= map) or (model ~= self.Model) then 
+    if (corSize ~= 1) then
+        self.Properties.iM_Height = width;
+        height = width;
+    end
+   
+    if (width < self.Width) or (height < self.Height) or (self.Map ~= map) or (model ~= self.Model) or (corSize ~= self.CorridorSize) then 
 	   --self:FreeAllSlots();
        local totalSlots = (self.Width*2+1)*(self.Height*2+1)
        for i=1, totalSlots do
@@ -162,11 +170,13 @@ function Maze:SetFromProperties()
        end
        Log("Freed all slots")
     end
+    
 	
     self.Width = width
     self.Height = height
     self.Map = map
     self.Model = model
+    self.CorridorSize = corSize
     
     self:SetupModel();
 
@@ -181,8 +191,9 @@ end
 function Maze:Border()
 
     -- Get Height and Width
-    local height = self:height()*2+1;       
-    local width = self:width()*2+1;
+    local corridorSize = self:corridorSize();
+    local height = 1+ (self:height()*(corridorSize+1));       
+    local width = 1+ (self:width()*(corridorSize+1));
         
     --[[
         The reason its multiplied by 2 and 1 is added is to 
@@ -264,10 +275,11 @@ function Maze:Border()
                
                where B is what has been filled in with walls so far
     ]]
-        
+    
+    local bGap = corridorSize+1
     -- Create Border
-    for y=1, height, 2 do 
-        for x=1, width, 2 do
+    for y=1, height, bGap do 
+        for x=1, width, bGap do
             
             self:Wall(x,y); -- This function takes an x and y coord on the graph and fills in a wall
             
@@ -279,8 +291,9 @@ end
     --Never actually used, made for testing purposes
 function Maze:DoorSpawn()
     
-    local height = self:height()*2+1;
-    local width = self:width()*2+1;
+    local corridorSize = self:corridorSize();
+    local height = 1+ (self:height()*(corridorSize+1));       
+    local width = 1+ (self:width()*(corridorSize+1));
     
     --[[ 
         Same as the comment block in CreateBorder
@@ -303,37 +316,37 @@ function Maze:DoorSpawn()
                
     ]]
     
-    -- Create doors
-    for y=1, height do
-        for x=1, width do
-        
-            -- Odd row (y is odd (1, 3, 5, 7...) ) then D is only on even X's ( (2,1), (4,1), (2,3)... )
-            if (y%2 ~=0 and x*2 <= width) then 
-                x = 2*x;
-                self:Wall(x,y);
-            elseif (y%2 ==0) then -- Even Row (y is even (2, 4, 6, ...)) then D is only on odd X's ( (1,2), (3,2), (1,4)...)
-                x = (2*x)-1;
-                self:Wall(x,y);
-            else 
-                --Otherwise do nothing...
-            end
-
+    local dGap = corridorSize+1;
+    -- For Each Room:
+    for y = 1, height, dGap do
+        for x=1, width, dGap do 
+            -- Door Bottom & Left
+                for i = 1, corridorSize do
+                    --Log("Dooring (%d, %d)", x+i, y)
+                    if(x+i <= width) then
+                        self:Wall(x+i, y)
+                    end
+                   -- Log("Dooring (%d, %d)", x, y+i)
+                    if(y+i <= height) then
+                        self:Wall(x, y+i)
+                    end
+                end 
         end
-
-    end
+    end 
+    
 end
 
--- Fills a block ( a wall) in at coordinates (w,h)
+-- Fills a block ( a wall) in at coordinates (w,h), (TAKES THE 2X,2Y COORDS)
 function Maze:Wall(w, h)
 
         local Properties = self.Properties;
-        local width = self:width()*2+1
+        local width = 1+ self:width()*(self:corridorSize()+1)
         local nSlot = (h-1)*width + w;
         
         local objX = self.Model_Width;
         local objY = self.Model_Height;
         
-        Log("ObjX %d, ObjY %d", objX, objY);
+        --Log("ObjX %d, ObjY %d", objX, objY);
         
         self:LoadObject(nSlot, Properties.object_Model);
         -- So guess what, actual world coordinates requires further manipulation
@@ -382,22 +395,22 @@ function Maze:New()
         local height = self:height() -- #rooms tall
         
         self:Border(); -- Fill in border cells with walls
-        
+        self:DoorSpawn();
         -- Setup Maze
             -- For each room in 2d array, record that there is a closed door (i.e. wall) in each direction
             -- Effectively doing what DoorSpawn() does, filling in remaining walls
         for y = 1, height do
             obj[y] = {}
             for x = 1, width do
-                obj[y][x] = { east = obj:CreateDoor(true,2*y, 2*x+1 ), north = obj:CreateDoor(true,2*y+1,2*x)}
+                obj[y][x] = { east = obj:CreateDoor(true ), north = obj:CreateDoor(true)}
                 --CreateDoor records that there is a wall there via bool value in 2d array that is obj[y][x], and fills wall in in actual 3D real world graph
                                             
             -- Doors are shared beetween the cells to avoid out of sync conditions and data dublication
             if x ~= 1 then obj[y][x].west = obj[y][x - 1].east
-            else obj[y][x].west = obj:CreateDoor(true,2*y,2*x-1) end
+            else obj[y][x].west = obj:CreateDoor(true) end
             
             if y ~= 1 then obj[y][x].south = obj[y -1 ][x].north
-            else obj[y][x].south = obj:CreateDoor(true,2*y-1,2*x) end
+            else obj[y][x].south = obj:CreateDoor(true) end
             end
         end
         
@@ -430,7 +443,7 @@ function Maze:New()
                         1   2   3   x-axis
         ]]
         
-        obj:GrowingTree(); -- This function calls the growing tree algorithm to start opening doors to create a maze 
+       obj:GrowingTree(); -- This function calls the growing tree algorithm to start opening doors to create a maze 
 
         obj:PhysicalizeWallSlots(); -- The maze has been complete, make the walls of the maze actually physical (i.e. cant go walk them)
    end
@@ -444,7 +457,7 @@ function Maze:CreateDoor(closed, h, w)
     local door = {}
     door.closed = closed and true or false -- records that door is closed  (e.g. door=true)
     
-    self:Wall(w,h)  -- Fills in block object in world at real world coordinates (w,h)
+   -- self:Wall(w,h)  -- Fills in block object in world at real world coordinates (w,h)
     
     -- Never used
     function door:IsClosed()
@@ -531,6 +544,12 @@ function Maze:height()
     return height
 end
 
+function Maze:corridorSize()
+    local Properties = self.Properties;
+    local cSize = Properties.iM_CorridorSize
+    return cSize
+end
+
 -- OOO Buddy, the fun part, picking the doors to unlock to make a maze
     -- This is the growing tree algorithm...
         --[[
@@ -555,6 +574,8 @@ function Maze:GrowingTree(selector)
     local list = { cell } -- Add random cell to list (also step 1)
     
     local width = self:width()
+    local corridorSize = self:corridorSize()
+    local realWidth = 1+ width*(self:corridorSize()+1)
 
     -- Until all neighboring cells have been visited
     while #list ~= 0 do
@@ -584,15 +605,30 @@ function Maze:GrowingTree(selector)
             local incX = self.directions[dirn.name].x;
             local incY = self.directions[dirn.name].y;
              
-            --Log("Need to open (%d, %d)", cell.x*2 + incX, cell.y*2 + incY);
-            local s = (cell.y*2+incY-1)*(2*width+1) + 2*cell.x+incX;  -- Find the slot number of the closed door in the way to get to the chosen adjacent cell.
-            --Log("Which is Slot: %d", s);
+            local nX, nY = self:CoordTransform(cell.x, cell.y)
+            
+            if (incX > 0) then 
+                incX = incX*corridorSize
+            elseif (incY > 0) then 
+                incY = incY*corridorSize
+            end 
+            
+            local s = ((nY-1)+incY)*(realWidth) +nX+incX; -- Slot of first door
+            self:OpenDoor(s);
+            
+            for d=2, corridorSize do
+                -- Free East or West doors...
+                if (incX ~= 0) then 
+                    s = s+realWidth
+                elseif (incY ~= 0) then -- Free North or south doors
+                    s = s+1
+                end
+               
+                self:OpenDoor(s);                       -- Remove wall in world that represented the door
+            end
             
             self[cell.y][cell.x][dirn.name]:Open()  -- Mark door as opened
             self[dirn.y][dirn.x].visited = true     -- Mark cell as visited
-            
-            self:OpenDoor(s);                       -- Remove wall in world that represented the door
-            
             list[#list + 1] = { x = dirn.x, y = dirn.y }  -- Add the new room just visted to list of cells that we can start branching out from
         end
 
@@ -607,7 +643,7 @@ function Maze:GrowingTree(selector)
 end
 
 function Maze:PhysicalizeWallSlots()  
-    local width, height = self:width()*2 + 1, self:height()*2+1
+    local width, height = 1+ self:width()*(self:corridorSize()+1), 1+self:height()*(self:corridorSize()+1)
  
     for i = 1, width*height do 
             if(self:IsSlotValid(i)) then
@@ -624,6 +660,7 @@ function Maze:PrintMaze(txtName) -- Optional parameter to name map
     local width = self:width()--*2+1;
     local height = self:height()--*2+1;
     
+    local realWidth = 1+width*(self:corridorSize()+1)
     local start_path = "C:\\Amazon\\Lumberyard\\1.1.0.0\\dev\\GameSDK\\Scripts\\Entities\\maps\\";
 
     --local all_maps = self:Scandir(start_path);
@@ -639,46 +676,68 @@ function Maze:PrintMaze(txtName) -- Optional parameter to name map
     io.output(file)
      
    -- Top border
-    for x = 1, width*2+1 do
+    for x = 1, realWidth do
         file:write("X");
     end
     file:write("\n");
     
+    local curLine = ""
     -- Insides
     for y = height, 1, -1 do 
-        -- 
+        curLine = ""
         for x = 1, width do
-
         
             -- Fill in walls by checking if there is a door to the west
             if(self[y][x].west.closed) then 
-                file:write("XO")
+                --file:write("XO")
+                curLine = curLine.."XO"
             else
-                file:write("OO")
+                --file:write("OO")
+                curLine = curLine.."OO"
+            end
+            -- Add additional corridor Width Size 
+            for d=2, corridorSize do
+                --file:write("O")
+                curLine = curLine.."O"
             end
             
             -- Edge case (Must fill in right vertical border)
             if(x == width) then
-                file:write("X")
+                --file:write("X")
+                curLine = curLine.."X"
             end 
             
         end
+        curLine = curLine.."\n"
+        for d=1, corridorSize do
+            file:write(curLine)
+        end
         
+        curLine = "X"
         -- Next Line, vertical border left side
-        file:write("\n");
-        file:write("X");
+        --file:write("\n");
+       -- file:write("X");
         
         for x = 1, width do 
             
             if(self[y][x].south:IsClosed()) then 
-                file:write("XX")
+                --file:write("XX")
+                for d=1, corridorSize+1 do
+                    curLine = curLine.."X"
+                end
             else 
-                file:write("OX")
+                --file:write("OX")
+                for d=1, corridorSize do
+                    curLine = curLine.."O"
+                end
+                curLine = curLine.."X"
             end 
             
         end 
         
-        file:write("\n");
+        curLine = curLine.."\n"
+        
+        file:write(curLine);
         
     end
     
@@ -691,6 +750,7 @@ end
 
 -- Reads in a txt file maze and creates it in the world
 function Maze:ReadMaze(my_maze_file)
+
     Log("In ReadMaze");
     
     local file_str;
@@ -737,6 +797,7 @@ function Maze:LinesToWorld(map_lines)
     
     Log("In LinesToWorld");
     
+    local corridorSize = self:corridorSize()
     local lines = map_lines or Maze.Lines;
     local width = #lines[1]
     local height = #lines
@@ -777,4 +838,13 @@ function Maze:Scandir(directory)
     end
     pfile:close()
     return t
+end
+
+function Maze:CoordTransform(x,y)
+    local Properties = self.Properties;
+    local corridorSize =  Properties.iM_CorridorSize;
+    
+    local nX = 2*x + ((corridorSize-1)*(x-1))
+    local nY = 2*y + ((corridorSize-1)*(y-1))
+    return nX, nY
 end
