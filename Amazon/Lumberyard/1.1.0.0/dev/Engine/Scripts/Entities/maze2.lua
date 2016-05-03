@@ -716,7 +716,7 @@ function Maze2:PrintMaze2(txtName) -- Optional parameter to name map
                 curLine = curLine.."OO"
             end
             -- Add additional corridor Width Size 
-            for d=2, corridorSize do
+            for d=2, corSize do
                 --file:write("O")
                 curLine = curLine.."O"
             end
@@ -729,7 +729,7 @@ function Maze2:PrintMaze2(txtName) -- Optional parameter to name map
             
         end
         curLine = curLine.."\n"
-        for d=1, corridorSize do
+        for d=1, corSize do
             file:write(curLine)
         end
         
@@ -742,12 +742,12 @@ function Maze2:PrintMaze2(txtName) -- Optional parameter to name map
             
             if(self[y][x].south:IsClosed()) then 
                 --file:write("XX")
-                for d=1, corridorSize+1 do
+                for d=1, corSize+1 do
                     curLine = curLine.."X"
                 end
             else 
                 --file:write("OX")
-                for d=1, corridorSize do
+                for d=1, corSize do
                     curLine = curLine.."O"
                 end
                 curLine = curLine.."X"
