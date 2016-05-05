@@ -1,6 +1,22 @@
 # CS188_Game_AI
 Github repository for quarter  project of UCLA CS188 Game AI course
 
+
+##TODO
+
+###General
+
+###Mouse
+ - [ ] Mouse/Mice freely roam maze, pick random direction at intersection, limited memory
+ - [ ] Mice detect food -> Eat state
+ - [ ] Mice detect state -> Run state
+ 
+###Snake
+  - [ ] Roam Maze
+  - [ ] Detect Mice -> chase -> kill
+ 
+
+
 Mouse Maze
 
 Mouse Maze / Rat Race / Racin' Rats
