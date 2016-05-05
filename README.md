@@ -16,7 +16,7 @@ Github repository for quarter  project of UCLA CS188 Game AI course
   - [ ] Detect Mice -> chase -> kill
  
 
-
+##Description
 Mouse Maze
 
 Mouse Maze / Rat Race / Racin' Rats
