@@ -1,0 +1,4 @@
+<Entity
+  Name="Maze_Wall"
+  Script="Scripts/Entities/userdef/Maze_Wall.lua"
+/>
