@@ -1,59 +1,117 @@
 <BehaviorTree>
   <Variables>
     <Variable name="Hungry"/>
-    <Variable name="AwareOfEnemy"/>
     <Variable name="SeenByEnemy" />
     <Variable name="AwareOfFood"/>
+    
+    <!-- Snake seen -->
+    <Variable name="HasTarget" />
+
+		<!-- these variables are not used in this BT, but need to be present to prevent a warning caused by BasicAI:OnReset() -->
     <Variable name="ExecuteSequence" />
     <Variable name="ExecuteInterruptibleSequence" />
   </Variables>
   
   <SignalVariables>
-    <Signal name="OnEnemySeen" variable="AwareOfEnemy" value="true"/>
+    <Signal name="GoTo_Search" variable="Hungry" value="true"/>
+
+    <Signal name="OnEnemySeen" variable="HasTarget" value="true"/>
     <Signal name="OnMealComplete" variable="Hungry" value="false" />
-    <Signal name="OnNoTarget" variable="AwareOfEnemy" value="false" />
+    <Signal name="OnLostSightOfTarget" variable="HasTarget" value="false" />
   </SignalVariables>
   
   <Timestamps />
   
   <Root>
     <StateMachine>
+    
+      <!--
+      =================================================
+            IDLE
+      =================================================
+      -->
 
+      <State name="Idle">
+      
+        <Transitions>
+          <Transition to="MouseSearch" onEvent="GoTo_Search" />
+        </Transitions>
+        
+          <BehaviorTree> 
+           
+            <Sequence>
+            
+              <Bubble message="Mouse is idle..." duration="5.0" balloon="true" log="true" />
+              
+              <SetAlertness value="0"/>
+              
+              <ExecuteLua code="entity.actor:HolsterItem(true)" />
+              
+              <Stance name="Relaxed" />
+              
+              <Animate name="ZZ_AI_idleBreak" />
+              
+              <SendTransitionSignal name="GoTo_Search" />
+
+              <Halt />
+              
+            </Sequence>
+            
+          </BehaviorTree>
+          
+      </State>
+      
       <!--
       =================================================
           SEARCH FOR FOODS
       =================================================
       -->
-      <State name="Idle">
-        <Transition to="MouseSearch" onEvent="OnForcedExecute" />
-          <BehaviorTree>  
-            <Sequence>
-              <Log message="Mouse is idle..." />
-            </Sequence>
-          </BehaviorTree>
-      </State>
-
+      
       <State name="MouseSearch">
       
         <Transitions>
-          <Transition to= "MouseSleep" onEvent="OnMealComplete" />
-          <Transition to= "MouseAvoid" onEvent="OnEnemySeen" />
+          <Transition to="Idle" onEvent="GoTo_Idle" />
+          <Transition to="MouseSleep" onEvent="OnMealComplete" />
+          <Transition to="MouseAvoid" onEvent="OnEnemySeen" />
         </Transitions>
         
         <BehaviorTree>
         
           <Sequence>
           
-            <Log message="IM SEARCHING: Where my food at?"/>
+            <Bubble message="IM SEARCHING: Where my food at?" duration="5.0" balloon="true" log="true" />
 
-            <SetAlertness value="0"/>
+            <SetAlertness value="1"/>
 
             <!--
             <Stance name="Run"/> 
             -->
+            
+            <Stance name="Alerted" />
+            
+            <!-- main loop -->
+            <Loop _startLog="main loop">
+              
+                <Sequence>
+                    
+                   <!--
+                    <Move to="Target" speed="Run" stance="Stand" avoidDangers="0" stopWithinDistance="1" />
+                    -->
+                    
+                    <ExecuteLua code="entity:Search()"/>  
+                    
+                    <Selector>
+                    
+                        <AssertCondition condition="Hungry" />
+                        
+                        <SendTransitionSignal name="OnMealComplete" />
+                    
+                    </Selector>
 
-            <ExecuteLua code="entity:Search()"/>  
-          
+                </Sequence>
+              
+            </Loop>
+                      
           </Sequence>
         
         </BehaviorTree>
@@ -67,27 +125,33 @@
       -->
       <State name="MouseSleep">
       
-        <Transitions>
-          
-        </Transitions>
+          <Transitions>
+              <Transition to="Idle" onEvent="GoTo_Idle" />
+          </Transitions>
         
-        <BehaviorTree>
-        
-          <Sequence>
-          
-            <Log message="SLEEPING: I'm full... zzzzz..."/>
+            <BehaviorTree>
+            
+              <Sequence>
+              
+                <Bubble message="SLEEPING: I'm full... zzzzz..." duration="5.0" balloon="true" log="true" />
 
-            <SetAlertness value="0"/>
+                <SetAlertness value="0"/>
+                
+                <ExecuteLua code="entity:Sleep()"/>
 
-            <!--
-            <Stance name="Sleeping"/>
-            -->
-
-            <ExecuteLua code="entity:Sleep()"/>
-          
-          </Sequence>
-        
-        </BehaviorTree>
+                <!--
+                <Stance name="Sleeping"/>
+                -->
+                
+                <Stance name="Relaxed" />
+                
+                <Animate name="ZZ_AI_idleBreak" />
+                
+                <Halt/>
+              
+              </Sequence>
+            
+            </BehaviorTree>
         
         </State>
 
@@ -99,18 +163,45 @@
         <State name= "MouseAvoid">
         
           <Transitions>
-            <Transition to= "MouseSearch" onEvent="OnNoTargetAwareness" />
+            <Transition to="Idle" onEvent="GoTo_Idle" />
+            <Transition to="MouseSearch" onEvent="OnLostSightOfTarget" />
+            
           </Transitions>
           
           <BehaviorTree>
           
             <Sequence>
             
-            <Log message="DANGER: Oh shit!"/>
+                <Bubble message="DANGER: Oh shit!" duration="5.0" balloon="true" log="true" />
 
-            <SetAlertness value="2"/>
-
-            <ExecuteLua code="entity:Avoid()"/>
+                <SetAlertness value="2"/>
+                
+                <Stance name="Alerted" />
+                
+                <!-- main loop -->
+                <Loop _startLog="main loop">
+                    
+                    <Sequence>
+                        
+                        <!--
+                        <Move to="Target" speed="Run" stance="Stand" avoidDangers="2" stopWithinDistance="1" />
+                        -->
+                        
+                        <ExecuteLua code="entity:Avoid()"/>
+                        
+                        <Selector>
+                        
+                          <AssertCondition condition="HasTarget" />
+                          
+                          <SendTransitionSignal name="OnLostSightOfTarget" />
+                        
+                        </Selector>
+                    
+                    </Sequence>
+                
+                </Loop>
+                
+                <Halt />
             
             </Sequence>
           
