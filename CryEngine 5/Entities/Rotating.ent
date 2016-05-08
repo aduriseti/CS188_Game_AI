@@ -1,0 +1,4 @@
+<Entity
+  Name="Rotating"
+  Script="Scripts/Entities/userdef/rotating.lua"
+/>

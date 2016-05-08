@@ -1,0 +1,4 @@
+<Entity
+  Name="Maze2"
+  Script="Scripts/Entities/userdef/maze2.lua"
+/>

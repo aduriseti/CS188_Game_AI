@@ -1,0 +1,4 @@
+<Entity
+  Name="Mouse"
+  Script="Scripts/Entities/userdef/mouse.lua"
+/>
