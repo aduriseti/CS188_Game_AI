@@ -29,8 +29,8 @@ Maze2 = {
   -- Copied from BasicEntity.lua
   Properties = {
      bUsable = 0,
-	 iM_Width = 5,
-     iM_Height = 5,
+	 iM_Width = 20,
+     iM_Height = 20,
 	 object_Model = "objects/default/primitive_cube.cgf",
      
      file_map_txt = "Scripts\\Entities\\maps\\map_default.txt",
@@ -355,11 +355,13 @@ function Maze2:Wall(w, h)
 
         --Log("Spawning at (%d, %d)", sx, sy);
         local spawnPos = {x=sx,y=sy,z=32}
-
+        local dVec = self:GetDirectionVector()
+        --LogVec("Maze orientation: ", dVec)
         local params = {
             class = "Maze_Wall";
             name = "WALLS";
             position = spawnPos;
+            orientation = dVec;
             properties = {
                 object_Model = self.Model;
             };
