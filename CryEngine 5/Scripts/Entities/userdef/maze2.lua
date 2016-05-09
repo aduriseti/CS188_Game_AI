@@ -59,6 +59,10 @@ Maze2 = {
   
     -- Read in Maze2 File to lines:
   Lines = {},
+  
+  --two dimensional table containing information about each cell (not door) in the maze
+  --actually maybe don't want to do that
+  --obj = {},
 };
 
 -- I DUNNO WTF THIS IS I COPIED FROM BasicEntity.lua
@@ -333,6 +337,30 @@ function Maze2:DoorSpawn()
                 end 
         end
     end 
+end
+
+function Maze2:wh_to_nslot(w, h) 
+	local width = 1+ self:width()*(self:corridorSize()+1)
+	return ((h-1)*width + w)
+end
+
+function Maze2:rowcol_to_nslot(row, col)
+	local h = row;
+	local w = col;
+	local width = 1+ self:width()*(self:corridorSize()+1);
+	return(h-1)*width + w;
+end
+
+function Maze2:wh_to_pos(w, h)
+	return {x = self.Model_Width*(w-1) + self.Origin.x, 
+		y = self.Model_Height*(h-1) + self.Origin.y};
+end
+
+function Maze2:rowcol_to_pos(row, col) 
+	local h = row;
+	local w = col;
+	return {x = self.Model_Width*(w-1) + self.Origin.x, 
+		y = self.Model_Height*(h-1) + self.Origin.y};
 end
 
 -- Spawn a wall at coordinates (w,h)
