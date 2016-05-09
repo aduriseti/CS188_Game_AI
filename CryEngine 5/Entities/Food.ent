@@ -1,0 +1,4 @@
+<Entity 
+Name="Food"
+ Script="Scripts/Entities/userdef/Food.lua"
+/>
