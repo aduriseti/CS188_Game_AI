@@ -4,7 +4,7 @@ Mouse = {
     Properties = {
         object_Model = "objects/default/primitive_cube_small.cgf",
         fRotSpeed = 3, --[0.1, 20, 0.1, "Speed of rotation"]
-		m_speed = 0.1;
+		m_speed = 0.05;
         --maze_ent_name = "Maze1",
 		maze_ent_name = "",
         bActive = 0,
@@ -102,6 +102,8 @@ function Mouse:OnReset()
 		self:Activate(self.Properties.bActive); --set OnUpdate() on/off
 		self.angles = self:GetAngles(); --gets the current angles of Mouse
 		self.pos = self:GetPos(); --gets the current position of Mouse
+		self.pos.z = 33;
+		self:SetPos({self.pos.x, self.pos.y, self.pos.z});
 		
 		Log("XPos: " .. tostring(self.pos.x));
 		
@@ -143,7 +145,7 @@ function Mouse:OnReset()
 		for row = 1, self.Maze_Properties.height do
 			for col = 1, self.Maze_Properties.width do
 				if self.Maze_Properties.grid[row][col].occupied == false then
-					--self:move_xy(self.Maze_Properties.ID:rowcol_to_pos(row, col));
+					self:move_xy(self.Maze_Properties.ID:rowcol_to_pos(row, col));
 					return;
 				end
 			end
@@ -162,6 +164,13 @@ end
 
 function Mouse:turnLeftAlways()
 	--STATUS: Not finished for maze2
+	
+	local rowcol = Mouse.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+	
+	local row = rowcol.row;
+	local col = rowcol.col;
+	
+	
 end
 
 function Mouse:depthFirstSearch()
@@ -170,10 +179,68 @@ end
 
 function Mouse:randomWalk() 
 	--STATUS: Cryengine only - will push when works with lumberyard
+	
+	local rowcol = Mouse.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+	
+	local row = rowcol.row;
+	local col = rowcol.col;
+	
+end
+
+function Mouse:clockwiseWalk(frameTime) 
+	local rowcol = Mouse.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+	
+	local row = rowcol.row;
+	local col = rowcol.col;
+	
+	if self.Maze_Properties.grid[row + 1][col] ~= nil and self.Maze_Properties.grid[row + 1][col].occupied == false then
+	
+		
+		local pos = self.Maze_Properties.ID:rowcol_to_pos(row+1, col);
+		
+		self:Move_to_Pos(frameTime, pos);
+		
+		return;
+	else if self.Maze_Properties.grid[row - 1][col] ~= nil and self.Maze_Properties.grid[row - 1][col].occupied == false then
+	
+		
+		local pos = self.Maze_Properties.ID:rowcol_to_pos(row-1, col);
+		
+		self:Move_to_Pos(frameTime, pos);
+		return;
+		
+	else if self.Maze_Properties.grid[row][col + 1] ~= nil and self.Maze_Properties.grid[row][col + 1].occupied == false then
+	
+		
+		local pos = self.Maze_Properties.ID:rowcol_to_pos(row, col + 1);
+		
+		self:Move_to_Pos(frameTime, pos);
+		return;
+		
+	else if self.Maze_Properties.grid[row][col - 1] ~= nil and self.Maze_Properties.grid[row][col - 1].occupied == false then
+	
+		
+		local pos = self.Maze_Properties.ID:rowcol_to_pos(row+1, col);
+		
+		self:Move_to_Pos(frameTime, pos);
+		return;
+	end
 end
 
 function Mouse:raytrace()
 	--STATUS: totally broken - will work on tomorrow
+end
+
+function Mouse:breathing_animation(frameTime)
+	local cycle_time = 50;
+	local new_scale = 0.9+(0.2 * cycle_time % frameTime );
+	--Log("New scale " .. tostring(new_scale));
+	--self.SetScale(new_scale);
+	
+	
+	Log("cycle" .. tostring(frameTime));
+	Log("New height" .. tostring(32 + 0.9+(0.2 * frameTime % cycle_time)));
+	self:SetPos({self.pos.x, self.pos.y, 32 + 0.9+(0.2/50 * frameTime % cycle_time)});
 end
 
 function Mouse:OnUpdate(frameTime)
@@ -181,7 +248,7 @@ function Mouse:OnUpdate(frameTime)
 	--Log("Frame at time" .. tostring(frameTime))
 	
 	if (self.state == "search") then
-		self:turnLeftAlways();
+		--self:turnLeftAlways();
 	elseif (self.state == "run") then
 	
 	elseif (self.state == "eat") then
@@ -189,10 +256,17 @@ function Mouse:OnUpdate(frameTime)
 	else 
 	
 	end
-	self:FollowPlayer(frameTime);
+	--self:turnLeftAlways();
+	--self:FollowPlayer(frameTime);
+	--self:breathing_animation(frameTime);
 	--self:MoveXForward();
     --self:FaceAt(self.mazeID, frameTime); 
+	
+	--self:randomWalk();
+	
+	self.clockwiseWalk(frameTime);
 end
+
 
 function Mouse:MoveXForward() 
 	self:move_xy({x = (self.pos.x + self.Properties.m_speed), y = self.pos.y});
@@ -200,10 +274,30 @@ function Mouse:MoveXForward()
 	
 end
 
+function Mouse:Move_to_Pos(frameTime, pos) 
+	--self:FaceAt_ID(self.Player_Properties.ID, frameTime);
+	local a = self.pos;
+	local b = pos;
+	self:FaceAt(b, frameTime);
+	--local b = self.Player_Properties.ID:GetPos();
+	local diff = {x = b.x - a.x, y = b.y - a.y};
+	local diff_mag = math.sqrt(diff.x^2 + diff.y^2);
+	if diff_mag < 5 then
+		return;
+	end
+	local speed_mag = self.Properties.m_speed / diff_mag;
+	self:move_xy({x = a.x + diff.x * speed_mag,
+		y = a.y + diff.y * speed_mag});
+	--Log("X: " .. tostring(self.angles.x));
+	--Log("Z: " .. tostring(self.angles.z));
+	
+end
+
 function Mouse:FollowPlayer(frameTime)
-	self:FaceAt(self.Player_Properties.ID, frameTime);
+	self:FaceAt_ID(self.Player_Properties.ID, frameTime);
 	local a = self.pos;
 	local b = self.Player_Properties.ID:GetPos();
+	--local b = self.Player_Properties.ID:GetPos();
 	local diff = {x = b.x - a.x, y = b.y - a.y};
 	local diff_mag = math.sqrt(diff.x^2 + diff.y^2);
 	if diff_mag < 5 then
@@ -216,9 +310,22 @@ function Mouse:FollowPlayer(frameTime)
 	--Log("Z: " .. tostring(self.angles.z));
 end
 
+function Mouse:FaceAt(pos, fT)
+	--Log("In FaceAt");
+    local a = self.pos;
+    local b = pos;
+    local newAngle = math.atan2 (b.y-a.y, b.x-a.x);    
+    
+    local difference =((((newAngle - self.angles.z) % (2 * math.pi)) + (3 * math.pi)) % (2 * math.pi)) - math.pi;
+    newAngle = (self.angles.z + difference);
+    
+    self.angles.z = Lerp(self.angles.z, newAngle, (self.Properties.fRotSpeed*fT));  
+    self:SetAngles(self.angles);
+
+end
 
 
-function Mouse:FaceAt(ID, fT)
+function Mouse:FaceAt_ID(ID, fT)
 	--Log("In FaceAt");
     local a = self.pos;
     local b = ID:GetPos();
