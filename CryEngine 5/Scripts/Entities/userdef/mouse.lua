@@ -180,7 +180,7 @@ end
 function Mouse:randomWalk() 
 	--STATUS: Cryengine only - will push when works with lumberyard
 	
-	local rowcol = Mouse.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
 	
 	local row = rowcol.row;
 	local col = rowcol.col;
@@ -188,12 +188,12 @@ function Mouse:randomWalk()
 end
 
 function Mouse:clockwiseWalk(frameTime) 
-	local rowcol = Mouse.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
 	
 	local row = rowcol.row;
 	local col = rowcol.col;
 	
-	if self.Maze_Properties.grid[row + 1][col] ~= nil and self.Maze_Properties.grid[row + 1][col].occupied == false then
+	if self.Maze_Properties.grid[row+1] ~=nil and  self.Maze_Properties.grid[row + 1][col] ~= nil and self.Maze_Properties.grid[row + 1][col].occupied == false then
 	
 		
 		local pos = self.Maze_Properties.ID:rowcol_to_pos(row+1, col);
@@ -201,7 +201,7 @@ function Mouse:clockwiseWalk(frameTime)
 		self:Move_to_Pos(frameTime, pos);
 		
 		return;
-	else if self.Maze_Properties.grid[row - 1][col] ~= nil and self.Maze_Properties.grid[row - 1][col].occupied == false then
+	elseif self.Maze_Properties.grid[row-1] ~=nil and self.Maze_Properties.grid[row - 1][col] ~= nil and self.Maze_Properties.grid[row - 1][col].occupied == false then
 	
 		
 		local pos = self.Maze_Properties.ID:rowcol_to_pos(row-1, col);
@@ -209,7 +209,7 @@ function Mouse:clockwiseWalk(frameTime)
 		self:Move_to_Pos(frameTime, pos);
 		return;
 		
-	else if self.Maze_Properties.grid[row][col + 1] ~= nil and self.Maze_Properties.grid[row][col + 1].occupied == false then
+	elseif self.Maze_Properties.grid[row][col + 1] ~= nil and self.Maze_Properties.grid[row][col + 1].occupied == false then
 	
 		
 		local pos = self.Maze_Properties.ID:rowcol_to_pos(row, col + 1);
@@ -217,14 +217,17 @@ function Mouse:clockwiseWalk(frameTime)
 		self:Move_to_Pos(frameTime, pos);
 		return;
 		
-	else if self.Maze_Properties.grid[row][col - 1] ~= nil and self.Maze_Properties.grid[row][col - 1].occupied == false then
+	elseif self.Maze_Properties.grid[row][col - 1] ~= nil and self.Maze_Properties.grid[row][col - 1].occupied == false then
 	
 		
 		local pos = self.Maze_Properties.ID:rowcol_to_pos(row+1, col);
 		
 		self:Move_to_Pos(frameTime, pos);
 		return;
+		else
+		
 	end
+	
 end
 
 function Mouse:raytrace()
@@ -264,7 +267,7 @@ function Mouse:OnUpdate(frameTime)
 	
 	--self:randomWalk();
 	
-	self.clockwiseWalk(frameTime);
+	self:clockwiseWalk(frameTime);
 end
 
 

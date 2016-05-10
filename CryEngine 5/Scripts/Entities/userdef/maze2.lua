@@ -363,13 +363,13 @@ function Maze2:rowcol_to_pos(row, col)
 		y = self.Model_Height*(h-1) + self.Origin.y};
 end
 
-function Maze2:pos_to_rowcol(pos) {
+function Maze2:pos_to_rowcol(pos) 
 	local x = pos.x;
 	local y = pos.y;
 	
 	return {col = (math.floor((x - self.Origin.x)/self.Model_Width)), 
-		row = (math.floor((y - self.Origin.y)/self.Model_Height));
-}
+		row = (math.floor((y - self.Origin.y)/self.Model_Height))};
+end
 
 -- Spawn a wall at coordinates (w,h)
 function Maze2:Wall(w, h)
