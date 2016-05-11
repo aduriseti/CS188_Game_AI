@@ -1,0 +1,4 @@
+<Entity
+  Name="LivingEntityBase"
+  Script="Scripts/Entities/userdef/LivingEntityBase.lua"
+/>
