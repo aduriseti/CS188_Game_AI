@@ -359,6 +359,9 @@ end
 function Maze2:rowcol_to_pos(row, col) 
 	local h = row;
 	local w = col;
+	
+	--local x_val = 
+	
 	return {x = self.Model_Width*(w-1) + self.Origin.x, 
 		y = self.Model_Height*(h-1) + self.Origin.y};
 end
