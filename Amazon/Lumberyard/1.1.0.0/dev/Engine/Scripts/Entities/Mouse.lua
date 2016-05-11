@@ -82,7 +82,7 @@ function Mouse:OnUpdate(frameTime)
 
 	--self:randomWalk();
 
-	self:directionalWalk(frameTime);
+	self:randomDirectionalWalk(frameTime);
 
 end
 
@@ -119,22 +119,37 @@ function Mouse:randomWalk()
 
 end
 
+function Mouse:getUnoccupiedNeighbors(loc_row, loc_col)
+	local empty_neighbors = {};
+	for key,value in pairs(self.directions) do
+		local loc_row_inc = value.row_inc;
+		local loc_col_inc = value.col_inc;
+		if self.Maze_Properties.grid[loc_row+loc_row_inc][loc_col+loc_col_inc].occupied == false then
+			--Log("continue moving in same direction");
+			--Log(tostring(loc_row + loc_row_inc));
+			--Log(tostring(loc_col + loc_col_inc));
+			empty_neighbors[#empty_neighbors+1] = {row = loc_row + loc_row_inc, col = loc_col + loc_col_inc, direction = value};
+			--Log(tostring(#empty_neighbors));
+		end
+	end
+	
+	return empty_neighbors;
+end
 
-
-function Mouse:directionalWalk(frameTime)
-
+function Mouse:randomDirectionalWalk(frameTime)
+	
 	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
 	
 	local row = rowcol.row;
 	local col = rowcol.col;
 	
-	local row_inc = self.direction.row_inc;
-	local col_inc = self.direction.col_inc;
+	local loc_row_inc = self.direction.row_inc;
+	local loc_col_inc = self.direction.col_inc;
 	
-	if row_inc ~= 0 or col_inc ~= 0 then
-		if self.Maze_Properties.grid[row+row_inc][col+col_inc].occupied == false then
+	if loc_row_inc ~= 0 or loc_col_inc ~= 0 then
+		if self.Maze_Properties.grid[row+loc_row_inc][col+loc_col_inc].occupied == false then
 			--Log("continue moving in same direction");
-			local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+row_inc, col + col_inc);
+			local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
 			self:Move_to_Pos(frameTime, target_pos);
 			return;
 		end
@@ -151,97 +166,60 @@ function Mouse:directionalWalk(frameTime)
 	Log(tostring(self.Maze_Properties.grid[row][col - 1].occupied));
 	--]]
 	
-	if self.Maze_Properties.grid[row + 1][col].occupied == false then
-		
-		--Log("can move up");
-		self.direction = self.directions.up;
-		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row + 1, col);
-		
-		self:Move_to_Pos(frameTime, target_pos);
-		return;
+	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
 	
-
-	elseif self.Maze_Properties.grid[row][col + 1].occupied == false then
-		
-		--Log("can move right");
-		self.direction = self.directions.right;
-		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row, col + 1);
-		self:Move_to_Pos(frameTime, target_pos);
-		return;
-		
-	elseif self.Maze_Properties.grid[row - 1][col].occupied == false then
-			
-		--Log("can move down");
-		self.direction = self.directions.down;
-		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row-1, col);
-		self:Move_to_Pos(frameTime, target_pos);
-		return;
-		
-	elseif self.Maze_Properties.grid[row][col - 1].occupied == false then
-		
-		Log ("can move left");
-		self.direction = self.directions.left;
-		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row, col - 1);
-		self:Move_to_Pos(frameTime, target_pos);
-		return;
+	--Log(tostring(#empty_neighbors));
 	
-	else end
-
+	local rnd_idx = random(#empty_neighbors);
+	self.direction = empty_neighbors[rnd_idx].direction;
+	local target_cell = empty_neighbors[rnd_idx];
+	local target_pos = self.Maze_Properties.ID:rowcol_to_pos(target_cell.row, target_cell.col);
+	self:Move_to_Pos(frameTime, target_pos);
 end
 
-
-
-function Mouse:shittyWalk(frameTime) 
+function Mouse:directionalWalk(frameTime)
 
 	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
 	
 	local row = rowcol.row;
 	local col = rowcol.col;
+	
+	local loc_row_inc = self.direction.row_inc;
+	local loc_col_inc = self.direction.col_inc;
+	
+	if loc_row_inc ~= 0 or loc_col_inc ~= 0 then
+		if self.Maze_Properties.grid[row+loc_row_inc][col+loc_col_inc].occupied == false then
+			--Log("continue moving in same direction");
+			local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
+			self:Move_to_Pos(frameTime, target_pos);
+			return;
+		end
+	end
 
 	--[[
 	Log("row: " .. tostring(row));
 	Log("col: " .. tostring(col));
 	
-	--Log(tostring(row) .. tostring(col));
 	Log(tostring(self.Maze_Properties.grid[row][col].occupied));
 	Log(tostring(self.Maze_Properties.grid[row + 1][col].occupied));
 	Log(tostring(self.Maze_Properties.grid[row - 1][col].occupied));
 	Log(tostring(self.Maze_Properties.grid[row][col + 1].occupied));
 	Log(tostring(self.Maze_Properties.grid[row][col - 1].occupied));
-	]]--
+	--]]
 	
-	if self.Maze_Properties.grid[row + 1][col].occupied == false then
-		
-		Log("can move up");
-		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row + 1, col);
-		self:Move_to_Pos(frameTime, target_pos);
-		return;
 	
+	for key,value in pairs(self.directions) do
+		loc_row_inc = value.row_inc;
+		loc_col_inc = value.col_inc;
+		if self.Maze_Properties.grid[row+loc_row_inc][col+loc_col_inc].occupied == false then
+			--Log("continue moving in same direction");
+			self.direction = {row_inc = loc_row_inc, col_inc = loc_col_inc};
+			local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
+			self:Move_to_Pos(frameTime, target_pos);
+			return;
+		end
+	end
 
-	elseif self.Maze_Properties.grid[row][col + 1].occupied == false then
-		
-		Log("can move right");
-		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row, col + 1);
-		self:Move_to_Pos(frameTime, target_pos);
-		return;
-		
-	elseif self.Maze_Properties.grid[row - 1][col].occupied == false then
-			
-		
-		Log("can move down");
-		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row-1, col);	
-		self:Move_to_Pos(frameTime, target_pos);
-		return;
-		
-		
-	elseif self.Maze_Properties.grid[row][col - 1].occupied == false then
-		
-		Log ("can move left");
-		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row, col - 1);
-		self:Move_to_Pos(frameTime, target_pos);
-		return;
-	
-	else end
 end
 
 
