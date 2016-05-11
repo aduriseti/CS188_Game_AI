@@ -2,7 +2,7 @@ Mouse = {
 	type = "Mouse",
 	
     Properties = {
-        object_Model = "objects/default/primitive_cube_small.cgf",
+        object_Model = "objects/characters/animals/rat/rat.cdf",
         fRotSpeed = 3, --[0.1, 20, 0.1, "Speed of rotation"]
 		m_speed = 0.05;
         --maze_ent_name = "Maze1",
