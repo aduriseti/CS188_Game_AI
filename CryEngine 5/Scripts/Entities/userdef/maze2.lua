@@ -367,8 +367,21 @@ function Maze2:pos_to_rowcol(pos)
 	local x = pos.x;
 	local y = pos.y;
 	
-	return {col = (math.floor((x - self.Origin.x)/self.Model_Width)), 
-		row = (math.floor((y - self.Origin.y)/self.Model_Height))};
+	local grid_dec_x = ((x - self.Origin.x)/self.Model_Width) + 1;
+	local grid_dec_y = ((y - self.Origin.y)/self.Model_Height) + 1;
+	
+	--[[
+	Log("In pos to rowcol");
+	
+	Log("Pos x: " .. tostring(pos.x));
+	Log("Pos y: " .. tostring(pos.y));
+	
+	Log("Grid decimal " .. tostring(grid_dec_x));
+	Log("Grid decimal " .. tostring(grid_dec_y));
+	]]--
+	
+	return {col = math.floor(grid_dec_x), 
+		row = math.floor(grid_dec_y)};
 end
 
 -- Spawn a wall at coordinates (w,h)
@@ -555,6 +568,7 @@ end
 function Maze2:OpenDoor(s)
     --Log("Freeing Slot: %d", s)
     self.myWalls[s]:DeleteThis();
+	self.myWalls[s] = nil;
     --Log("Freed")
 end
 

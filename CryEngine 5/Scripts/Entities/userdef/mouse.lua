@@ -2,7 +2,7 @@ Mouse = {
 	type = "Mouse",
 	
     Properties = {
-        object_Model = "objects/characters/animals/rat/rat.cdf",
+        object_Model = "objects/default/primitive_cube_small.cgf",
         fRotSpeed = 3, --[0.1, 20, 0.1, "Speed of rotation"]
 		m_speed = 0.05;
         --maze_ent_name = "Maze1",
@@ -99,7 +99,6 @@ function Mouse:OnReset()
 		
 		self.state = "search";
 		
-		self:Activate(self.Properties.bActive); --set OnUpdate() on/off
 		self.angles = self:GetAngles(); --gets the current angles of Mouse
 		self.pos = self:GetPos(); --gets the current position of Mouse
 		self.pos.z = 33;
@@ -142,15 +141,31 @@ function Mouse:OnReset()
 			end
 		end
 		
-		for row = 1, self.Maze_Properties.height do
-			for col = 1, self.Maze_Properties.width do
-				if self.Maze_Properties.grid[row][col].occupied == false then
-					self:move_xy(self.Maze_Properties.ID:rowcol_to_pos(row, col));
-					return;
+		(function ()
+		
+			for row = 1, self.Maze_Properties.height do
+				for col = 1, self.Maze_Properties.width do
+					if self.Maze_Properties.grid[row][col].occupied == false then
+						--Log("Pos x: " .. tostring(self.pos.x));
+						--Log("Pos y: " .. tostring(self.pos.y));
+						--Log("GetPos x: " .. tostring(self:GetPos().x));
+						--Log("GetPos y: " .. tostring(self:GetPos().y));
+						--Log("Row: " .. tostring(row));
+						--Log("Col: " .. tostring(col));
+						self:move_xy(self.Maze_Properties.ID:rowcol_to_pos(row, col));
+						--Log("Pos x: " .. tostring(self.pos.x));
+						--Log("Pos y: " .. tostring(self.pos.y));
+						--Log("GetPos x: " .. tostring(self:GetPos().x));
+						--Log("GetPos y: " .. tostring(self:GetPos().y));
+						return;
+					end
 				end
 			end
-		end
 		
+		end ) ()
+		
+		self:Activate(self.Properties.bActive); --set OnUpdate() on/off
+
    
    else Log("Error: Modelname not found!"); end
 end
@@ -188,45 +203,84 @@ function Mouse:randomWalk()
 end
 
 function Mouse:clockwiseWalk(frameTime) 
-	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+	
+	--System.ShowDebugger();
+	
+	--[[
+	Log("Pos x: " .. tostring(self.pos.x));
+	Log("Pos y: " .. tostring(self.pos.y));
+	Log("GetPos x: " .. tostring(self:GetPos().x));
+	Log("GetPos y: " .. tostring(self:GetPos().y));
+	]]--
+	
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
 	
 	local row = rowcol.row;
 	local col = rowcol.col;
+
+	--[[
+	Log("row: " .. tostring(row));
+	Log("col: " .. tostring(col));
 	
-	if self.Maze_Properties.grid[row+1] ~=nil and  self.Maze_Properties.grid[row + 1][col] ~= nil and self.Maze_Properties.grid[row + 1][col].occupied == false then
+	Log(tostring(row) .. tostring(col));
+	Log(tostring(self.Maze_Properties.grid[row][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row + 1][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row - 1][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row][col + 1].occupied));
+	Log(tostring(self.Maze_Properties.grid[row][col - 1].occupied));
+	]]--
 	
+	if 
+	--[[self.Maze_Properties.grid[row + 1] ~=nil 
+			and self.Maze_Properties.grid[row + 1][col] ~= nil 
+			and ]]
+			self.Maze_Properties.grid[row + 1][col].occupied == false then
 		
-		local pos = self.Maze_Properties.ID:rowcol_to_pos(row+1, col);
+		Log("can move up");
+		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row + 1, col);
 		
-		self:Move_to_Pos(frameTime, pos);
+		Log("Pos x: " .. tostring(self.pos.x));
+		Log("Pos y: " .. tostring(self.pos.y));
+		Log("GetPos x: " .. tostring(self:GetPos().x));
+		Log("GetPos y: " .. tostring(self:GetPos().y));
 		
+		Log("Target Pos x: " .. tostring(target_pos.x));
+		Log("Target Pos y: " .. tostring(target_pos.y));
+
+		self:Move_to_Pos(frameTime, target_pos);
 		return;
-	elseif self.Maze_Properties.grid[row-1] ~=nil and self.Maze_Properties.grid[row - 1][col] ~= nil and self.Maze_Properties.grid[row - 1][col].occupied == false then
 	
+	elseif 
+		--[[self.Maze_Properties.grid[row - 1] ~=nil 
+			and self.Maze_Properties.grid[row - 1][col] ~= nil 
+			and ]]
+			self.Maze_Properties.grid[row - 1][col].occupied == false then
+			
 		
+		Log("can move down");
 		local pos = self.Maze_Properties.ID:rowcol_to_pos(row-1, col);
-		
 		self:Move_to_Pos(frameTime, pos);
 		return;
 		
-	elseif self.Maze_Properties.grid[row][col + 1] ~= nil and self.Maze_Properties.grid[row][col + 1].occupied == false then
-	
+	elseif --self.Maze_Properties.grid[row][col + 1] ~= nil 
+			--and 
+			self.Maze_Properties.grid[row][col + 1].occupied == false then
 		
+		Log("can move right");
 		local pos = self.Maze_Properties.ID:rowcol_to_pos(row, col + 1);
-		
 		self:Move_to_Pos(frameTime, pos);
 		return;
 		
-	elseif self.Maze_Properties.grid[row][col - 1] ~= nil and self.Maze_Properties.grid[row][col - 1].occupied == false then
+	elseif --self.Maze_Properties.grid[row][col - 1] ~= nil 
+			--and 
+			self.Maze_Properties.grid[row][col - 1].occupied == false then
+		
+		Log ("can move left");
+		local pos = self.Maze_Properties.ID:rowcol_to_pos(row, col - 1);
+		self:Move_to_Pos(frameTime, pos);
+		return;
 	
-		
-		local pos = self.Maze_Properties.ID:rowcol_to_pos(row+1, col);
-		
-		self:Move_to_Pos(frameTime, pos);
-		return;
-		else
-		
-	end
+	else end
 	
 end
 
