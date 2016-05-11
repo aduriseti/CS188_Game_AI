@@ -2,15 +2,18 @@
  
     <Property name="version" type="string"/>
  
-    <Table name="test">
-        <Property name="a" type="string"/>
-        <Property name="b" type="int" optional="1"/>
-        <Array name="c" type="string" elementName="Val"/>
-        <Array name="d" elementName="Value">
-           <Property name="da" type="float"/>
-           <Property name="db" type="Vec3"/>
+    <Table name="mouseDataTable">
+        <Property name="EnemyInMemory" type="bool"/>
+        <Property name="LeftTurnTendency" type="float" />
+        <Property name="Boldness" type="float"/>
+        <Array name="ToEat" type="string" elementName="FoodType"/>
+        <Array name="FoodLocations" elementName="FoodType">
+           <Property name="FoodType" type="string" />
+           <Property name="LocationGeneral" type="string"/>
+           <Property name="LocationVec" type="Vec3" optional="1"/>
         </Array>
-        <Property name="e" type="int"/>
+        <Array name="KnownDangerEnts" type="string" elementName="Killer" />
+        <Array name="Allies" type="string" elementName="Mouse" />
     </Table>
      
 </Definition>
