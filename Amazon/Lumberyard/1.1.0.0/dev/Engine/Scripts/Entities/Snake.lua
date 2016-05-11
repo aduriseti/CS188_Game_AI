@@ -1,3 +1,8 @@
+--CryEngine
+--Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
+--Lumberyard
+Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
+
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    Snake Table Declaration                 ---------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
@@ -10,7 +15,11 @@ Snake = {
 	max_patrol = 5,
     cur_patrol = 0,
     cur_direction = "NorthEast",
-	state = "",
+	
+	States = {
+		"Patrol",
+		"Eat",
+	},
 	
     Properties = {
         --object_Model = "objects/characters/animals/reptiles/snake/snake.cdf",
@@ -51,13 +60,69 @@ Snake = {
 	
 };
 
+MakeDerivedEntityOverride(Snake, LivingEntityBase);
+
+----------------------------------------------------------------------------------------------------------------------------------
+-------------------------                    Snake States                 ---------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------
+Snake.Patrol =
+ {
+
+  OnBeginState = function(self)
+
+    self:Patrol();
+
+  end,
+
+  OnUpdate = function(self,time)
+  	
+	self:Patrol()
+    --if (--[[ SEE MOUSE ]]) then
+      --self:GotoState("Eat");
+    --end
+
+  end,
+
+  OnEndState = function(self)
+
+  end,
+
+ }
+
+Snake.Eat =
+{
+	OnBeginState = function(self)
+
+    --self:Eat();
+
+  end,
+
+  OnUpdate = function(self,time)
+  	
+	--self:Eat()
+    --if (--[[ Lose Sight ]]) then
+      --self:GotoState("Patrol");
+    --end
+
+  end,
+
+  OnEndState = function(self)
+
+  end,
+	
+}
+---------------------------------------------------------------------------------------------------------------------------------
+-------------------------                     State Functions                        --------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------
+
 --sets the Mouse's properties
 function Snake:abstractReset()
 	Log("In OnReset");
-	self.state = "patrol";
+	self:GotoState("Patrol");
 		
 end
 
+--[[
 function Snake:OnUpdate(frameTime)
 	--Log("In OnUpdate");
 	--Log("Frame at time" .. tostring(frameTime))
@@ -71,6 +136,10 @@ function Snake:OnUpdate(frameTime)
 	end
 	-
 end
+]]
+----------------------------------------------------------------------------------------------------------------------------------
+-------------------------                      Functions                             ---------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------
 
 function Snake:Patrol()
 	if (self.cur_patrol ~= self.max_patrol and self.cur_direction == "NorthEast") then
