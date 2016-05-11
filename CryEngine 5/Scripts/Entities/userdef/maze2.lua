@@ -370,8 +370,14 @@ function Maze2:pos_to_rowcol(pos)
 	local x = pos.x;
 	local y = pos.y;
 	
-	local grid_dec_x = ((x - self.Origin.x)/self.Model_Width) + 1;
-	local grid_dec_y = ((y - self.Origin.y)/self.Model_Height) + 1;
+	local offset_x = x - self.Origin.x;
+	local offset_y = y - self.Origin.y;
+	
+	local offset_blocks_x = offset_x/self.Model_Width;
+	local offset_blocks_y = offset_y/self.Model_Height;
+	
+	local grid_dec_x = offset_blocks_x + 1;
+	local grid_dec_y = offset_blocks_y + 1;
 	
 	--[[
 	Log("In pos to rowcol");
@@ -379,12 +385,18 @@ function Maze2:pos_to_rowcol(pos)
 	Log("Pos x: " .. tostring(pos.x));
 	Log("Pos y: " .. tostring(pos.y));
 	
+	Log("Offset Pos x" .. tostring(offset_x));
+	Log("Offset Pos y" .. tostring(offset_y));
+	
+	Log("Offset blocks x" .. tostring(offset_blocks_x));
+	Log("Offset blocks y" .. tostring(offset_blocks_y));
+	
 	Log("Grid decimal " .. tostring(grid_dec_x));
 	Log("Grid decimal " .. tostring(grid_dec_y));
 	]]--
 	
-	return {col = math.floor(grid_dec_x), 
-		row = math.floor(grid_dec_y)};
+	return {col = math.floor(grid_dec_x+0.5), 
+		row = math.floor(grid_dec_y+0.5)};
 end
 
 -- Spawn a wall at coordinates (w,h)
