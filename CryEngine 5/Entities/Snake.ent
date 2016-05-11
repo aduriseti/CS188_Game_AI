@@ -1,0 +1,4 @@
+<Entity
+  Name="Snake"
+  Script="Scripts/Entities/userdef/Snake.lua"
+/>
