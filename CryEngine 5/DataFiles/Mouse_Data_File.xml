@@ -1,0 +1,49 @@
+<Data version="Blag 1.0">
+    <test
+        a="blag"
+        e="3">
+        <c>
+           <Val value="blag"/>
+           <Val value="foo"/>
+        </c>
+        <d>
+           <Value da="3.0" db="2.1,2.2,2.3"/>
+           <Value da="3.1" db="2.1,2.2,2.3"/>
+           <Value da="3.2" db="3.1,3.2,2.3"/>
+        </d>
+    </test>
+</Data>
+
+<!--
+<!-- Table Example 
+In Lua: letters = { a="a", b="b", c="c" } --
+<letters a="a" b="b" c="c"/>
+
+<!-- Array 
+In Lua: numbers = {0,1,2,3,4,5,6,7,8,9} --
+<numbers>
+  <number value="0"/>
+  <number value="1"/>
+  <number value="2"/>
+  <number value="3"/>
+  <number value="4"/>
+  <number value="5"/>
+  <number value="6"/>
+  <number value="7"/>
+  <number value="8"/>
+  <number value="9"/>
+</numbers>
+
+<!-- Array of Tables 
+In Lua: 
+wheels = {
+  {size=3, weight=10},
+  {size=2, weight=1},
+  {size=4, weight=20},
+} --
+<wheels>
+  <wheel size="3" weight="10"/>
+  <wheel size="2" weight="1"/>
+  <wheel size="4" weight="20"/>
+</wheels>
+-->

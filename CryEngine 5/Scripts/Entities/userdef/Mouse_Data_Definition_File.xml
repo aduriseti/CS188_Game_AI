@@ -1,0 +1,41 @@
+<Definition root="Data">
+ 
+    <Property name="version" type="string"/>
+ 
+    <Table name="test">
+        <Property name="a" type="string"/>
+        <Property name="b" type="int" optional="1"/>
+        <Array name="c" type="string" elementName="Val"/>
+        <Array name="d" elementName="Value">
+           <Property name="da" type="float"/>
+           <Property name="db" type="Vec3"/>
+        </Array>
+        <Property name="e" type="int"/>
+    </Table>
+     
+</Definition>
+
+<!-- Table Example 
+In Lua: letters = { a="a", b="b", c="c" } --
+<Table name="letters">
+  <Property name="a" type="string"/>
+  <Property name="b" type="string"/>
+  <Property name="c" type="string" optional="1"/>
+</Table>
+
+<!-- Array 
+In Lua: numbers = {0,1,2,3,4,5,6,7,8,9} --
+<Array name="numbers" type="int" elementName="number"/>
+
+<!-- Array of Tables 
+In Lua: 
+wheels = {
+  {size=3, weight=10},
+  {size=2, weight=1},
+  {size=4, weight=20},
+} --
+<Array name="wheels" elementName="wheel"> <!-- note no type is attached --
+  <Property name="size" type="float"/>
+  <Property name="weight" type="int"/>
+</Array>
+-->
