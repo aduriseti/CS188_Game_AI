@@ -1,169 +1,272 @@
+--CryEngine
+--Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
+--Lumberyard
+Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
+
 ----------------------------------------------------------------------------------------------------------------------------------
--------------------------                     Maze Table Declaration                 ---------------------------------------------
+-------------------------                    Mouse Table Declaration                 ---------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
 
 Mouse = {
-  
-  type = "Mouse",                                   -- can be useful for scripting
-  MapVisMask = 0,
-  ENTITY_DETAIL_ID = 1,
+	type = "Mouse",
 
-  Properties =
-  {
+    Properties = {
+		bUsable = 0,
+        object_Model = "objects/default/primitive_cube_small.cgf",
+		fRotSpeed = 3, --[0.1, 20, 0.1, "Speed of rotation"]
+		m_speed = 0.05;   
 
-    soclasses_SmartObjectClass = "Human, Actor",
-    esModularBehaviorTree = "Mouse",
-    esNavigationType = "MediumSizedCharacters",
+		maze_ent_name = "",         --maze_ent_name = "Maze1",
 
-    Movement =
-    {
-      SpeedMin = 1,
-      SpeedMax = 5,
-      MaxAnimSpeed = 4,
+        bActive = 0,
+
+        --Copied from BasicEntity.lua
+        Physics = {
+            bPhysicalize = 1, -- True if object should be physicalized at all.
+            bRigidBody = 1, -- True if rigid body, False if static.
+            bPushableByPlayers = 1,
+
+            Density = -1,
+            Mass = -1,
+        },
     },
 
-    Boid =
-    {
-      nCount = 10, --[0,1000,1,"Specifies how many individual objects will be spawned."]
-      object_Model = "objects/characters/animals/rat/rat.cdf",
-      Mass = 10,
-      bInvulnerable = false,
-    },
+	Food_Properties = {
+		ent_type = "Food",	
+	},	
 
-    Options =
-    {
-      bPickableWhenAlive = 1,
-      bPickableWhenDead = 1,
-      PickableMessage = "Squeak: Unhand me sir",
-      bFollowPlayer = 0,
-      bAvoidWater = 1,
-      bObstacleAvoidance = 1,
-      VisibilityDist = 50,
-      bActivate = 1,
-      Radius = 10,
-    },
+	Snake_Properties = {
+		ent_type = "Snake",
+	},
 
-    ParticleEffects =
-    {
-      
-    },
+	Trap_Properties = {
+		ent_type = "Trap",
+	},
 
-    Status = 
-    {
-      Hunger = 10,
-      FoodAte = 0,
-      Health = 100,
-    },
+    Editor = { 
+		Icon = "Checkpoint.bmp", 
+	},	
 
-    Hungry = true,
-
-    AwareOfEnemy = false,
-
-  },
-
-  Audio =
-  {
-    
-  },
-
-  Animations =
-  {
-    "walk_loop",  -- walking
-    "idle01",     -- idle1
-  },
-
-  Editor =
-  {
-    Icon = "Bug.bmp"
-  },
-
-  params={x=0,y=0,z=0},
 };
 
+MakeDerivedEntityOverride(Mouse, LivingEntityBase);
 
-----------------------------------------------------------------------------------------------------------------------------------
--------------------------                     Entity State Function                  ---------------------------------------------
-----------------------------------------------------------------------------------------------------------------------------------
--- Order of Events: (Spawn) -> (Init)
+---------------------------------------------------------------------------------------------------------------------------------
+-------------------------                     State Functions                        --------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------
 
---[[
-function Mouse:OnSpawn()
-  self:SetFlags(ENTITY_FLAG_CLIENT_ONLY, 0);
-  self:SetFlagsExtended(ENTITY_FLAG_EXTENDED_NEEDS_MOVEINSIDE, 0);
-end
-]]
-
-function Mouse:OnInit()
-    self:OnReset()
+--sets the Mouse's properties
+function Mouse:abstractReset()
+	--Log("In Mouse AbstractReset");
+	self.state = "search";
 end
 
-function Mouse:OnPropertyChange()
-    Log("OnPropertyChange is running");
-    self:SetFromProperties();
-    self:OnReset();
-end
 
-function Mouse:OnReset()
-    Log("OnReset is running");
-    self:SetupModel()
-    
-end
+function Mouse:OnUpdate(frameTime)
 
-----------------------------------------------------------------------------------------------------------------------------------
--------------------------                     State Helper Function                  ---------------------------------------------
-----------------------------------------------------------------------------------------------------------------------------------
+	if (self.state == "search") then
+		--self:turnLeftAlways();
+	elseif (self.state == "run") then
 
-function Mouse:SetupModel()
-        
-    local Properties = self.Properties;
+	elseif (self.state == "eat") then
 
-    if(Properties.Boid.object_Model ~= "") then          -- Make sure objectModel is specified
-        self:LoadObject(0,Properties.Boid.object_Model)  -- Load model into main entity
+	else 
 
-        --[[
-        if (Properties.Physics.bPhysicalize == 1) then -- Physicalize it
-            self:PhysicalizeThis();
-        end
-        ]]
-        
-    end
-    
-end
-
-function Mouse:PhysicalizeThis() -- Helper function to physicalize, Copied from BasicEntity.lua
-    -- Init physics.
-	local Physics = self.Properties.Physics;
-	if (CryAction.IsImmersivenessEnabled() == 0) then
-		Physics = Physics_DX9MP_Simple;
 	end
-	EntityCommon.PhysicalizeRigid( self,0,Physics,self.bRigidBodyActive );
+
+	--self:turnLeftAlways();
+	--self:FollowPlayer(frameTime);
+	--self:breathing_animation(frameTime);
+	--self:MoveXForward();
+    --self:FaceAt(self.mazeID, frameTime); 
+
+	--self:randomWalk();
+
+	self:directionalWalk(frameTime);
+
 end
 
-function Mouse:SetFromProperties()
-    
-	local Properties = self.Properties;
+----------------------------------------------------------------------------------------------------------------------------------
+-------------------------                      Functions                             ---------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------
+
+function Mouse:turnLeftAlways()
+	--STATUS: Not finished for maze2
+
+	local rowcol = Mouse.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+	local row = rowcol.row;
+	local col = rowcol.col;
+
+end
+
+
+
+function Mouse:depthFirstSearch()
+
+	--STATUS: Not finished for any maze
+
+end
+
+
+
+function Mouse:randomWalk() 
+
+	--STATUS: Cryengine only - will push when works with lumberyard
+
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+	local row = rowcol.row;
+	local col = rowcol.col;
+
+end
+
+
+
+function Mouse:directionalWalk(frameTime)
+
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
 	
-	if (Properties.Boid.object_Model == "") then
-		do return end;
+	local row = rowcol.row;
+	local col = rowcol.col;
+	
+	local row_inc = self.direction.row_inc;
+	local col_inc = self.direction.col_inc;
+	
+	if row_inc ~= 0 or col_inc ~= 0 then
+		if self.Maze_Properties.grid[row+row_inc][col+col_inc].occupied == false then
+			--Log("continue moving in same direction");
+			local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+row_inc, col + col_inc);
+			self:Move_to_Pos(frameTime, target_pos);
+			return;
+		end
 	end
-    
-    self:SetupModel();
+
+	--[[
+	Log("row: " .. tostring(row));
+	Log("col: " .. tostring(col));
+	
+	Log(tostring(self.Maze_Properties.grid[row][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row + 1][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row - 1][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row][col + 1].occupied));
+	Log(tostring(self.Maze_Properties.grid[row][col - 1].occupied));
+	--]]
+	
+	if self.Maze_Properties.grid[row + 1][col].occupied == false then
+		
+		--Log("can move up");
+		self.direction = self.directions.up;
+		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row + 1, col);
+		
+		self:Move_to_Pos(frameTime, target_pos);
+		return;
+	
+
+	elseif self.Maze_Properties.grid[row][col + 1].occupied == false then
+		
+		--Log("can move right");
+		self.direction = self.directions.right;
+		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row, col + 1);
+		self:Move_to_Pos(frameTime, target_pos);
+		return;
+		
+	elseif self.Maze_Properties.grid[row - 1][col].occupied == false then
+			
+		--Log("can move down");
+		self.direction = self.directions.down;
+		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row-1, col);
+		self:Move_to_Pos(frameTime, target_pos);
+		return;
+		
+	elseif self.Maze_Properties.grid[row][col - 1].occupied == false then
+		
+		Log ("can move left");
+		self.direction = self.directions.left;
+		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row, col - 1);
+		self:Move_to_Pos(frameTime, target_pos);
+		return;
+	
+	else end
 
 end
 
 
-----------------------------------------------------------------------------------------------------------------------------------
--------------------------                     AI Functions                           ---------------------------------------------
-----------------------------------------------------------------------------------------------------------------------------------
 
-function Mouse:Search()
-  Log("Inside of Mouse.lua Search")
+function Mouse:shittyWalk(frameTime) 
+
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
+	
+	local row = rowcol.row;
+	local col = rowcol.col;
+
+	--[[
+	Log("row: " .. tostring(row));
+	Log("col: " .. tostring(col));
+	
+	--Log(tostring(row) .. tostring(col));
+	Log(tostring(self.Maze_Properties.grid[row][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row + 1][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row - 1][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row][col + 1].occupied));
+	Log(tostring(self.Maze_Properties.grid[row][col - 1].occupied));
+	]]--
+	
+	if self.Maze_Properties.grid[row + 1][col].occupied == false then
+		
+		Log("can move up");
+		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row + 1, col);
+		self:Move_to_Pos(frameTime, target_pos);
+		return;
+	
+
+	elseif self.Maze_Properties.grid[row][col + 1].occupied == false then
+		
+		Log("can move right");
+		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row, col + 1);
+		self:Move_to_Pos(frameTime, target_pos);
+		return;
+		
+	elseif self.Maze_Properties.grid[row - 1][col].occupied == false then
+			
+		
+		Log("can move down");
+		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row-1, col);	
+		self:Move_to_Pos(frameTime, target_pos);
+		return;
+		
+		
+	elseif self.Maze_Properties.grid[row][col - 1].occupied == false then
+		
+		Log ("can move left");
+		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row, col - 1);
+		self:Move_to_Pos(frameTime, target_pos);
+		return;
+	
+	else end
 end
 
-function Mouse:Sleep()
+
+function Mouse:raytrace()
+
+	--STATUS: totally broken - will work on tomorrow
 
 end
 
-function Mouse:Avoid()
 
+
+function Mouse:breathing_animation(frameTime)
+
+	local cycle_time = 50;
+	local new_scale = 0.9+(0.2 * cycle_time % frameTime );
+	--Log("New scale " .. tostring(new_scale));
+	--self.SetScale(new_scale);
+
+	Log("cycle" .. tostring(frameTime));
+	Log("New height" .. tostring(32 + 0.9+(0.2 * frameTime % cycle_time)));
+	self:SetPos({self.pos.x, self.pos.y, 32 + 0.9+(0.2/50 * frameTime % cycle_time)});
+end
+
+function Mouse:MoveXForward() 
+	self:move_xy({x = (self.pos.x + self.Properties.m_speed), y = self.pos.y});
+
+	--Log(tostring(self:GetPos().x) .. tostring(self.pos.x));
 end
