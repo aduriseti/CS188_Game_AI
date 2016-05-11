@@ -228,14 +228,6 @@ function Mouse:randomWalk()
 end
 
 function Mouse:directionalWalk(frameTime)
-	--System.ShowDebugger();
-	
-	--[[
-	Log("Pos x: " .. tostring(self.pos.x));
-	Log("Pos y: " .. tostring(self.pos.y));
-	Log("GetPos x: " .. tostring(self:GetPos().x));
-	Log("GetPos y: " .. tostring(self:GetPos().y));
-	]]
 	
 	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
 	
@@ -265,68 +257,33 @@ function Mouse:directionalWalk(frameTime)
 	Log(tostring(self.Maze_Properties.grid[row][col - 1].occupied));
 	--]]
 	
-	if 
-	--[[self.Maze_Properties.grid[row + 1] ~=nil 
-			and self.Maze_Properties.grid[row + 1][col] ~= nil 
-			and ]]
-			self.Maze_Properties.grid[row + 1][col].occupied == false then
+	if self.Maze_Properties.grid[row + 1][col].occupied == false then
 		
-		Log("can move up");
+		--Log("can move up");
 		self.direction = self.directions.up;
 		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row + 1, col);
-		
-		--[[
-		Log("Pos x: " .. tostring(self.pos.x));
-		Log("Pos y: " .. tostring(self.pos.y));
-		Log("GetPos x: " .. tostring(self:GetPos().x));
-		Log("GetPos y: " .. tostring(self:GetPos().y));
-		
-		Log("Target Pos x: " .. tostring(target_pos.x));
-		Log("Target Pos y: " .. tostring(target_pos.y));
-		]]
 		
 		self:Move_to_Pos(frameTime, target_pos);
 		return;
 	
 
-	elseif --self.Maze_Properties.grid[row][col + 1] ~= nil 
-			--and 
-			self.Maze_Properties.grid[row][col + 1].occupied == false then
+	elseif self.Maze_Properties.grid[row][col + 1].occupied == false then
 		
-		Log("can move right");
+		--Log("can move right");
 		self.direction = self.directions.right;
 		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row, col + 1);
 		self:Move_to_Pos(frameTime, target_pos);
 		return;
 		
-	elseif 
-		--[[self.Maze_Properties.grid[row - 1] ~=nil 
-			and self.Maze_Properties.grid[row - 1][col] ~= nil 
-			and ]]
-			self.Maze_Properties.grid[row - 1][col].occupied == false then
+	elseif self.Maze_Properties.grid[row - 1][col].occupied == false then
 			
-		
-		Log("can move down");
+		--Log("can move down");
 		self.direction = self.directions.down;
 		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row-1, col);
-		
-		--[[
-		Log("Pos x: " .. tostring(self.pos.x));
-		Log("Pos y: " .. tostring(self.pos.y));
-		Log("GetPos x: " .. tostring(self:GetPos().x));
-		Log("GetPos y: " .. tostring(self:GetPos().y));
-		
-		Log("Target Pos x: " .. tostring(target_pos.x));
-		Log("Target Pos y: " .. tostring(target_pos.y));
-		]]
-		
 		self:Move_to_Pos(frameTime, target_pos);
 		return;
 		
-		
-	elseif --self.Maze_Properties.grid[row][col - 1] ~= nil 
-			--and 
-			self.Maze_Properties.grid[row][col - 1].occupied == false then
+	elseif self.Maze_Properties.grid[row][col - 1].occupied == false then
 		
 		Log ("can move left");
 		self.direction = self.directions.left;
@@ -339,16 +296,7 @@ function Mouse:directionalWalk(frameTime)
 end
 
 function Mouse:shittyWalk(frameTime) 
-	
-	--System.ShowDebugger();
-	
-	--[[
-	Log("Pos x: " .. tostring(self.pos.x));
-	Log("Pos y: " .. tostring(self.pos.y));
-	Log("GetPos x: " .. tostring(self:GetPos().x));
-	Log("GetPos y: " .. tostring(self:GetPos().y));
-	]]
-	
+
 	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
 	
 	local row = rowcol.row;
@@ -366,65 +314,31 @@ function Mouse:shittyWalk(frameTime)
 	Log(tostring(self.Maze_Properties.grid[row][col - 1].occupied));
 	]]--
 	
-	if 
-	--[[self.Maze_Properties.grid[row + 1] ~=nil 
-			and self.Maze_Properties.grid[row + 1][col] ~= nil 
-			and ]]
-			self.Maze_Properties.grid[row + 1][col].occupied == false then
+	if self.Maze_Properties.grid[row + 1][col].occupied == false then
 		
 		Log("can move up");
 		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row + 1, col);
-		
-		--[[
-		Log("Pos x: " .. tostring(self.pos.x));
-		Log("Pos y: " .. tostring(self.pos.y));
-		Log("GetPos x: " .. tostring(self:GetPos().x));
-		Log("GetPos y: " .. tostring(self:GetPos().y));
-		
-		Log("Target Pos x: " .. tostring(target_pos.x));
-		Log("Target Pos y: " .. tostring(target_pos.y));
-		]]
-		
 		self:Move_to_Pos(frameTime, target_pos);
 		return;
 	
 
-	elseif --self.Maze_Properties.grid[row][col + 1] ~= nil 
-			--and 
-			self.Maze_Properties.grid[row][col + 1].occupied == false then
+	elseif self.Maze_Properties.grid[row][col + 1].occupied == false then
 		
 		Log("can move right");
 		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row, col + 1);
 		self:Move_to_Pos(frameTime, target_pos);
 		return;
 		
-	elseif 
-		--[[self.Maze_Properties.grid[row - 1] ~=nil 
-			and self.Maze_Properties.grid[row - 1][col] ~= nil 
-			and ]]
-			self.Maze_Properties.grid[row - 1][col].occupied == false then
+	elseif self.Maze_Properties.grid[row - 1][col].occupied == false then
 			
 		
 		Log("can move down");
-		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row-1, col);
-		
-		--[[
-		Log("Pos x: " .. tostring(self.pos.x));
-		Log("Pos y: " .. tostring(self.pos.y));
-		Log("GetPos x: " .. tostring(self:GetPos().x));
-		Log("GetPos y: " .. tostring(self:GetPos().y));
-		
-		Log("Target Pos x: " .. tostring(target_pos.x));
-		Log("Target Pos y: " .. tostring(target_pos.y));
-		]]
-		
+		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row-1, col);	
 		self:Move_to_Pos(frameTime, target_pos);
 		return;
 		
 		
-	elseif --self.Maze_Properties.grid[row][col - 1] ~= nil 
-			--and 
-			self.Maze_Properties.grid[row][col - 1].occupied == false then
+	elseif self.Maze_Properties.grid[row][col - 1].occupied == false then
 		
 		Log ("can move left");
 		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row, col - 1);
@@ -485,11 +399,9 @@ function Mouse:MoveXForward()
 end
 
 function Mouse:Move_to_Pos(frameTime, pos) 
-	--self:FaceAt_ID(self.Player_Properties.ID, frameTime);
 	local a = self.pos;
 	local b = pos;
 	self:FaceAt(b, frameTime);
-	--local b = self.Player_Properties.ID:GetPos();
 	local diff = {x = b.x - a.x, y = b.y - a.y};
 	
 	--[[
@@ -502,16 +414,12 @@ function Mouse:Move_to_Pos(frameTime, pos)
 	local speed_mag = self.Properties.m_speed / diff_mag;
 	self:move_xy({x = a.x + diff.x * speed_mag,
 		y = a.y + diff.y * speed_mag});
-	--Log("X: " .. tostring(self.angles.x));
-	--Log("Z: " .. tostring(self.angles.z));
-	
 end
 
 function Mouse:FollowPlayer(frameTime)
-	self:FaceAt_ID(self.Player_Properties.ID, frameTime);
+	self:FaceAt_ID(self.Player_Properties.ID:GetPos(), frameTime);
 	local a = self.pos;
 	local b = self.Player_Properties.ID:GetPos();
-	--local b = self.Player_Properties.ID:GetPos();
 	local diff = {x = b.x - a.x, y = b.y - a.y};
 	local diff_mag = math.sqrt(diff.x^2 + diff.y^2);
 	if diff_mag < 5 then
@@ -520,8 +428,6 @@ function Mouse:FollowPlayer(frameTime)
 	local speed_mag = self.Properties.m_speed / diff_mag;
 	self:move_xy({x = a.x + diff.x * speed_mag,
 		y = a.y + diff.y * speed_mag});
-	--Log("X: " .. tostring(self.angles.x));
-	--Log("Z: " .. tostring(self.angles.z));
 end
 
 function Mouse:FaceAt(pos, fT)
@@ -535,20 +441,4 @@ function Mouse:FaceAt(pos, fT)
     
     self.angles.z = Lerp(self.angles.z, newAngle, (self.Properties.fRotSpeed*fT));  
     self:SetAngles(self.angles);
-
-end
-
-
-function Mouse:FaceAt_ID(ID, fT)
-	--Log("In FaceAt");
-    local a = self.pos;
-    local b = ID:GetPos();
-    local newAngle = math.atan2 (b.y-a.y, b.x-a.x);    
-    
-    local difference =((((newAngle - self.angles.z) % (2 * math.pi)) + (3 * math.pi)) % (2 * math.pi)) - math.pi;
-    newAngle = (self.angles.z + difference);
-    
-    self.angles.z = Lerp(self.angles.z, newAngle, (self.Properties.fRotSpeed*fT));  
-    self:SetAngles(self.angles);
-
 end
