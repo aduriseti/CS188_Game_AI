@@ -1,0 +1,4 @@
+<Entity
+  Name="Mouse_ND"
+  Script="Scripts/Entities/userdef/mouse_nonderived.lua"
+/>
