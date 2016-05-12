@@ -20,7 +20,7 @@ Snake = {
 	
     Properties = {
         --object_Model = "objects/characters/animals/reptiles/snake/snake.cdf",
-        object_Model = "objects/default/primitive_cube_small.cgf",
+        object_Model = "objects/default/primitive_sphere.cgf",
 		fRotSpeed = 3, --[0.1, 20, 0.1, "Speed of rotation"]
 		m_speed = 0.1;
         --maze_ent_name = "Maze1",f
@@ -55,6 +55,8 @@ Snake = {
 		Icon = "Checkpoint.bmp", 
 	},
 	
+	ToEat = {},
+	
 };
 
 MakeDerivedEntityOverride(Snake, LivingEntityBase);
@@ -66,7 +68,7 @@ Snake.Patrol =
  {
 
   OnBeginState = function(self)
-  	Log("Entering Patrol State")
+  	Log("Snake: Entering Patrol State")
 
   end,
 
@@ -80,16 +82,7 @@ Snake.Patrol =
   end,
 
   OnEndState = function(self)
-  	Log("Exiting Search State")
-  end,
-
-  OnCollision = function(self,hitdata)
-
-  	if (hitdata.target.type == "Mouse") then
-  		Log("YO MOUSE! I'm gonna eat you!")
-  		self:GotoState("Eat")
-  	end
-
+  	Log("Snake: Exiting Patrol State")
   end,
 
 
@@ -100,14 +93,14 @@ Snake.Patrol =
 Snake.Eat =
 {
 	OnBeginState = function(self)
-
+		Log("Snake: Enter Eat State")
     --self:Eat();
 
-  end,
+  	end,
 
   OnUpdate = function(self,time)
   	
-	--self:Eat()
+	self:KillMouse()
     --if (--[[ Lose Sight ]]) then
       --self:GotoState("Patrol");
     --end
@@ -115,19 +108,9 @@ Snake.Eat =
   end,
 
   OnEndState = function(self)
-
+  	Log("Snake: Exiting Eat State")
   end,
 	
-  OnCollision = function(self,hitdata)
-
-  	if (hitdata.target.type == "Mouse") then
-  		Log("Yum!")
-  		hitdata.target:GotoState("Dead")
-  	end
-
-  	self:GotoState("Patrol")
-
-  end,
 }
 
 Snake.Destroyed =
@@ -135,7 +118,7 @@ Snake.Destroyed =
 
     OnBeginState = function( self )
 
-        Log("IN STATE")
+        Log("Snake: IN Destroyed STATE")
 
     end,
 
@@ -159,7 +142,7 @@ function Snake:abstractReset()
 
 end
 
-function Snake:OnCollision
+--function Snake:OnCollision
 --[[
 function Snake:OnUpdate(frameTime)
 	--Log("In OnUpdate");
@@ -261,7 +244,13 @@ function Snake:CheckMouseCollision()
     end
 
     if foundMouse ~= "" then
-    	foundMouse:GetEaten()
+		self.ToEat[1] = foundMouse;
+    	self:GotoState("Eat")--foundMouse:GetEaten()
     end
 
+end
+
+function Snake:KillMouse()
+	self.ToEat[1]:GetEaten()
+	self:GotoState("Patrol")
 end

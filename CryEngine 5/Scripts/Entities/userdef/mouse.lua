@@ -1,19 +1,19 @@
 --Amal's file path
-Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
+--Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
 
 --Mitchel's file path
---Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
+Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
 
 
 -- Globals
 
 --Mitchel's file path
---Mouse_Data_Definition_File = "Scripts/Entities/Custom/Mouse_Data_Definition_File.xml"
---Mouse_Default_Data_File = "Scripts/Entities/Custom/DataFiles/Mouse_Data_File.xml"
+Mouse_Data_Definition_File = "Scripts/Entities/Custom/Mouse_Data_Definition_File.xml"
+Mouse_Default_Data_File = "Scripts/Entities/Custom/DataFiles/Mouse_Data_File.xml"
 
 --Amal's file path
-Mouse_Data_Definition_File = "Scripts/Entities/userdef/Mouse_Data_Definition_File.xml"
-Mouse_Default_Data_File = "Scripts/Entities/userdef/DataFiles/Mouse_Data_File.xml"
+--Mouse_Data_Definition_File = "Scripts/Entities/userdef/Mouse_Data_Definition_File.xml"
+--Mouse_Default_Data_File = "Scripts/Entities/userdef/DataFiles/Mouse_Data_File.xml"
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    Mouse Table Declaration                 ---------------------------------------------
@@ -41,7 +41,7 @@ Mouse = {
 
 		maze_ent_name = "",         --maze_ent_name = "Maze1",
 
-        --bActive = 0,
+        bActive = 0,
 
         --Copied from BasicEntity.lua
         Physics = {
@@ -81,7 +81,7 @@ Mouse.Search =
  {
 
   OnBeginState = function(self)
-  	Log("Entering Search State")
+  	Log("Mouse: Entering Search State")
 
   end,
 
@@ -108,7 +108,7 @@ Mouse.Search =
   end,
 
   OnEndState = function(self)
-  	Log("Exiting Search State")
+  	Log("Mouse: Exiting Search State")
   end,
 
  }
@@ -117,7 +117,7 @@ Mouse.Avoid =
 {
 
 	OnBeginState = function(self)
-		Log("Entering Avoid State")
+		Log("Mouse: Entering Avoid State")
 
   	end,
 
@@ -138,7 +138,7 @@ Mouse.Avoid =
 	end,
 
   	OnEndState = function(self)
-		Log("Exiting Avoid State")
+		Log("Mouse: Exiting Avoid State")
   	end,
 	
 }
@@ -147,7 +147,7 @@ Mouse.Eat =
 {
 
 	OnBeginState = function(self)
-		Log("Entering Eat State")
+		Log("Mouse: Entering Eat State")
 		--[[
 			GetNearbyFood Entity
 		]]
@@ -158,7 +158,7 @@ Mouse.Eat =
 	end,
 
   	OnEndState = function(self)
-		Log("Exiting Eat State")
+		Log("Mouse: Exiting Eat State")
 		-- Record Food Locs knowledge
   	end,
 	
@@ -168,7 +168,7 @@ Mouse.Sleep =
 {
 
 	OnBeginState = function(self)
-		Log("Entering SLeep State")
+		Log("Mouse: Entering SLeep State")
 		-- Mark as winner
 
   	end,
@@ -188,8 +188,9 @@ Mouse.Dead =
 {
 	
 	OnBeginState = function(self)
-		Log("Entering Dead State")
-		
+		Log("Mouse: Entering Dead State")
+			self:DeleteThis()
+
 		-- Mark as Loser
 		-- Record learned dangers
   	end,
@@ -208,7 +209,7 @@ Mouse.Power =
 {
 	
 	OnBeginState = function(self)
-		Log("Entering Power State")
+		Log("Mouse: Entering Power State")
   	end,
 
  	OnUpdate = function(self,time)
@@ -223,7 +224,7 @@ Mouse.Power =
 	end,
 
   	OnEndState = function(self)
-	  	Log("Exiting Power State")
+	  	Log("Mouse: Exiting Power State")
   	end,
 }
 ---------------------------------------------------------------------------------------------------------------------------------
@@ -232,8 +233,7 @@ Mouse.Power =
 
 function Mouse:GetEaten()
 	Log("RIP Mouse")
-	-- self:GotoState("Dead")
-	self:DeleteThis()
+	self:GotoState("Dead")
 end
 
 --sets the Mouse's properties
