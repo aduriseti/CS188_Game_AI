@@ -12,14 +12,11 @@ Snake = {
 	type = "Snake",
 	
 	-- Instance Vars
-	max_patrol = 5,
+	max_patrol = 100,
     cur_patrol = 0,
     cur_direction = "NorthEast",
 	
-	States = {
-		"Patrol",
-		"Eat",
-	},
+	States = {"Opened","Closed","Destroyed", "Patrol", "Eat"},
 	
     Properties = {
         --object_Model = "objects/characters/animals/reptiles/snake/snake.cdf",
@@ -69,25 +66,24 @@ Snake.Patrol =
  {
 
   OnBeginState = function(self)
-
-    self:Patrol();
+  	Log("Entering Patrol State")
 
   end,
 
   OnUpdate = function(self,time)
-  	
-	self:Patrol()
-    --if (--[[ SEE MOUSE ]]) then
-      --self:GotoState("Eat");
-    --end
-
+  
+		  --Log("FUCKERS")
+		  self:myPatrol(time)
+		
   end,
 
   OnEndState = function(self)
-
+  	Log("Exiting Search State")
   end,
 
  }
+
+
 
 Snake.Eat =
 {
@@ -111,15 +107,34 @@ Snake.Eat =
   end,
 	
 }
+
+Snake.Destroyed =
+{
+
+    OnBeginState = function( self )
+
+        Log("IN STATE")
+
+    end,
+
+  
+
+    OnUpdate = function(self, dt)
+
+       -- self:OnUpdate();
+
+    end,
+
+}
 ---------------------------------------------------------------------------------------------------------------------------------
 -------------------------                     State Functions                        --------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------
 
 --sets the Mouse's properties
 function Snake:abstractReset()
-	Log("In OnReset");
+	--Log("In OnResettttttttt")
 	self:GotoState("Patrol");
-		
+
 end
 
 --[[
@@ -141,12 +156,12 @@ end
 -------------------------                      Functions                             ---------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
 
-function Snake:Patrol()
+function Snake:myPatrol(time)
 	if (self.cur_patrol ~= self.max_patrol and self.cur_direction == "NorthEast") then
-		self:MoveNorthEast();
+		self:MoveNorthEast(time);
 		self.cur_patrol = self.cur_patrol + 1;
 	elseif (self.cur_patrol ~= self.max_patrol and self.cur_direction == "SouthWest") then
-		self:MoveSouthWest();
+		self:MoveSouthWest(time);
 		self.cur_patrol = self.cur_patrol + 1;
 	elseif (self.cur_patrol == self.max_patrol and self.cur_direction == "NorthEast") then
 		self.cur_direction = "SouthWest";
@@ -158,12 +173,17 @@ function Snake:Patrol()
 		
 end
 
-function Snake:MoveNorthEast() 
+function Snake:MoveNorthEast(frameTime) 
 
 	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
-
+	local row = rowcol.row
+	local col = rowcol.col
+	
+	local grid = self.Maze_Properties.grid;
+	local maxX, maxY = #grid, #grid[1]
+	
 	-- Check if snake can move north, then east, then west, then south
-	if (self.Maze_Properties.grid[row-1][col].occupied == false) then		-- North
+	if row-1 > 0 and row-1 <= maxX and col-1 > 0 and col-1 <= maxY and (self.Maze_Properties.grid[row-1][col].occupied == false) then		-- North
 		local pos = self.Maze_Properties.ID:rowcol_to_pos(row-1, col);
 		self:Move_to_Pos(frameTime, pos);
 	elseif (self.Maze_Properties.grid[row][col+1].occupied == false) then	-- East
@@ -180,10 +200,15 @@ function Snake:MoveNorthEast()
 	
 end
 
-function Snake:MoveSouthWest() 
+function Snake:MoveSouthWest(frameTime) 
 
 	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
-
+	local row = rowcol.row
+	local col = rowcol.col
+	
+	local grid = self.Maze_Properties.grid;
+	local maxX, maxY = #grid, #grid[1]
+	
 	-- Check if snake can move south, then west, then east, then north
 	if (self.Maze_Properties.grid[row+1][col].occupied == false) then		-- South
 		local pos = self.Maze_Properties.ID:rowcol_to_pos(row+1, col);
