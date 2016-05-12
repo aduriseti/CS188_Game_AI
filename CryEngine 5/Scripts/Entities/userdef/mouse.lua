@@ -182,9 +182,9 @@ Mouse.Dead =
 	
 	OnBeginState = function(self)
 		Log("Entering Dead State")
-		
 		-- Mark as Loser
 		-- Record learned dangers
+		self:GetEaten()
   	end,
 
  	OnUpdate = function(self,time)
@@ -481,6 +481,11 @@ end
 
 function Mouse:PowerMode()
 
+end
+
+function Mouse:GetEaten()
+	Log("RIP Mouse")
+	self:DeleteThis()
 end
 
 function Mouse:PrintTable(t)
