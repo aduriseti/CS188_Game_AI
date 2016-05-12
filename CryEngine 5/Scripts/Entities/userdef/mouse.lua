@@ -70,6 +70,8 @@ Mouse = {
 		Icon = "Checkpoint.bmp", 
 	},	
 
+	ToEat = {},
+
 };
 
 MakeDerivedEntityOverride(Mouse, LivingEntityBase);
@@ -103,6 +105,8 @@ Mouse.Search =
 		  
 	  ]]
 	  	self:randomDirectionalWalk(time);
+
+	  	self:CheckFoodCollision()
 		
 
   end,
@@ -154,7 +158,8 @@ Mouse.Eat =
   	end,
 
  	OnUpdate = function(self,time)
-  		-- Call Nearby foodEntity's Eat function	 	
+  		-- Call Nearby foodEntity's Eat function
+  		ToEat[1]:OnUsed(self)	 	
 	end,
 
   	OnEndState = function(self)
@@ -293,7 +298,20 @@ end
 -------------------------                      Functions                             ---------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
 
+function Mouse:CheckFoodCollision()
+	local nearby_entities = System.GetEntities(self.pos, 1)
+	local foundFood = ""
+	for key, value in pairs( nearby_entities ) do
+        if (tostring(value.type) == "Food") then
+            foundFood = value;
+        end 
+    end
 
+    if foundFood ~= "" then
+		self.ToEat[1] = foundFood;
+    	self:GotoState("Eat")--foundMouse:GetEaten()
+    end
+end
 
 
 function Mouse:breathing_animation(frameTime)
@@ -332,6 +350,8 @@ function Mouse:OnEat(foodType)
     else
         Log("Mouse:OnEat = I am eating IDK")
     end
+
+    self:GotoState("Search")
 	
 	--[[ 
 		if MealComplete then
