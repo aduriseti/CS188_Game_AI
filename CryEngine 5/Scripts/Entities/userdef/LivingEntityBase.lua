@@ -61,7 +61,7 @@ LivingEntityBase = {
     },
 
     directions = {
-			none = {row_inc = 0, col_inc = 0, name = "none"},
+			--none = {row_inc = 0, col_inc = 0, name = "none"},
 			up = {row_inc = 1, col_inc = 0, name = "up"},
 			down = {row_inc = -1, col_inc = 0, name = "down"},
 			right = {row_inc = 0, col_inc = 1, name = "right"},
@@ -69,6 +69,12 @@ LivingEntityBase = {
 		},
 
 	direction = {row_inc = 0, col_inc = 0},
+
+	target = "",
+
+	enemy = "",
+
+	timer  = 0,
 
 };
 
@@ -110,6 +116,7 @@ end
 -- This abstract reset is empty in Base, it purely exists if you want extra functionality from reset in subclass
 function LivingEntityBase:abstractReset()
 end
+
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                     State Helper Function                  ---------------------------------------------
@@ -195,7 +202,7 @@ function LivingEntityBase:SetFromProperties()
         end
     end
 
-    self.direction = self.directions.none
+    --self.direction = self.directions.none
 
     self:Activate(self.Properties.bActive); --set OnUpdate() on/off
 
@@ -223,9 +230,9 @@ function LivingEntityBase:SetupMaze()
                 local cur_wall = self.Maze_Properties.ID.myWalls[cur_nslot];
 
                 if cur_wall ~= nil then
-                    self.Maze_Properties.grid[row][col] = {occupied = true, nslot = cur_nslot};
+                    self.Maze_Properties.grid[row][col] = {occupied = true, nslot = cur_nslot, n_visited = 0};
                 else
-                    self.Maze_Properties.grid[row][col] = {occupied = false, nlsot = -1};
+                    self.Maze_Properties.grid[row][col] = {occupied = false, nlsot = -1, n_visited = 0};
                 end
             end
         end
@@ -335,7 +342,7 @@ function LivingEntityBase:getUnoccupiedNeighbors(loc_row, loc_col)
 
 				--Log(tostring(loc_col + loc_col_inc));
 
-				empty_neighbors[#empty_neighbors+1] = {row =row_index, col = col_index, direction = value};
+				empty_neighbors[#empty_neighbors+1] = {row =row_index, col = col_index, n_visited = grid[row_index][col_index].n_visited, direction = value};
 
 				--Log(tostring(#empty_neighbors));
 			end
@@ -362,11 +369,138 @@ function LivingEntityBase:getLeftRight()
 	end
 end
 
+function LivingEntityBase:exploratoryWalk(frameTime)
+	--Cryengine
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
+	--Lumberyard
+	--local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+
+	local row = rowcol.row;
+	local col = rowcol.col;
+
+	local loc_row_inc = self.direction.row_inc;
+	local loc_col_inc = self.direction.col_inc;
+
+	--[[
+	Log("previous row " .. tostring(self.previous_row));
+	Log("previous_col " .. tostring(self.previous_col));
+	Log("row: " .. tostring(row));
+	Log("col: " .. tostring(col));
+
+	Log("delta_X " .. tostring(loc_col_inc));
+	Log("delta_Y " .. tostring(loc_row_inc));
+	
+	Log(tostring(self.Maze_Properties.grid[row][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row + 1][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row - 1][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row][col + 1].occupied));
+	Log(tostring(self.Maze_Properties.grid[row][col - 1].occupied));
+	--]]
+
+	--if we haven't moved out of a grid space yet, continue as before
+	if row == self.previous_row and
+			col == self.previous_col and 
+			(loc_row_inc ~= 0 or loc_col_inc) ~= 0 then
+		--Log("STAY ON COURSE");
+		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
+		self:Move_to_Pos(frameTime, target_pos);
+		return;
+	end
+
+	--else change our behavior
+	self.previous_col = col;
+	self.previous_row = row;
+
+	--increment visit counter of current grid space
+	--Log(tostring(self.Maze_Properties.grid[row][col].n_visited));
+	self.Maze_Properties.grid[row][col].n_visited = self.Maze_Properties.grid[row][col].n_visited + 1;
+	--Log(tostring(self.Maze_Properties.grid[row][col].n_visited));
+
+	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
+
+	--Log("Num Empty_neighbors: " .. tostring(#empty_neighbors));
+
+	-- if there are more options than backwards
+	if #empty_neighbors >=2 then
+		--remove backtracking as an option
+		for key, value in pairs(empty_neighbors) do
+			try_dir = empty_neighbors[key].direction;
+			if try_dir.row_inc ==  -self.direction.row_inc and
+					try_dir.col_inc == -self.direction.col_inc then
+				--Log("REMOVE BACKTRACKING AS OPTION");
+				empty_neighbors[key] = nil;
+			end
+		end
+	else
+		--[[
+		if loc_row_inc ~= 0 or loc_col_inc ~= 0 then
+			if self.Maze_Properties.grid[row+loc_row_inc][col+loc_col_inc].occupied == false then
+				--Log("continue moving in same direction");
+				local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
+				self:Move_to_Pos(frameTime, target_pos);
+				return;
+			end
+		end
+		--]]
+	end
+	
+	--get rid of most visited neighbor until there is only one left or until all neighbors have been visited equally
+	--[[
+	while #empty_neighbors > 1 and max_val != min_val do
+		local max_val = -1;
+		local min_val = 10000;
+		local max_key = 0;
+		for key, value in pairs(empty_neighbors) do
+			if value.n_visited > max_val then
+				max_val = value.n_visited;
+				max_key = key;
+			end
+
+			if value.n_visited < min_val then
+				min_val = value.n_visited;
+			end
+		end
+
+		if #empty_neighbors <= 1 or max_val == min_val then
+			break;
+		else
+			empty_neighbors[max_val] = nil;
+		end
+	end
+	--]]
+	
+	local min_val = 10000;
+	local min_key = 0
+
+	for key, value in pairs(empty_neighbors) do
+		--if (value.n_visited == nil) then value.n_visited = 0; end;
+		--Log(tostring(value.n_visited));
+		if value.n_visited < min_val then
+			min_val = value.n_visited;
+			min_key = key;
+		end
+	end
+	--]]
+	--[[
+	for key, value in pairs(empty_neighbors) do
+		if value.n_visited > min_val then
+			empty_neighbors[key] = nil;
+		end
+	end
+	--]]
+
+	--now row randomly select neighbors out of the remaining empty ones
+	--Log("Num Empty_neighbors: " .. tostring(#empty_neighbors));
+
+	--Log("CHOOSE RANDOM DIRECTION OUT OF REMAINING OPTIONS");
+	--local rnd_idx = random(#empty_neighbors);
+	self.direction = empty_neighbors[min_key].direction;
+end
+
 function LivingEntityBase:randomDirectionalWalk(frameTime)
 	--Cryengine
 	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
 	--Lumberyard
-
 	--local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
 
 	local row = rowcol.row;
@@ -385,17 +519,8 @@ function LivingEntityBase:randomDirectionalWalk(frameTime)
 	end
 
 	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
-
-	-- TODO: AMAL FOR SOME REASON SOMETIMES THIS GETS CALLED WITH NIL VALs
-		--commenting out last 3 lines of this function is a fix - don't ask me why
-	--local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
-
 	local rnd_idx = random(#empty_neighbors);
-	--if rnd_idx >1 then rnd_idx = rnd_idx-1 end
 	self.direction = empty_neighbors[rnd_idx].direction;
-	--local target_cell = empty_neighbors[rnd_idx];
-	--local target_pos = self.Maze_Properties.ID:rowcol_to_pos(target_cell.row, target_cell.col);
-	--self:Move_to_Pos(frameTime, target_pos);
 
 end
 
@@ -422,10 +547,12 @@ function LivingEntityBase:bounce(frameTime)
 		else
 			--reverse direction if living enity has one
 			self.direction = {row_inc = -loc_row_inc, col_inc = -loc_col_inc};
+			return;
 		end
 	end
 
 	--choose random starting direction
+	Log("choose rand initial direction");
 	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
 	local rnd_idx = random(#empty_neighbors);
 	self.direction = empty_neighbors[rnd_idx].direction;
@@ -464,8 +591,67 @@ function LivingEntityBase:directionalWalk(frameTime)
 end
 
 ----------------------------------------------------------------------------------------------------------------------------------
+-------------------------              Behaviors                             ---------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------
+function LivingEntityBase:chase(target_class, time)
+
+	local target = self:ray_cast(target_class);
+
+	if (target ~= nil) then
+		local distance = vecLen(vecSub(target.pos, self.pos));
+		if distance < 1 then
+			target:OnEat();
+			self.target = nil;
+
+			return false;
+		end
+
+		self:Move_to_Pos(time, target.pos);
+
+		return true;
+	else
+		return false;
+	end
+
+end
+
+
+----------------------------------------------------------------------------------------------------------------------------------
 -------------------------              Utility Functions                             ---------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------
+function LivingEntityBase:ray_cast(target_class)
+
+	local target = System.GetNearestEntityByClass({self.pos.x, self.pos.y, self.pos.z},
+ 			 20, target_class);
+
+	if target == nil then
+		return nil;
+	end
+
+ 	Log(tostring(target));
+
+ 	System.DrawLine(self.pos, target.pos, 1, 0, 0, 1);
+
+ 	local diff = {x = target.pos.x - self.pos.x, y = target.pos.y - self.pos.y, z = 0};
+
+ 	local fucker = {};
+
+ 	Physics.RayWorldIntersection(self.pos, diff, 1, ent_all, self.id, target.id, fucker);--, self:GetRawId(), target_mouse:GetRawId());
+
+	local n_hits = 0;
+
+	for key, value in pairs(fucker) do
+		n_hits = n_hits + 1
+	end
+
+	if (n_hits > 0) then
+		Log("Raycast intersect");
+		return nil;
+	end
+
+	return target;
+end
+
 
 function LivingEntityBase:PrintTable(t)
 

@@ -27,7 +27,6 @@ Maze2 = {
   myWalls = {},
   myMice = {},
   mySnakes = {},
-  myFoods = {},
   
   -- Copied from BasicEntity.lua
   Properties = {
@@ -120,7 +119,6 @@ function Maze2:OnDestroy()
     self:RemoveWalls()
     self:RemoveMice()
     self:RemoveSnakes()
-    self:RemoveFoods()
 end
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                     State Helper Function                  ---------------------------------------------
@@ -167,7 +165,7 @@ function Maze2:SetFromProperties()
     self:RemoveWalls()
     self:RemoveMice()
     self:RemoveSnakes()
-    self:RemoveFoods()
+ 
 
     self.Width = width
     self.Height = height
@@ -225,19 +223,6 @@ function Maze2:RemoveSnakes()
         --v:TestDelete()
     end
     
-end
-function Maze2:RemoveFoods()
-    Log("Removing All Foods")
-    for k,v in pairs(self.myFoods) do
-
-        --local EntID=System.GetEntityByName(v);
-        --local EntID = System.GetEntityByName("WALLS");
-
-        --System.RemoveEntity(EntID)
-        System.RemoveEntity(v.id)
-        --v:DeleteThis()
-        --v:TestDelete()
-    end
 end
 
 --Fills in border of Maze2 with blocks
@@ -414,25 +399,38 @@ function Maze2:rowcol_to_pos(row, col)
 end
 
 function Maze2:pos_to_rowcol(pos) 
-	local x = pos.x;
-	local y = pos.y;
-	
-	local grid_dec_x = ((x - self.Origin.x)/self.Model_Width) + 1;
-	local grid_dec_y = ((y - self.Origin.y)/self.Model_Height) + 1;
-	
-	--[[
-	Log("In pos to rowcol");
-	
-	Log("Pos x: " .. tostring(pos.x));
-	Log("Pos y: " .. tostring(pos.y));
-	
-	Log("Grid decimal " .. tostring(grid_dec_x));
-	Log("Grid decimal " .. tostring(grid_dec_y));
-	]]--
-	
-	return {col = math.floor(grid_dec_x), 
-		row = math.floor(grid_dec_y)};
+  local x = pos.x;
+  local y = pos.y;
+  
+  local offset_x = x - self.Origin.x;
+  local offset_y = y - self.Origin.y;
+  
+  local offset_blocks_x = offset_x/self.Model_Width;
+  local offset_blocks_y = offset_y/self.Model_Height;
+  
+  local grid_dec_x = offset_blocks_x + 1;
+  local grid_dec_y = offset_blocks_y + 1;
+  
+  --[[
+  Log("In pos to rowcol");
+  
+  Log("Pos x: " .. tostring(pos.x));
+  Log("Pos y: " .. tostring(pos.y));
+  
+  Log("Offset Pos x" .. tostring(offset_x));
+  Log("Offset Pos y" .. tostring(offset_y));
+  
+  Log("Offset blocks x" .. tostring(offset_blocks_x));
+  Log("Offset blocks y" .. tostring(offset_blocks_y));
+  
+  Log("Grid decimal " .. tostring(grid_dec_x));
+  Log("Grid decimal " .. tostring(grid_dec_y));
+  ]]--
+  
+  return {col = math.floor(grid_dec_x+0.5), 
+    row = math.floor(grid_dec_y+0.5)};
 end
+
 
 -- Spawn a wall at coordinates (w,h)
 function Maze2:Wall(w, h)
@@ -566,13 +564,7 @@ function Maze2:New()
    end
    
    self:SpawnMice()
-   self:SpawnSnakes()
-  --self:SpawnFood(2,5)
-   self:SpawnFood(4,4)
-   self:SpawnFood(self:width()*2+1-1,6)
-   self:SpawnFood(self:width()*2+1-3,self:height()*2+1-1 )
-   self:SpawnFood(2, self:height()*2+1-3)
-   self:SpawnFood(self:width(), self:height())
+   --self:SpawnSnakes()
 end
 
 --Door class/ called to create doors
@@ -1015,12 +1007,10 @@ function Maze2:SpawnMice()
             name = "M";
             position = spawnPos;
             --orientation = dVec;
-            --scale = 10.6;
             properties = {
                 bActive = 1;
               --  object_Model = self.Model;
             };
-            
         };
         
         local mouse = System.SpawnEntity(params);
@@ -1057,65 +1047,17 @@ function Maze2:SpawnSnakes()
             --orientation = dVec;
             properties = {
                 bActive = 1;
+
+                --initial_direction = "up",
               --  object_Model = self.Model;
             };
         };
         
+
+
         local snake = System.SpawnEntity(params);
+        snake.direction = snake.directions[up];
+
          self.mySnakes[#self.mySnakes+1] = snake;
-
-end
-
-function Maze2:SpawnFood(w,h)
-        local Properties = self.Properties;
-        local width = 1+ self:width()*(self:corridorSize()+1)
-        local nSlot = (h-1)*width + w;
-        
-        local objX = self.Model_Width;
-        local objY = self.Model_Height;
-
-        if self.Origin.x == 0 then 
-            self.Origin = self:GetPos()
-        end 
-        local xOffset = self.Origin.x;
-        local yOffset = self.Origin.y;
-        local sx = objX*(w-1) + xOffset
-        local sy = objY*(h-1) + yOffset
-
-        --Log("Spawning at (%d, %d)", sx, sy);
-        local spawnPos = {x=sx,y=sy,z=32}
-        local dVec = self:GetDirectionVector()
-        --LogVec("Maze orientation: ", dVec)
-        
-        local foodType = ""
-        if w > self:width() and h > self:height() then
-            -- North Easst
-            foodType = "Berry"
-        elseif w > self:width() and h <= self:height() then
-            --North Wesst
-            foodType = "Cheese"
-        elseif w <=  self:width() and h > self:height() then
-            -- South Easst
-            foodType = "Potato"
-        elseif w <= self:width() and h <= self:height() then
-            -- South Wesst
-            foodType = "Grains"
-        end
-        
-        if( random(10) > 9) then foodType = "PowerBall" end
-        
-        local params = {
-            class = "Food";
-            name = "F";
-            position = spawnPos;
-            --orientation = dVec;
-            properties = {
-                esFoodType = foodType
-              --  object_Model = self.Model;
-            };
-        };
-        
-        local food = System.SpawnEntity(params);
-         self.myFoods[#self.myFoods+1] = food;
 
 end

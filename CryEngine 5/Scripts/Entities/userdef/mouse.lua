@@ -1,8 +1,8 @@
 --Amal's file path
---Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
+Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
 
 --Mitchel's file path
-Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
+--Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
 
 
 -- Globals
@@ -35,7 +35,7 @@ Mouse = {
 	
     Properties = {
 		bUsable = 0,
-        object_Model = "objects/characters/animals/rat/rat.cdf",
+        object_Model = "objects/default/primitive_cube_small.cgf",
 		fRotSpeed = 3, --[0.1, 20, 0.1, "Speed of rotation"]
 		m_speed = 0.1;   
 
@@ -70,8 +70,6 @@ Mouse = {
 		Icon = "Checkpoint.bmp", 
 	},	
 
-	ToEat = {},
-
 };
 
 MakeDerivedEntityOverride(Mouse, LivingEntityBase);
@@ -104,10 +102,23 @@ Mouse.Search =
 		end
 		  
 	  ]]
-	  	self:randomDirectionalWalk(time);
 
-	  	self:CheckFoodCollision()
-		
+	  local enemy = self:ray_cast("Snake");
+	  local target = self:ray_cast("Food");
+
+	  --Log(tostring(enemy));
+	  --Log(tostring(target));
+
+	  if enemy ~= nil then
+	  	self:GotoState("Avoid");
+	  elseif target ~= nil then
+	  	self:GotoState("Eat");
+	  else end;
+
+		--self:randomDirectionalWalk(time);
+
+		--Log("exploratoryWalk");
+		self:exploratoryWalk(time);
 
   end,
 
@@ -137,7 +148,7 @@ Mouse.Avoid =
 			  end
 		  ]]
 		  
-		  --self:Avoid()
+		  self:avoidWalk()
 
 	end,
 
@@ -147,19 +158,50 @@ Mouse.Avoid =
 	
 }
 
+Mouse.Cautious =
+{
+
+	OnBeginState = function(self)
+		Log("Mouse: Entering Cautious State")
+
+  	end,
+
+ 	OnUpdate = function(self,time)
+  		
+		  --[[
+			  if Safe then
+			  	self:GotoState("Search")
+			  end
+			  
+			  if Dead then
+			  	self:GotoState("Dead")
+			  end
+		  ]]
+		  
+		  self:cautiousWalk()
+
+	end,
+
+  	OnEndState = function(self)
+		Log("Mouse: Exiting Cautious State")
+  	end,
+	
+}
+
 Mouse.Eat =
 {
 
 	OnBeginState = function(self)
 		Log("Mouse: Entering Eat State")
-		--[[
-			GetNearbyFood Entity
-		]]
+
   	end,
 
  	OnUpdate = function(self,time)
-  		-- Call Nearby foodEntity's Eat function
-  		self.ToEat[1]:OnUsed(self)	 	
+  		local continue_chase = self:chase("Food", time);
+
+  		if continue_chase == false then
+  			self:GotoState("Search");
+  		else end;	 	
 	end,
 
   	OnEndState = function(self)
@@ -236,7 +278,7 @@ Mouse.Power =
 -------------------------                     State Functions                        --------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------
 
-function Mouse:GetEaten()
+function Mouse:OnEat()
 	Log("RIP Mouse")
 	self:GotoState("Dead")
 end
@@ -249,7 +291,7 @@ function Mouse:abstractReset()
 	self.mouseDataTable = self:LoadXMLData() -- Optional Parameter to SPecify what file to read
 	
 	--self:PrintTable(self.mouseDataTable)
-	self:SetScale(3);
+	
 	self:GotoState("Search");
 end
 
@@ -298,20 +340,7 @@ end
 -------------------------                      Functions                             ---------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
 
-function Mouse:CheckFoodCollision()
-	local nearby_entities = System.GetEntities(self.pos, 1)
-	local foundFood = ""
-	for key, value in pairs( nearby_entities ) do
-        if (tostring(value.type) == "Food") then
-            foundFood = value;
-        end 
-    end
 
-    if foundFood ~= "" then
-		self.ToEat[1] = foundFood;
-    	self:GotoState("Eat")--foundMouse:GetEaten()
-    end
-end
 
 
 function Mouse:breathing_animation(frameTime)
@@ -330,28 +359,26 @@ function Mouse:Avoid()
 
 end
 
-function Mouse:OnEat(foodType)
-	Log("Mouse: Eat FoodType = "..foodType)
-	if foodType == "Cheese" or foodType == "0" then     -- Cheese
+function Mouse:Eating(foodType)
+
+	if foodType == "0" then     -- Cheese
         Log("Mouse:OnEat = I am eating Cheese")
 		-- Update food table
-    elseif foodType == "Berry" or foodType == "1" then -- Berry
+    elseif foodType == "1" then -- Berry
         Log("Mouse:OnEat = I am eating Berry")
 		-- Update food table
-    elseif foodType == "Potato" or foodType == "2" then -- Potato
+    elseif foodType == "2" then -- Potato
         Log("Mouse:OnEat = I am eating Potato")
 		-- Update food table
-    elseif foodType == "3" or foodType == "Grains" then -- Grains
+    elseif foodType == "3" then -- Grains
         Log("Mouse:OnEat = I am eating Grains")
 		-- Update food table
-    elseif foodType == "4" or foodType == "PowerBall" then -- PowerBall
+    elseif foodType == "4" then -- PowerBall
         Log("Mouse:OnEat = I am eating PowerBall")
 		self:GotoState("Power")
     else
         Log("Mouse:OnEat = I am eating IDK")
     end
-
-    self:GotoState("Search")
 	
 	--[[ 
 		if MealComplete then
