@@ -60,11 +60,11 @@ LivingEntityBase = {
     },
     
     directions = {
-			none = {row_inc = 0, col_inc = 0},
-			up = {row_inc = 1, col_inc = 0},
-			down = {row_inc = -1, col_inc = 0},
-			right = {row_inc = 0, col_inc = 1},
-			left = {row_inc = 0, col_inc = -1}
+			none = {row_inc = 0, col_inc = 0, name = "none"},
+			up = {row_inc = 1, col_inc = 0, name = "up"},
+			down = {row_inc = -1, col_inc = 0, name = "down"},
+			right = {row_inc = 0, col_inc = 1, name = "right"},
+			left = {row_inc = 0, col_inc = -1, name = "left"}
 		},
 		
 	direction = {row_inc = 0, col_inc = 0},
@@ -88,6 +88,7 @@ function LivingEntityBase:OnInit()
 end
 
 function LivingEntityBase:OnPropertyChange() 
+	Log("In OnPropertyChange");
     self:OnReset();
 end
 
@@ -173,7 +174,7 @@ function LivingEntityBase:SetFromProperties()
     end
     
     if (self.Maze_Properties.ID == "") then
-        Log("Error: Mouse unable to locate maze");
+        Log("Error: LivingEntityBase unable to locate maze");
         return;
     end
     
@@ -195,7 +196,7 @@ function LivingEntityBase:SetFromProperties()
 end
 
 function LivingEntityBase:SetupMaze()
-    --populate Maze_Properties and put Mouse in maze
+    --populate Maze_Properties and put LivingEntityBase in maze
     --populate Maze Properties
     self.Maze_Properties.cell_height = self.Maze_Properties.ID:height();
     self.Maze_Properties.cell_width = self.Maze_Properties.ID:width();
@@ -228,9 +229,11 @@ function LivingEntityBase:SetupMaze()
         for row = 1, self.Maze_Properties.height do
             for col = 1, self.Maze_Properties.width do
                 if self.Maze_Properties.grid[row][col].occupied == false then
-
+					--Log("put living entity in maze");
+					--local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row, col);
                     self:move_xy(self.Maze_Properties.ID:rowcol_to_pos(row, col));
-                    return;
+                    --self:SetPos({target_pos.x, target_pos.y, 33});
+					return;
                 end
             end
         end
@@ -238,12 +241,14 @@ function LivingEntityBase:SetupMaze()
     end ) ()
 end
 ----------------------------------------------------------------------------------------------------------------------------------
--------------------------                      Functions                             ---------------------------------------------
+-------------------------              Movement Functions                             ---------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
 
 function LivingEntityBase:move_xy(xy)
+	--Log("x " .. tostring(self.pos.x));
 	self:SetPos({xy.x, xy.y, self.pos.z});
 	self.pos.x = xy.x;
+	--Log("x " .. tostring(self.pos.x));
 	self.pos.y = xy.y;
 end
 
@@ -292,4 +297,155 @@ function LivingEntityBase:FollowPlayer(frameTime)
 	self:move_xy({x = a.x + diff.x * speed_mag,
 		y = a.y + diff.y * speed_mag});
 	
+end
+
+
+function LivingEntityBase:turnLeftAlways()
+	--STATUS: Not finished for maze2
+
+	local rowcol = LivingEntityBase.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+	local row = rowcol.row;
+	local col = rowcol.col;
+
+end
+
+function LivingEntityBase:depthFirstSearch()
+
+	--STATUS: Not finished for any maze
+
+end
+
+function LivingEntityBase:randomWalk() 
+
+	--STATUS: Cryengine only - will push when works with lumberyard
+
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+	local row = rowcol.row;
+	local col = rowcol.col;
+
+end
+
+function LivingEntityBase:getUnoccupiedNeighbors(loc_row, loc_col)
+	
+	local grid = self.Maze_Properties.grid
+	local empty_neighbors = {};
+	
+	for key,value in pairs(self.directions) do
+		local row_index = value.row_inc + loc_row
+		local col_index = value.col_inc + loc_col
+		
+		if row_index > 0 and col_index > 0 and row_index <= #grid and col_index <= #grid[1] then 
+			--Log("row_index = %d, col_index = %d", row_index, col_index)
+			
+			if grid[row_index][col_index].occupied == false then
+				--Log("continue moving in same direction");
+				--Log(tostring(loc_row + loc_row_inc));
+				--Log(tostring(loc_col + loc_col_inc));
+				empty_neighbors[#empty_neighbors+1] = {row =row_index, col = col_index, direction = value};
+				--Log(tostring(#empty_neighbors));
+			end
+		end
+	end
+	
+	return empty_neighbors;
+end
+
+function LivingEntityBase:getLeftRight()
+	local dir = self.direction;
+	local dirs = self.directions;
+	if dir.name == "up" then
+		return dirs.left, dirs.right;
+	elseif dir.name == "down" then
+		return dirs.right, dirs.left;
+	elseif dir.name == "left" then 
+		return dirs.up, dirs.down;
+	elseif dir.name == "right" then
+		return dirs.down, dirs.up;
+	else
+		return nil;
+	end
+end
+
+function LivingEntityBase:randomDirectionalWalk(frameTime)
+	--Cryengine
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
+	--Lumberyard
+	--local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+	
+	local row = rowcol.row;
+	local col = rowcol.col;
+	
+	local loc_row_inc = self.direction.row_inc;
+	local loc_col_inc = self.direction.col_inc;
+	
+	
+	if loc_row_inc ~= 0 or loc_col_inc ~= 0 then
+		if self.Maze_Properties.grid[row+loc_row_inc][col+loc_col_inc].occupied == false then
+			--Log("continue moving in same direction");
+			local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
+			self:Move_to_Pos(frameTime, target_pos);
+			return;
+		end
+	end
+	
+	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
+
+	--[[
+	Log("row: " .. tostring(row));
+	Log("col: " .. tostring(col));
+
+	Log(tostring(self.Maze_Properties.grid[row][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row + 1][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row - 1][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row][col + 1].occupied));
+	Log(tostring(self.Maze_Properties.grid[row][col - 1].occupied));
+	
+	Log(tostring(#empty_neighbors));
+	Log(tostring(frameTime))
+	--]]
+	
+	-- TODO: AMAL FOR SOME REASON SOMETIMES THIS GETS CALLED WITH NIL VALs
+		--commenting out last 3 lines of this function is a fix - don't ask me why
+	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
+	
+	
+	local rnd_idx = random(#empty_neighbors);
+	--if rnd_idx >1 then rnd_idx = rnd_idx-1 end
+	self.direction = empty_neighbors[rnd_idx].direction;
+	--local target_cell = empty_neighbors[rnd_idx];
+	--local target_pos = self.Maze_Properties.ID:rowcol_to_pos(target_cell.row, target_cell.col);
+	--self:Move_to_Pos(frameTime, target_pos);
+end
+
+function LivingEntityBase:directionalWalk(frameTime)
+
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
+	
+	local row = rowcol.row;
+	local col = rowcol.col;
+	
+	local loc_row_inc = self.direction.row_inc;
+	local loc_col_inc = self.direction.col_inc;
+	
+	if loc_row_inc ~= 0 or loc_col_inc ~= 0 then
+		if self.Maze_Properties.grid[row+loc_row_inc][col+loc_col_inc].occupied == false then
+			--Log("continue moving in same direction");
+			local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
+			self:Move_to_Pos(frameTime, target_pos);
+			return;
+		end
+	end
+	
+	for key,value in pairs(self.directions) do
+		loc_row_inc = value.row_inc;
+		loc_col_inc = value.col_inc;
+		if self.Maze_Properties.grid[row+loc_row_inc][col+loc_col_inc].occupied == false then
+			--Log("continue moving in same direction");
+			self.direction = {row_inc = loc_row_inc, col_inc = loc_col_inc};
+			local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
+			self:Move_to_Pos(frameTime, target_pos);
+			return;
+		end
+	end
+
 end
