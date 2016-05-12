@@ -567,6 +567,7 @@ function Maze2:New()
    
    self:SpawnMice()
    self:SpawnSnakes()
+  --self:SpawnFood(2,5)
    self:SpawnFood(4,4)
    self:SpawnFood(self:width()*2+1-1,6)
    self:SpawnFood(self:width()*2+1-3,self:height()*2+1-1 )
@@ -1014,10 +1015,12 @@ function Maze2:SpawnMice()
             name = "M";
             position = spawnPos;
             --orientation = dVec;
+            --scale = 10.6;
             properties = {
                 bActive = 1;
               --  object_Model = self.Model;
             };
+            
         };
         
         local mouse = System.SpawnEntity(params);

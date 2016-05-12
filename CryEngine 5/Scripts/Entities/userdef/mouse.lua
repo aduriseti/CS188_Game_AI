@@ -35,7 +35,7 @@ Mouse = {
 	
     Properties = {
 		bUsable = 0,
-        object_Model = "objects/default/primitive_cube_small.cgf",
+        object_Model = "objects/characters/animals/rat/rat.cdf",
 		fRotSpeed = 3, --[0.1, 20, 0.1, "Speed of rotation"]
 		m_speed = 0.1;   
 
@@ -249,7 +249,7 @@ function Mouse:abstractReset()
 	self.mouseDataTable = self:LoadXMLData() -- Optional Parameter to SPecify what file to read
 	
 	--self:PrintTable(self.mouseDataTable)
-	
+	self:SetScale(3);
 	self:GotoState("Search");
 end
 
