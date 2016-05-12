@@ -4,6 +4,7 @@ Food = {
   -- Instance vars
   --Model_Dimensions = {Width = 0, Height = 0, Z = 0},
   Model = "",
+  pos = {x=0, y=0, z=0},
   
   -- Copied from BasicEntity.lua
   Properties = {
@@ -13,8 +14,7 @@ Food = {
      
      -- Cheese = 0, Berry = 1, Potato = 2, Grains = 3, PowerBall = 4
      esFoodType = "Cheese",                 
-     
-    
+  
      --Copied from BasicEntity.lua
      Physics = {
         bPhysicalize = 1, -- True if object should be physicalized at all.
@@ -54,6 +54,7 @@ end
 function Food:OnReset()
     --Log("OnReset is running");
     self:SetupModel()
+    self.pos = self:GetPos();
 end
 
 ----------------------------------------------------------------------------------------------------------------------------------
@@ -143,6 +144,10 @@ end
 
 function Food:OnUsed(userId, index)
     Log("Used")
-    userId:OnEat(self.Properties.esFoodType)
+    userId:Eating(self.Properties.esFoodType)
     self:Eaten();
+end
+
+function Food:OnEat(userId, index)
+    self:OnUsed(userId, index);
 end

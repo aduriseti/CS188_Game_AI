@@ -594,13 +594,16 @@ end
 -------------------------              Behaviors                             ---------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------
 function LivingEntityBase:chase(target_class, time)
-
+	Log("In Chase")
 	local target = self:ray_cast(target_class);
-
-	if (target ~= nil) then
+	self:PrintTable(target)
+	if (target.class ~= "") then
+		Log("In if state")
 		local distance = vecLen(vecSub(target.pos, self.pos));
-		if distance < 1 then
-			target:OnEat();
+		Log("Distance = %d", distance)
+		if distance <= 1 then
+			Log("Distance <= 1, Eat")
+			target:OnEat(self, 2);
 			self.target = nil;
 
 			return false;
@@ -628,7 +631,7 @@ function LivingEntityBase:ray_cast(target_class)
 		return nil;
 	end
 
- 	Log(tostring(target));
+ 	--Log(tostring(target));
 
  	System.DrawLine(self.pos, target.pos, 1, 0, 0, 1);
 
