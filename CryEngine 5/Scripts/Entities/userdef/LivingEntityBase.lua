@@ -369,7 +369,7 @@ function LivingEntityBase:getLeftRight()
 	end
 end
 
-function LivingEntityBase:exploratoryWalk(frameTime)
+function LivingEntityBase:runFrom(target, frameTime)
 	--Cryengine
 	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
 	--Lumberyard
@@ -381,21 +381,116 @@ function LivingEntityBase:exploratoryWalk(frameTime)
 	local loc_row_inc = self.direction.row_inc;
 	local loc_col_inc = self.direction.col_inc;
 
-	--[[
-	Log("previous row " .. tostring(self.previous_row));
-	Log("previous_col " .. tostring(self.previous_col));
-	Log("row: " .. tostring(row));
-	Log("col: " .. tostring(col));
+	--if we haven't moved out of a grid space yet, continue as before
+	if row == self.previous_row and
+			col == self.previous_col and 
+			(loc_row_inc ~= 0 or loc_col_inc) ~= 0 then
+		--Log("STAY ON COURSE");
+		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
+		self:Move_to_Pos(frameTime, target_pos);
+		return;
+	end
 
-	Log("delta_X " .. tostring(loc_col_inc));
-	Log("delta_Y " .. tostring(loc_row_inc));
+	--else change our behavior
+	self.previous_col = col;
+	self.previous_row = row;
+
+	--increment visit counter of current grid space
+	--Log(tostring(self.Maze_Properties.grid[row][col].n_visited));
+	self.Maze_Properties.grid[row][col].n_visited = self.Maze_Properties.grid[row][col].n_visited + 1;
+	--Log(tostring(self.Maze_Properties.grid[row][col].n_visited));
+
+	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
+
+	--Log("Num Empty_neighbors: " .. tostring(#empty_neighbors));
+
+	--get direction vector of target
+	local target_col_inc, target_row_inc;
+	block_offset_x = math.floor((target.pos.x - self.pos.x)/2 + 0.5);
+	block_offset_y = math.floor((target.pos.y - self.pos.y)/2 + 0.5);
+	if block_offset_x < 0 then
+		target_col_inc = -1;
+	elseif block_offset_x > 0 then
+		target_col_inc = 1;
+	else
+		target_col_inc = 0;
+	end
+
+	if block_offset_y < 0 then
+		target_row_inc = -1;
+	elseif block_offset_y > 0 then
+		target_row_inc = 1;
+	else
+		target_row_inc = 0;
+	end
+
+	local target_direction = {row_inc = target_row_inc, col_inc = target_col_inc};
+
+	-- if there are more options than mvoing towards target
+	if #empty_neighbors >=2 then
+		--remove moving towards target as an option
+		for key, value in pairs(empty_neighbors) do
+			--remove moving towards target as an option
+			try_dir = empty_neighbors[key].direction;
+			if try_dir.row_inc ==  target_row_inc and
+					try_dir.col_inc == target_col_inc then
+				--Log("REMOVE BACKTRACKING AS OPTION");
+				empty_neighbors[key] = nil;
+			--if a movement direction takes the mouse out of the sight of the snake - take it
+			else
+				try_pos = self.Maze_Properties.ID:rowcol_to_pos(value.row, value.col);
+				
+				local diff = {x = target.pos.x - try_pos.x, y = target.pos.y - try_pos.y, z = 0};
+
+				--Log(Vec2Str(diff));
+
+			 	local fucker = {};
+
+			 	Physics.RayWorldIntersection({try_pos.x, try_pos.y, self.pos.z}, diff, 1, ent_all, self.id, target.id, fucker);--, self:GetRawId(), target_mouse:GetRawId());
+
+				local n_hits = 0;
+
+				--self:PrintTable(fucker);
+
+				for key, value in pairs(fucker) do
+					n_hits = n_hits + 1
+				end
+
+				if (n_hits > 0) then
+					Log("HIDE AND SEEK");
+					self.direction = value.direction;
+					return;
+				end
+			end
+		end
+	else end
 	
-	Log(tostring(self.Maze_Properties.grid[row][col].occupied));
-	Log(tostring(self.Maze_Properties.grid[row + 1][col].occupied));
-	Log(tostring(self.Maze_Properties.grid[row - 1][col].occupied));
-	Log(tostring(self.Maze_Properties.grid[row][col + 1].occupied));
-	Log(tostring(self.Maze_Properties.grid[row][col - 1].occupied));
-	--]]
+	local min_val = 10000;
+	local min_key = 0
+
+	for key, value in pairs(empty_neighbors) do
+		--Log(tostring(value.n_visited));
+		if value.n_visited < min_val then
+			min_val = value.n_visited;
+			min_key = key;
+		end
+	end
+	
+	--select minimally visited neighbor
+	self.direction = empty_neighbors[min_key].direction;
+end
+
+function LivingEntityBase:exploratoryWalk(frameTime)
+	--Cryengine
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
+	--Lumberyard
+	--local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+
+	local row = rowcol.row;
+	local col = rowcol.col;
+
+	local loc_row_inc = self.direction.row_inc;
+	local loc_col_inc = self.direction.col_inc;
 
 	--if we haven't moved out of a grid space yet, continue as before
 	if row == self.previous_row and
@@ -431,69 +526,20 @@ function LivingEntityBase:exploratoryWalk(frameTime)
 				empty_neighbors[key] = nil;
 			end
 		end
-	else
-		--[[
-		if loc_row_inc ~= 0 or loc_col_inc ~= 0 then
-			if self.Maze_Properties.grid[row+loc_row_inc][col+loc_col_inc].occupied == false then
-				--Log("continue moving in same direction");
-				local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
-				self:Move_to_Pos(frameTime, target_pos);
-				return;
-			end
-		end
-		--]]
-	end
-	
-	--get rid of most visited neighbor until there is only one left or until all neighbors have been visited equally
-	--[[
-	while #empty_neighbors > 1 and max_val != min_val do
-		local max_val = -1;
-		local min_val = 10000;
-		local max_key = 0;
-		for key, value in pairs(empty_neighbors) do
-			if value.n_visited > max_val then
-				max_val = value.n_visited;
-				max_key = key;
-			end
-
-			if value.n_visited < min_val then
-				min_val = value.n_visited;
-			end
-		end
-
-		if #empty_neighbors <= 1 or max_val == min_val then
-			break;
-		else
-			empty_neighbors[max_val] = nil;
-		end
-	end
-	--]]
+	else end
 	
 	local min_val = 10000;
 	local min_key = 0
 
 	for key, value in pairs(empty_neighbors) do
-		--if (value.n_visited == nil) then value.n_visited = 0; end;
 		--Log(tostring(value.n_visited));
 		if value.n_visited < min_val then
 			min_val = value.n_visited;
 			min_key = key;
 		end
 	end
-	--]]
-	--[[
-	for key, value in pairs(empty_neighbors) do
-		if value.n_visited > min_val then
-			empty_neighbors[key] = nil;
-		end
-	end
-	--]]
-
-	--now row randomly select neighbors out of the remaining empty ones
-	--Log("Num Empty_neighbors: " .. tostring(#empty_neighbors));
-
-	--Log("CHOOSE RANDOM DIRECTION OUT OF REMAINING OPTIONS");
-	--local rnd_idx = random(#empty_neighbors);
+	
+	--select minimally visited neighbor
 	self.direction = empty_neighbors[min_key].direction;
 end
 
@@ -552,7 +598,7 @@ function LivingEntityBase:bounce(frameTime)
 	end
 
 	--choose random starting direction
-	Log("choose rand initial direction");
+	--Log("choose rand initial direction");
 	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
 	local rnd_idx = random(#empty_neighbors);
 	self.direction = empty_neighbors[rnd_idx].direction;
@@ -594,30 +640,44 @@ end
 -------------------------              Behaviors                             ---------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------
 function LivingEntityBase:chase(target_class, time)
-	Log("In Chase")
+	--Log("In Chase")
 	local target = self:ray_cast(target_class);
-	self:PrintTable(target)
-	if (target.class ~= "") then
-		Log("In if state")
-		local distance = vecLen(vecSub(target.pos, self.pos));
-		Log("Distance = %d", distance)
-		if distance <= 1 then
-			Log("Distance <= 1, Eat")
-			target:OnEat(self, 2);
-			self.target = nil;
 
+	if (target ~= nil) then
+		--self:PrintTable(target)
+		if (target.class ~= "") then
+			--Log("In if state")
+			local distance = vecLen(vecSub(target.pos, self.pos));
+			--Log("Distance = %d", distance)
+			if distance < 2 then
+				--Log("Distance <= 1, Eat")
+				target:OnEat(self, 2);
+				self.target = nil;
+
+				return false;
+			end
+
+			self:Move_to_Pos(time, target.pos);
+
+			return true;
+		else
 			return false;
 		end
+	end
+end
 
-		self:Move_to_Pos(time, target.pos);
 
+function LivingEntityBase:run(target_class, time)
+
+	local target = self:ray_cast(target_class);
+
+	if (target ~= nil) then
+		self:runFrom(target, time);
 		return true;
 	else
 		return false;
 	end
-
 end
-
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------              Utility Functions                             ---------------------------------------------
@@ -648,7 +708,7 @@ function LivingEntityBase:ray_cast(target_class)
 	end
 
 	if (n_hits > 0) then
-		Log("Raycast intersect");
+		--Log("Raycast intersect");
 		return nil;
 	end
 

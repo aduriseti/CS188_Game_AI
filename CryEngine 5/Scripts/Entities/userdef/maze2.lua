@@ -32,9 +32,9 @@ Maze2 = {
   -- Copied from BasicEntity.lua
   Properties = {
      bUsable = 0,
-	 iM_Width = 20,
+   iM_Width = 20,
      iM_Height = 20,
-	 object_Model = "objects/default/primitive_cube.cgf",
+   object_Model = "objects/default/primitive_cube.cgf",
      
      file_map_txt = "Scripts\\Entities\\maps\\map_default.txt",
      bMap_Save_TXT = 0,
@@ -56,8 +56,8 @@ Maze2 = {
 
   -- optional editor information taken from BasicEntity.lua
   Editor = {
-	 	Icon = "physicsobject.bmp",
-		IconOnTop=1,
+    Icon = "physicsobject.bmp",
+    IconOnTop=1,
   },
   
     -- Read in Maze2 File to lines:
@@ -70,12 +70,12 @@ Maze2 = {
 
 -- I DUNNO WTF THIS IS I COPIED FROM BasicEntity.lua
 local Physics_DX9MP_Simple = {
-	bPhysicalize = 1, -- True if object should be physicalized at all.
-	bPushableByPlayers = 0,
-		
-	Density = 0,
-	Mass = 0,
-		
+  bPhysicalize = 1, -- True if object should be physicalized at all.
+  bPushableByPlayers = 0,
+    
+  Density = 0,
+  Mass = 0,
+    
 }
 
 -- I dunno, make it usable?
@@ -146,21 +146,21 @@ end
 
 function Maze2:PhysicalizeThis() -- Helper function to physicalize, Copied from BasicEntity.lua
     -- Init physics.
-	local Physics = self.Properties.Physics;
-	if (CryAction.IsImmersivenessEnabled() == 0) then
-		Physics = Physics_DX9MP_Simple;
-	end
-	EntityCommon.PhysicalizeRigid( self,0,Physics,self.bRigidBodyActive );
+  local Physics = self.Properties.Physics;
+  if (CryAction.IsImmersivenessEnabled() == 0) then
+    Physics = Physics_DX9MP_Simple;
+  end
+  EntityCommon.PhysicalizeRigid( self,0,Physics,self.bRigidBodyActive );
 end
 
 function Maze2:SetFromProperties()
     Log("In SetFromProperties")
     
-	local Properties = self.Properties;
-	
-	if (Properties.object_Model == "") then
-		do return end;
-	end
+  local Properties = self.Properties;
+  
+  if (Properties.object_Model == "") then
+    do return end;
+  end
        
     -- Free Spawn 
     local width, height, map, model, corSize = Properties.iM_Width, Properties.iM_Height, Properties.file_map_txt, Properties.object_Model, Properties.iM_CorridorSize
@@ -391,27 +391,27 @@ function Maze2:DoorSpawn()
 end
 
 function Maze2:wh_to_nslot(w, h) 
-	local width = 1+ self:width()*(self:corridorSize()+1)
-	return ((h-1)*width + w)
+  local width = 1+ self:width()*(self:corridorSize()+1)
+  return ((h-1)*width + w)
 end
 
 function Maze2:rowcol_to_nslot(row, col)
-	local h = row;
-	local w = col;
-	local width = 1+ self:width()*(self:corridorSize()+1);
-	return(h-1)*width + w;
+  local h = row;
+  local w = col;
+  local width = 1+ self:width()*(self:corridorSize()+1);
+  return(h-1)*width + w;
 end
 
 function Maze2:wh_to_pos(w, h)
-	return {x = self.Model_Width*(w-1) + self.Origin.x, 
-		y = self.Model_Height*(h-1) + self.Origin.y};
+  return {x = self.Model_Width*(w-1) + self.Origin.x, 
+    y = self.Model_Height*(h-1) + self.Origin.y};
 end
 
 function Maze2:rowcol_to_pos(row, col) 
-	local h = row;
-	local w = col;
-	return {x = self.Model_Width*(w-1) + self.Origin.x, 
-		y = self.Model_Height*(h-1) + self.Origin.y};
+  local h = row;
+  local w = col;
+  return {x = self.Model_Width*(w-1) + self.Origin.x, 
+    y = self.Model_Height*(h-1) + self.Origin.y};
 end
 
 function Maze2:pos_to_rowcol(pos) 
@@ -494,8 +494,8 @@ function Maze2:New()
     Log("In New");
     
     local Properties = self.Properties;
-	local success = false;
-	if (Properties.file_map_txt ~= "") then
+  local success = false;
+  if (Properties.file_map_txt ~= "") then
         Log("Map property isn't empty");
         success = self:ReadMaze2();
         --Properties.file_map_txt = "";
@@ -626,7 +626,7 @@ end
 function Maze2:OpenDoor(s)
     --Log("Freeing Slot: %d", s)
     self.myWalls[s]:DeleteThis();
-	self.myWalls[s] = nil;
+  self.myWalls[s] = nil;
     --Log("Freed")
 end
 
@@ -1027,7 +1027,7 @@ function Maze2:SpawnMice()
 end
 
 function Maze2:SpawnSnakes()
-        local w, h = 4,10
+        local w, h = 4,16
         local Properties = self.Properties;
         local width = 1+ self:width()*(self:corridorSize()+1)
         local nSlot = (h-1)*width + w;

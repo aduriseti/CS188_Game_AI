@@ -147,9 +147,12 @@ Mouse.Avoid =
 			  	self:GotoState("Dead")
 			  end
 		  ]]
-		  
-		  self:avoidWalk()
 
+	  	local continue_run = self:run("Snake", time);
+
+		if continue_run == false then
+			self:GotoState("Search");
+		else end;
 	end,
 
   	OnEndState = function(self)
@@ -340,6 +343,9 @@ end
 -------------------------                      Functions                             ---------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
 
+
+
+
 function Mouse:breathing_animation(frameTime)
 
 	local cycle_time = 50;
@@ -352,9 +358,6 @@ function Mouse:breathing_animation(frameTime)
 	self:SetPos({self.pos.x, self.pos.y, 32 + 0.9+(0.2/50 * frameTime % cycle_time)});
 end
 
-function Mouse:Avoid()
-
-end
 
 function Mouse:Eating(foodType)
 

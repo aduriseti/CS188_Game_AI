@@ -1,7 +1,7 @@
 --CryEngine
---Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
+Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
 --Lumberyard
-Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
+--Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    Snake Table Declaration                 ---------------------------------------------
@@ -20,12 +20,14 @@ Snake = {
 	
     Properties = {
         --object_Model = "objects/characters/animals/reptiles/snake/snake.cdf",
-        object_Model = "objects/snake.cgf",
+        object_Model = "objects/default/primitive_sphere.cgf",
 		fRotSpeed = 3, --[0.1, 20, 0.1, "Speed of rotation"]
 		m_speed = 0.1;
         --maze_ent_name = "Maze1",f
 		maze_ent_name = "",
         bActive = 0,
+
+        initial_direction = "up",
 		
 		--Copied from BasicEntity.lua
         Physics = {
@@ -70,14 +72,24 @@ Snake.Patrol =
   OnBeginState = function(self)
   	Log("Snake: Entering Patrol State")
 
+  	self.direction = self.directions[up];
+
   end,
 
   OnUpdate = function(self,time)
   
 		  --Log("FUCKERS")
-		  self:myPatrol(time)
+		  --self:myPatrol(time)
 
-		  self:CheckMouseCollision()
+		  local target = self:ray_cast("Mouse");
+
+		  if target ~= nil then
+		  	self:GotoState("Eat");
+		  end
+
+		  self:bounce(time);
+
+		  --self:CheckMouseCollision()
 		
   end,
 
@@ -87,6 +99,39 @@ Snake.Patrol =
 
 
  }
+
+ function Snake:ray_cas(target_class)
+
+	local target = System.GetNearestEntityByClass({self.pos.x, self.pos.y, self.pos.z},
+ 			 1000, target_class);
+
+	if target == nil then
+		return nil;
+	end
+
+ 	--Log(tostring(target));
+
+ 	System.DrawLine(self.pos, target.pos, 1, 0, 0, 1);
+
+ 	local diff = {x = target.pos.x - self.pos.x, y = target.pos.y - self.pos.y, z = 0};
+
+ 	local fucker = {};
+
+ 	Physics.RayWorldIntersection(self.pos, diff, 1, ent_all, self.id, target.id, fucker);--, self:GetRawId(), target_mouse:GetRawId());
+
+	local n_hits = 0;
+
+	for key, value in fucker do
+		n_hits = n_hits + 1
+	end
+
+	if (n_hits > 0) then
+		--Log("Raycast intersect");
+		return nil;
+	end
+
+	return target;
+end
 
 
 
@@ -100,10 +145,11 @@ Snake.Eat =
 
   OnUpdate = function(self,time)
   	
-	self:KillMouse()
-    --if (--[[ Lose Sight ]]) then
-      --self:GotoState("Patrol");
-    --end
+	local continue_chase = self:chase("Mouse", time);
+
+		if continue_chase == false then
+			self:GotoState("Patrol");
+		else end;
 
   end,
 
@@ -138,6 +184,10 @@ Snake.Destroyed =
 --sets the Mouse's properties
 function Snake:abstractReset()
 	--Log("In OnResettttttttt")
+
+	--self.direction = self.directions.up;
+	--Log(tostring(self.direction.row_inc));
+
 	self:GotoState("Patrol");
 
 end
@@ -162,76 +212,6 @@ end
 -------------------------                      Functions                             ---------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
 
-function Snake:myPatrol(time)
-	if (self.cur_patrol ~= self.max_patrol and self.cur_direction == "NorthEast") then
-		self:MoveNorthEast(time);
-		self.cur_patrol = self.cur_patrol + 1;
-	elseif (self.cur_patrol ~= self.max_patrol and self.cur_direction == "SouthWest") then
-		self:MoveSouthWest(time);
-		self.cur_patrol = self.cur_patrol + 1;
-	elseif (self.cur_patrol == self.max_patrol and self.cur_direction == "NorthEast") then
-		self.cur_direction = "SouthWest";
-		self.cur_patrol = 0;
-	else
-		self.cur_direction = "NorthEast";
-		self.cur_patrol = 0;
-	end
-		
-end
-
-function Snake:MoveNorthEast(frameTime) 
-
-	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
-	local row = rowcol.row
-	local col = rowcol.col
-	
-	local grid = self.Maze_Properties.grid;
-	local maxX, maxY = #grid, #grid[1]
-	
-	-- Check if snake can move north, then east, then west, then south
-	if (row-1 > 0 and row-1 <= maxX and col > 0 and col <= maxY) and (self.Maze_Properties.grid[row-1][col].occupied == false) then		-- North
-		local pos = self.Maze_Properties.ID:rowcol_to_pos(row-1, col);
-		self:Move_to_Pos(frameTime, pos);
-	elseif (row > 0 and row <= maxX and col+1 > 0 and col+1 <= maxY) and (self.Maze_Properties.grid[row][col+1].occupied == false) then	-- East
-		local pos = self.Maze_Properties.ID:rowcol_to_pos(row, col+1);
-		self:Move_to_Pos(frameTime, pos);
-	elseif (row > 0 and row <= maxX and col-1 > 0 and col-1 <= maxY) and (self.Maze_Properties.grid[row][col-1].occupied == false) then	-- West
-		local pos = self.Maze_Properties.ID:rowcol_to_pos(row, col-1);
-		self:Move_to_Pos(frameTime, pos);
-	elseif (row+1 > 0 and row+1 <= maxX and col > 0 and col <= maxY) and (self.Maze_Properties.grid[row+1][col].occupied == false) then	-- South
-		local pos = self.Maze_Properties.ID:rowcol_to_pos(row+1, col);
-		self:Move_to_Pos(frameTime, pos);
-	end
-	--Log(tostring(self:GetPos().x) .. tostring(self.pos.x));
-	
-end
-
-function Snake:MoveSouthWest(frameTime) 
-
-	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
-	local row = rowcol.row
-	local col = rowcol.col
-	
-	local grid = self.Maze_Properties.grid;
-	local maxX, maxY = #grid, #grid[1]
-	
-	-- Check if snake can move south, then west, then east, then north
-	if (row+1 > 0 and row+1 <= maxX and col > 0 and col <= maxY) and (self.Maze_Properties.grid[row+1][col].occupied == false) then		-- South
-		local pos = self.Maze_Properties.ID:rowcol_to_pos(row+1, col);
-		self:Move_to_Pos(frameTime, pos);
-	elseif (row > 0 and row <= maxX and col-1 > 0 and col-1 <= maxY) and (self.Maze_Properties.grid[row][col-1].occupied == false) then	-- West
-		local pos = self.Maze_Properties.ID:rowcol_to_pos(row, col-1);
-		self:Move_to_Pos(frameTime, pos);
-	elseif (row > 0 and row <= maxX and col+1 > 0 and col+1 <= maxY) and (self.Maze_Properties.grid[row][col+1].occupied == false) then	-- East
-		local pos = self.Maze_Properties.ID:rowcol_to_pos(row, col+1);
-		self:Move_to_Pos(frameTime, pos);
-	elseif (row-1 > 0 and row-1 <= maxX and col > 0 and col <= maxY) and (self.Maze_Properties.grid[row-1][col].occupied == false) then	-- North
-		local pos = self.Maze_Properties.ID:rowcol_to_pos(row-1, col);
-		self:Move_to_Pos(frameTime, pos);
-	end
-	--Log(tostring(self:GetPos().x) .. tostring(self.pos.x));
-	
-end
 
 function Snake:CheckMouseCollision()
 
