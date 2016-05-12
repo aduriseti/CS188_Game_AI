@@ -159,7 +159,7 @@ Mouse.Eat =
 
  	OnUpdate = function(self,time)
   		-- Call Nearby foodEntity's Eat function
-  		ToEat[1]:OnUsed(self)	 	
+  		self.ToEat[1]:OnUsed(self)	 	
 	end,
 
   	OnEndState = function(self)
@@ -331,20 +331,20 @@ function Mouse:Avoid()
 end
 
 function Mouse:OnEat(foodType)
-
-	if foodType == "0" then     -- Cheese
+	Log("Mouse: Eat FoodType = "..foodType)
+	if foodType == "Cheese" or foodType == "0" then     -- Cheese
         Log("Mouse:OnEat = I am eating Cheese")
 		-- Update food table
-    elseif foodType == "1" then -- Berry
+    elseif foodType == "Berry" or foodType == "1" then -- Berry
         Log("Mouse:OnEat = I am eating Berry")
 		-- Update food table
-    elseif foodType == "2" then -- Potato
+    elseif foodType == "Potato" or foodType == "2" then -- Potato
         Log("Mouse:OnEat = I am eating Potato")
 		-- Update food table
-    elseif foodType == "3" then -- Grains
+    elseif foodType == "3" or foodType == "Grains" then -- Grains
         Log("Mouse:OnEat = I am eating Grains")
 		-- Update food table
-    elseif foodType == "4" then -- PowerBall
+    elseif foodType == "4" or foodType == "PowerBall" then -- PowerBall
         Log("Mouse:OnEat = I am eating PowerBall")
 		self:GotoState("Power")
     else
