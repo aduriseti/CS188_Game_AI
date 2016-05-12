@@ -1,7 +1,7 @@
 --CryEngine
---Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
+Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
 --Lumberyard
-Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
+--Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    Snake Table Declaration                 ---------------------------------------------
@@ -20,9 +20,12 @@ Snake = {
 	
     Properties = {
         --object_Model = "objects/characters/animals/reptiles/snake/snake.cdf",
-        object_Model = "objects/default/primitive_cube_small.cgf",
+        --object_Model = "objects/default/primitive_cube_small.cgf",
+		
+		object_Model = "objects/default/primitive_sphere.cgf",
+		
 		fRotSpeed = 3, --[0.1, 20, 0.1, "Speed of rotation"]
-		m_speed = 0.1;
+		--m_speed = 0.1;
         --maze_ent_name = "Maze1",f
 		maze_ent_name = "",
         bActive = 0,
@@ -74,6 +77,15 @@ Snake.Patrol =
   
 		  --Log("FUCKERS")
 		  self:myPatrol(time)
+		  
+		  Log("Is colliding: " .. tostring(self:IsColliding()));
+		  local collision_table = self:CheckCollisions();
+		  for key, value in pairs(collision_table) do
+			Log(tostring(key) .. ":" .. tostring(value));
+		end
+		  --Log("Check collisions: " .. tostring(self:CheckCollisions()));
+		  
+		  --self:bounce(time);
 		
   end,
 

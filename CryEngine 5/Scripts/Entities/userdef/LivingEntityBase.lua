@@ -299,6 +299,9 @@ function LivingEntityBase:FollowPlayer(frameTime)
 	
 end
 
+----------------------------------------------------------------------------------------------------------------------------------
+-------------------------              Movement Algorithms                             ---------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------
 
 function LivingEntityBase:turnLeftAlways()
 	--STATUS: Not finished for maze2
@@ -406,7 +409,7 @@ function LivingEntityBase:randomDirectionalWalk(frameTime)
 	
 	-- TODO: AMAL FOR SOME REASON SOMETIMES THIS GETS CALLED WITH NIL VALs
 		--commenting out last 3 lines of this function is a fix - don't ask me why
-	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
+	--local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
 	
 	
 	local rnd_idx = random(#empty_neighbors);
@@ -416,6 +419,39 @@ function LivingEntityBase:randomDirectionalWalk(frameTime)
 	--local target_pos = self.Maze_Properties.ID:rowcol_to_pos(target_cell.row, target_cell.col);
 	--self:Move_to_Pos(frameTime, target_pos);
 end
+
+--function which makes living entity patrol the straight line pathway its spawned in
+function LivingEntityBase:bounce(frameTime)
+	--Cryengine
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
+	--Lumberyard
+	--local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+	
+	local row = rowcol.row;
+	local col = rowcol.col;
+	
+	local loc_row_inc = self.direction.row_inc;
+	local loc_col_inc = self.direction.col_inc;
+	
+
+	if loc_row_inc ~= 0 or loc_col_inc ~= 0 then
+		if self.Maze_Properties.grid[row+loc_row_inc][col+loc_col_inc].occupied == false then
+			--Log("continue moving in same direction");
+			local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
+			self:Move_to_Pos(frameTime, target_pos);
+			return;
+		else
+			--reverse direction if living enity has one
+			self.direction = {row_inc = -loc_row_inc, col_inc = -loc_col_inc};
+		end
+	end
+	
+	--choose random starting direction
+	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
+	local rnd_idx = random(#empty_neighbors);
+	self.direction = empty_neighbors[rnd_idx].direction;
+end	
+
 
 function LivingEntityBase:directionalWalk(frameTime)
 
@@ -447,5 +483,75 @@ function LivingEntityBase:directionalWalk(frameTime)
 			return;
 		end
 	end
+
+end
+
+----------------------------------------------------------------------------------------------------------------------------------
+-------------------------              Utility Functions                             ---------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------
+
+function Mouse:PrintTable(t)
+
+    local print_r_cache={}
+
+    local function sub_print_r(t,indent)
+
+        if (print_r_cache[tostring(t)]) then
+
+            Log(indent.."*"..tostring(t))
+
+        else
+
+            print_r_cache[tostring(t)]=true
+
+            if (type(t)=="table") then
+
+                for pos,val in pairs(t) do
+
+                    if (type(val)=="table") then
+
+                        Log(indent.."["..pos.."] => "..tostring(t).." {")
+
+                        sub_print_r(val,indent..string.rep(" ",string.len(pos)+8))
+
+                        Log(indent..string.rep(" ",string.len(pos)+6).."}")
+
+                    elseif (type(val)=="string") then
+
+                        Log(indent.."["..pos..'] => "'..val..'"')
+
+                    else
+
+                        Log(indent.."["..pos.."] => "..tostring(val))
+
+                    end
+
+                end
+
+            else
+
+                Log(indent..tostring(t))
+
+            end
+
+        end
+
+    end
+
+    if (type(t)=="table") then
+
+        Log(tostring(t).." {")
+
+        sub_print_r(t,"  ")
+
+        Log("}")
+
+    else
+
+        sub_print_r(t,"  ")
+
+    end
+
+    --Log()
 
 end
