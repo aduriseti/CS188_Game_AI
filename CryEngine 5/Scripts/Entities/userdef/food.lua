@@ -144,4 +144,5 @@ end
 function Food:OnUsed(userId, index)
     Log("Used")
     userId:OnEat(self.Properties.esFoodType)
+    self:Eaten();
 end
