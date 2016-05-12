@@ -183,16 +183,16 @@ function Snake:MoveNorthEast(frameTime)
 	local maxX, maxY = #grid, #grid[1]
 	
 	-- Check if snake can move north, then east, then west, then south
-	if row-1 > 0 and row-1 <= maxX and col-1 > 0 and col-1 <= maxY and (self.Maze_Properties.grid[row-1][col].occupied == false) then		-- North
+	if (row-1 > 0 and row-1 <= maxX and col > 0 and col <= maxY) and (self.Maze_Properties.grid[row-1][col].occupied == false) then		-- North
 		local pos = self.Maze_Properties.ID:rowcol_to_pos(row-1, col);
 		self:Move_to_Pos(frameTime, pos);
-	elseif (self.Maze_Properties.grid[row][col+1].occupied == false) then	-- East
+	elseif (row > 0 and row <= maxX and col+1 > 0 and col+1 <= maxY) and (self.Maze_Properties.grid[row][col+1].occupied == false) then	-- East
 		local pos = self.Maze_Properties.ID:rowcol_to_pos(row, col+1);
 		self:Move_to_Pos(frameTime, pos);
-	elseif (self.Maze_Properties.grid[row][col-1].occupied == false) then	-- West
+	elseif (row > 0 and row <= maxX and col-1 > 0 and col-1 <= maxY) and (self.Maze_Properties.grid[row][col-1].occupied == false) then	-- West
 		local pos = self.Maze_Properties.ID:rowcol_to_pos(row, col-1);
 		self:Move_to_Pos(frameTime, pos);
-	elseif (self.Maze_Properties.grid[row+1][col].occupied == false) then	-- South
+	elseif (row+1 > 0 and row+1 <= maxX and col > 0 and col <= maxY) and (self.Maze_Properties.grid[row+1][col].occupied == false) then	-- South
 		local pos = self.Maze_Properties.ID:rowcol_to_pos(row+1, col);
 		self:Move_to_Pos(frameTime, pos);
 	end
@@ -210,16 +210,16 @@ function Snake:MoveSouthWest(frameTime)
 	local maxX, maxY = #grid, #grid[1]
 	
 	-- Check if snake can move south, then west, then east, then north
-	if (self.Maze_Properties.grid[row+1][col].occupied == false) then		-- South
+	if (row+1 > 0 and row+1 <= maxX and col > 0 and col <= maxY) and (self.Maze_Properties.grid[row+1][col].occupied == false) then		-- South
 		local pos = self.Maze_Properties.ID:rowcol_to_pos(row+1, col);
 		self:Move_to_Pos(frameTime, pos);
-	elseif (self.Maze_Properties.grid[row][col-1].occupied == false) then	-- West
+	elseif (row > 0 and row <= maxX and col-1 > 0 and col-1 <= maxY) and (self.Maze_Properties.grid[row][col-1].occupied == false) then	-- West
 		local pos = self.Maze_Properties.ID:rowcol_to_pos(row, col-1);
 		self:Move_to_Pos(frameTime, pos);
-	elseif (self.Maze_Properties.grid[row][col+1].occupied == false) then	-- East
+	elseif (row > 0 and row <= maxX and col+1 > 0 and col+1 <= maxY) and (self.Maze_Properties.grid[row][col+1].occupied == false) then	-- East
 		local pos = self.Maze_Properties.ID:rowcol_to_pos(row, col+1);
 		self:Move_to_Pos(frameTime, pos);
-	elseif (self.Maze_Properties.grid[row-1][col].occupied == false) then	-- North
+	elseif (row-1 > 0 and row-1 <= maxX and col > 0 and col <= maxY) and (self.Maze_Properties.grid[row-1][col].occupied == false) then	-- North
 		local pos = self.Maze_Properties.ID:rowcol_to_pos(row-1, col);
 		self:Move_to_Pos(frameTime, pos);
 	end
