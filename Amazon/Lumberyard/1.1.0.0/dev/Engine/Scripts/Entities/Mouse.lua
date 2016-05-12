@@ -163,7 +163,6 @@ Mouse.Sleep =
 	OnBeginState = function(self)
 		Log("Entering SLeep State")
 		-- Mark as winner
-		CryAction.SaveXML(Mouse_Data_Definition_File.xml, DataFiles/Mouse_Data_File.xml, mouseDataTable);
 
   	end,
 
@@ -183,6 +182,7 @@ Mouse.Dead =
 	
 	OnBeginState = function(self)
 		Log("Entering Dead State")
+		
 		-- Mark as Loser
 		-- Record learned dangers
   	end,
@@ -202,7 +202,6 @@ Mouse.Power =
 	
 	OnBeginState = function(self)
 		Log("Entering Power State")
-		-- Mark as winner
   	end,
 
  	OnUpdate = function(self,time)
@@ -230,7 +229,9 @@ function Mouse:abstractReset()
 	
 	-- Load Knowledge Base in
 	self.mouseDataTable = self:LoadXMLData() -- Optional Parameter to SPecify what file to read
-		
+	
+	self:PrintTable(self.mouseDataTable)
+	
 	self:GotoState("Search");
 end
 
@@ -305,10 +306,6 @@ function Mouse:randomWalk()
 end
 
 function Mouse:getUnoccupiedNeighbors(loc_row, loc_col)
-	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
-	
-	row = loc_row or rowcol.row;
-	col = loc_col or rowcol.col;
 	
 	local grid = self.Maze_Properties.grid
 	local empty_neighbors = {};
@@ -318,6 +315,8 @@ function Mouse:getUnoccupiedNeighbors(loc_row, loc_col)
 		local col_index = value.col_inc + loc_col
 		
 		if row_index > 0 and col_index > 0 and row_index <= #grid and col_index <= #grid[1] then 
+			Log("row_index = %d, col_index = %d", row_index, col_index)
+			
 			if grid[row_index][col_index].occupied == false then
 				--Log("continue moving in same direction");
 				--Log(tostring(loc_row + loc_row_inc));
@@ -333,7 +332,7 @@ end
 
 function Mouse:randomDirectionalWalk(frameTime)
 	
-	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
 	
 	local row = rowcol.row;
 	local col = rowcol.col;
@@ -350,10 +349,11 @@ function Mouse:randomDirectionalWalk(frameTime)
 		end
 	end
 
-	--[[
+	
 	Log("row: " .. tostring(row));
 	Log("col: " .. tostring(col));
-	
+
+--[[	
 	Log(tostring(self.Maze_Properties.grid[row][col].occupied));
 	Log(tostring(self.Maze_Properties.grid[row + 1][col].occupied));
 	Log(tostring(self.Maze_Properties.grid[row - 1][col].occupied));
@@ -364,13 +364,15 @@ function Mouse:randomDirectionalWalk(frameTime)
 	-- TODO: AMAL FOR SOME REASON SOMETIMES THIS GETS CALLED WITH NIL VALs
 	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
 	
-	--Log(tostring(#empty_neighbors));
+	Log(tostring(#empty_neighbors));
+	Log(tostring(frameTime))
 	
 	local rnd_idx = random(#empty_neighbors);
+	--if rnd_idx >1 then rnd_idx = rnd_idx-1 end
 	self.direction = empty_neighbors[rnd_idx].direction;
-	local target_cell = empty_neighbors[rnd_idx];
-	local target_pos = self.Maze_Properties.ID:rowcol_to_pos(target_cell.row, target_cell.col);
-	self:Move_to_Pos(frameTime, target_pos);
+	--local target_cell = empty_neighbors[rnd_idx];
+	--local target_pos = self.Maze_Properties.ID:rowcol_to_pos(target_cell.row, target_cell.col);
+	--self:Move_to_Pos(frameTime, target_pos);
 end
 
 function Mouse:directionalWalk(frameTime)
@@ -478,5 +480,71 @@ function Mouse:OnEat(foodType)
 end
 
 function Mouse:PowerMode()
+
+end
+
+function Mouse:PrintTable(t)
+
+    local print_r_cache={}
+
+    local function sub_print_r(t,indent)
+
+        if (print_r_cache[tostring(t)]) then
+
+            Log(indent.."*"..tostring(t))
+
+        else
+
+            print_r_cache[tostring(t)]=true
+
+            if (type(t)=="table") then
+
+                for pos,val in pairs(t) do
+
+                    if (type(val)=="table") then
+
+                        Log(indent.."["..pos.."] => "..tostring(t).." {")
+
+                        sub_print_r(val,indent..string.rep(" ",string.len(pos)+8))
+
+                        Log(indent..string.rep(" ",string.len(pos)+6).."}")
+
+                    elseif (type(val)=="string") then
+
+                        Log(indent.."["..pos..'] => "'..val..'"')
+
+                    else
+
+                        Log(indent.."["..pos.."] => "..tostring(val))
+
+                    end
+
+                end
+
+            else
+
+                Log(indent..tostring(t))
+
+            end
+
+        end
+
+    end
+
+    if (type(t)=="table") then
+
+        Log(tostring(t).." {")
+
+        sub_print_r(t,"  ")
+
+        Log("}")
+
+    else
+
+        sub_print_r(t,"  ")
+
+    end
+
+    --Log()
 
 end
