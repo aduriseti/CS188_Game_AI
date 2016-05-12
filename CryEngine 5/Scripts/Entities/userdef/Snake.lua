@@ -81,6 +81,16 @@ Snake.Patrol =
   	Log("Exiting Search State")
   end,
 
+  OnCollision = function(self,hitdata)
+
+  	if (hitdata.target.type == "Mouse") then
+  		Log("YO MOUSE! I'm gonna eat you!")
+  		self:GotoState("Eat")
+  	end
+
+  end,
+
+
  }
 
 
@@ -106,6 +116,16 @@ Snake.Eat =
 
   end,
 	
+  OnCollision = function(self,hitdata)
+
+  	if (hitdata.target.type == "Mouse") then
+  		Log("Yum!")
+  		hitdata.target:GotoState("Dead")
+  	end
+
+  	self:GotoState("Patrol")
+
+  end,
 }
 
 Snake.Destroyed =
