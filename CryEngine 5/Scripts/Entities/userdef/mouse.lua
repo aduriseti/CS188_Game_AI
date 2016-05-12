@@ -1,7 +1,12 @@
 --CryEngine
---Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
+Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
 --Lumberyard
-Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
+--Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
+
+
+-- Globals
+Mouse_Data_Definition_File = "Scripts/Entities/userdef/Mouse_Data_Definition_File.xml"
+Mouse_Default_Data_File = "Scripts/Entities/userdef/DataFiles/Mouse_Data_File.xml"
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    Mouse Table Declaration                 ---------------------------------------------
@@ -18,6 +23,8 @@ Mouse = {
 		"Dead",
 		"Power",
 	},
+	
+	mouseDataTable = {},
 	
     Properties = {
 		bUsable = 0,
@@ -156,6 +163,8 @@ Mouse.Sleep =
 	OnBeginState = function(self)
 		Log("Entering SLeep State")
 		-- Mark as winner
+		CryAction.SaveXML(Mouse_Data_Definition_File.xml, DataFiles/Mouse_Data_File.xml, mouseDataTable);
+
   	end,
 
  	OnUpdate = function(self,time)
@@ -184,7 +193,7 @@ Mouse.Dead =
 	end,
 
   	OnEndState = function(self)
-	  
+		self:SaveXMLData()
   	end,
 }
 
@@ -218,7 +227,26 @@ Mouse.Power =
 --sets the Mouse's properties
 function Mouse:abstractReset()
 	--Log("In Mouse AbstractReset");
+	
+	-- Load Knowledge Base in
+	self.mouseDataTable = self:LoadXMLData() -- Optional Parameter to SPecify what file to read
+		
 	self:GotoState("Search");
+end
+
+
+-- Loads a XML data file and returns it as a script table
+function Mouse:LoadXMLData(dataFile)
+	dataFile = dataFile	or Mouse_Default_Data_File
+	return CryAction.LoadXML(Mouse_Data_Definition_File, dataFile);
+end
+
+-- Saves XML data from dataTable to dataFile
+function Mouse:SaveXMLData(dataTable, dataFile)
+	dataFile = dataFile or Mouse_Default_Data_File
+	dataTable = dataTable or self.mouseDataTable
+	
+	CryAction.SaveXML(Mouse_Data_Definition_File, dataFile, dataTable);
 end
 
 --[[
@@ -277,16 +305,26 @@ function Mouse:randomWalk()
 end
 
 function Mouse:getUnoccupiedNeighbors(loc_row, loc_col)
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
+	
+	row = loc_row or rowcol.row;
+	col = loc_col or rowcol.col;
+	
+	local grid = self.Maze_Properties.grid
 	local empty_neighbors = {};
+	
 	for key,value in pairs(self.directions) do
-		local loc_row_inc = value.row_inc;
-		local loc_col_inc = value.col_inc;
-		if self.Maze_Properties.grid[loc_row+loc_row_inc][loc_col+loc_col_inc].occupied == false then
-			--Log("continue moving in same direction");
-			--Log(tostring(loc_row + loc_row_inc));
-			--Log(tostring(loc_col + loc_col_inc));
-			empty_neighbors[#empty_neighbors+1] = {row = loc_row + loc_row_inc, col = loc_col + loc_col_inc, direction = value};
-			--Log(tostring(#empty_neighbors));
+		local row_index = value.row_inc + loc_row
+		local col_index = value.col_inc + loc_col
+		
+		if row_index > 0 and col_index > 0 and row_index <= #grid and col_index <= #grid[1] then 
+			if grid[row_index][col_index].occupied == false then
+				--Log("continue moving in same direction");
+				--Log(tostring(loc_row + loc_row_inc));
+				--Log(tostring(loc_col + loc_col_inc));
+				empty_neighbors[#empty_neighbors+1] = {row =row_index, col = col_index, direction = value};
+				--Log(tostring(#empty_neighbors));
+			end
 		end
 	end
 	
@@ -323,6 +361,7 @@ function Mouse:randomDirectionalWalk(frameTime)
 	Log(tostring(self.Maze_Properties.grid[row][col - 1].occupied));
 	--]]
 	
+	-- TODO: AMAL FOR SOME REASON SOMETIMES THIS GETS CALLED WITH NIL VALs
 	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
 	
 	--Log(tostring(#empty_neighbors));

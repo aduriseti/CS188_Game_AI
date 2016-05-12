@@ -1,0 +1,23 @@
+<Data version="Test 1.0">
+    <mouseDataTable
+        EnemyInMemory="false"
+        LeftTurnTendency="0.5"
+        Boldness="0.1"
+        DeathCounter="0"
+        WinCounter="0">
+        <ToEat>
+           <FoodType value="Berry"/>
+           <FoodType value="Potato"/>
+           <FoodType value="Cheese"/>
+        </ToEat>
+        <FoodLocations>
+           <Food FoodType="Berry" LocationGeneral="North-East"/>
+        </FoodLocations>
+        <KnownDangerEnts>
+           <Killer value="Snake"/>
+        </KnownDangerEnts>
+        <Allies>
+           <Mouse value="Mouse_2"/>
+        </Allies>
+    </mouseDataTable>
+</Data>
