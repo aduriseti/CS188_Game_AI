@@ -21,7 +21,8 @@ Github repository for quarter  project of UCLA CS188 Game AI course
  - [x] Make Food Entity(s)
  - [ ] Make Trap Entities
  - [ ] Spawn Food
- - [ ] Spawn Mice
+ - [x] Spawn Mice
+ - [x] Spawn Snakes
  - [ ] Spawn Traps
 
 ###Misc (Erick, Everyone)
