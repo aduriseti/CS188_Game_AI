@@ -8,19 +8,19 @@ Github repository for quarter  project of UCLA CS188 Game AI course
 
 ###Mouse (Amal)
  - [x] Mouse/Mice freely roam maze, pick random direction at intersection, limited memory
- - [ ] Mice detect food -> Eat state
+ - [x] Mice detect food -> Eat state
  - [ ] Mice detect state -> Run state
  - [ ] Mice Power state -> Can get Snakes (Replace wildcard food or maybe Snakes drop food like RPGs...?)
  
 ###Snake (Gil)
-  - [ ] Roam Maze (On Leash from spawned start)
-  - [ ] Detect Mice -> chase -> kill 
+  - [x] Roam Maze (On Leash from spawned start)
+  - [x] Detect Mice -> chase -> kill 
 
 ###Maze (Mitchell)
  - [ ] Make Fancy Walls
  - [x] Make Food Entity(s)
  - [ ] Make Trap Entities
- - [ ] Spawn Food
+ - [x] Spawn Food
  - [x] Spawn Mice
  - [x] Spawn Snakes
  - [ ] Spawn Traps
