@@ -9,7 +9,16 @@ Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
 
 Mouse = {
 	type = "Mouse",
-
+	
+	States = {
+		"Search",
+		"Avoid",
+		"Eat",
+		"Sleep",
+		"Dead",
+		"Power",
+	},
+	
     Properties = {
 		bUsable = 0,
         object_Model = "objects/default/primitive_cube_small.cgf",
@@ -51,6 +60,157 @@ Mouse = {
 
 MakeDerivedEntityOverride(Mouse, LivingEntityBase);
 
+----------------------------------------------------------------------------------------------------------------------------------
+-------------------------                    Mouse States                 --------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------
+Mouse.Search =
+ {
+
+  OnBeginState = function(self)
+  	Log("Entering Search State")
+
+  end,
+
+  OnUpdate = function(self,time)
+  	
+	  --[[
+		  if SeeFood then 
+		  	self:ApproachEntity()
+			self:GotoState("Eat")
+		end
+		
+		if Danger then 
+			self:GotoState("Avoid")
+		end
+		
+		if Dead then
+			self:GotoState("Dead")
+		end
+		  
+	  ]]
+	  	self:randomDirectionalWalk(time);
+		
+
+  end,
+
+  OnEndState = function(self)
+  	Log("Exiting Search State")
+  end,
+
+ }
+
+Mouse.Avoid =
+{
+
+	OnBeginState = function(self)
+		Log("Entering Avoid State")
+
+  	end,
+
+ 	OnUpdate = function(self,time)
+  		
+		  --[[
+			  if Safe then
+			  	self:GotoState("Search")
+			  end
+			  
+			  if Dead then
+			  	self:GotoState("Dead")
+			  end
+		  ]]
+		  
+		  --self:Avoid()
+
+	end,
+
+  	OnEndState = function(self)
+		Log("Exiting Avoid State")
+  	end,
+	
+}
+
+Mouse.Eat =
+{
+
+	OnBeginState = function(self)
+		Log("Entering Eat State")
+		--[[
+			GetNearbyFood Entity
+		]]
+  	end,
+
+ 	OnUpdate = function(self,time)
+  		-- Call Nearby foodEntity's Eat function	 	
+	end,
+
+  	OnEndState = function(self)
+		Log("Exiting Eat State")
+		-- Record Food Locs knowledge
+  	end,
+	
+}
+
+Mouse.Sleep =
+{
+
+	OnBeginState = function(self)
+		Log("Entering SLeep State")
+		-- Mark as winner
+  	end,
+
+ 	OnUpdate = function(self,time)
+  	
+
+	end,
+
+  	OnEndState = function(self)
+
+  	end,
+	
+}
+
+Mouse.Dead =
+{
+	
+	OnBeginState = function(self)
+		Log("Entering Dead State")
+		-- Mark as Loser
+		-- Record learned dangers
+  	end,
+
+ 	OnUpdate = function(self,time)
+  	
+
+	end,
+
+  	OnEndState = function(self)
+	  
+  	end,
+}
+
+Mouse.Power = 
+{
+	
+	OnBeginState = function(self)
+		Log("Entering Power State")
+		-- Mark as winner
+  	end,
+
+ 	OnUpdate = function(self,time)
+  		--[[
+			  if timePassed > powerTime then
+			  	self:GotoState("Search")
+			  end
+			  
+			  self:PowerMode();
+		  ]]
+
+	end,
+
+  	OnEndState = function(self)
+	  	Log("Exiting Power State")
+  	end,
+}
 ---------------------------------------------------------------------------------------------------------------------------------
 -------------------------                     State Functions                        --------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------
@@ -58,10 +218,10 @@ MakeDerivedEntityOverride(Mouse, LivingEntityBase);
 --sets the Mouse's properties
 function Mouse:abstractReset()
 	--Log("In Mouse AbstractReset");
-	self.state = "search";
+	self:GotoState("Search");
 end
 
-
+--[[
 function Mouse:OnUpdate(frameTime)
 
 	if (self.state == "search") then
@@ -85,6 +245,7 @@ function Mouse:OnUpdate(frameTime)
 	self:randomDirectionalWalk(frameTime);
 
 end
+]]
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                      Functions                             ---------------------------------------------
@@ -99,15 +260,11 @@ function Mouse:turnLeftAlways()
 
 end
 
-
-
 function Mouse:depthFirstSearch()
 
 	--STATUS: Not finished for any maze
 
 end
-
-
 
 function Mouse:randomWalk() 
 
@@ -222,14 +379,11 @@ function Mouse:directionalWalk(frameTime)
 
 end
 
-
 function Mouse:raytrace()
 
 	--STATUS: totally broken - will work on tomorrow
 
 end
-
-
 
 function Mouse:breathing_animation(frameTime)
 
@@ -247,4 +401,43 @@ function Mouse:MoveXForward()
 	self:move_xy({x = (self.pos.x + self.Properties.m_speed), y = self.pos.y});
 
 	--Log(tostring(self:GetPos().x) .. tostring(self.pos.x));
+end
+
+function Mouse:Avoid()
+
+end
+
+function Mouse:OnEat(foodType)
+
+	if foodType == "0" then     -- Cheese
+        Log("Mouse:OnEat = I am eating Cheese")
+		-- Update food table
+    elseif foodType == "1" then -- Berry
+        Log("Mouse:OnEat = I am eating Berry")
+		-- Update food table
+    elseif foodType == "2" then -- Potato
+        Log("Mouse:OnEat = I am eating Potato")
+		-- Update food table
+    elseif foodType == "3" then -- Grains
+        Log("Mouse:OnEat = I am eating Grains")
+		-- Update food table
+    elseif foodType == "4" then -- PowerBall
+        Log("Mouse:OnEat = I am eating PowerBall")
+		self:GotoState("Power")
+    else
+        Log("Mouse:OnEat = I am eating IDK")
+    end
+	
+	--[[ 
+		if MealComplete then
+			self:GotoState("Sleep")
+		else
+			self:GotoState("Search")
+		end
+		]]
+	
+end
+
+function Mouse:PowerMode()
+
 end
