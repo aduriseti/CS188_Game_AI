@@ -1,12 +1,19 @@
---CryEngine
---Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
---Lumberyard
-Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
+--Amal's file path
+Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
+
+--Mitchel's file path
+--Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
 
 
 -- Globals
-Mouse_Data_Definition_File = "Scripts/Entities/Custom/Mouse_Data_Definition_File.xml"
-Mouse_Default_Data_File = "Scripts/Entities/Custom/DataFiles/Mouse_Data_File.xml"
+
+--Mitchel's file path
+--Mouse_Data_Definition_File = "Scripts/Entities/Custom/Mouse_Data_Definition_File.xml"
+--Mouse_Default_Data_File = "Scripts/Entities/Custom/DataFiles/Mouse_Data_File.xml"
+
+--Amal's file path
+Mouse_Data_Definition_File = "Scripts/Entities/userdef/Mouse_Data_Definition_File.xml"
+Mouse_Default_Data_File = "Scripts/Entities/userdef/DataFiles/Mouse_Data_File.xml"
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    Mouse Table Declaration                 ---------------------------------------------
@@ -30,11 +37,11 @@ Mouse = {
 		bUsable = 0,
         object_Model = "objects/default/primitive_cube_small.cgf",
 		fRotSpeed = 3, --[0.1, 20, 0.1, "Speed of rotation"]
-		m_speed = 0.05;   
+		m_speed = 0.1;   
 
 		maze_ent_name = "",         --maze_ent_name = "Maze1",
 
-        bActive = 0,
+        --bActive = 0,
 
         --Copied from BasicEntity.lua
         Physics = {
@@ -182,9 +189,9 @@ Mouse.Dead =
 	
 	OnBeginState = function(self)
 		Log("Entering Dead State")
+		
 		-- Mark as Loser
 		-- Record learned dangers
-		self:GetEaten()
   	end,
 
  	OnUpdate = function(self,time)
@@ -223,6 +230,11 @@ Mouse.Power =
 -------------------------                     State Functions                        --------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------
 
+function Mouse:GetEaten()
+	Log("RIP Mouse")
+	self:DeleteThis()
+end
+
 --sets the Mouse's properties
 function Mouse:abstractReset()
 	--Log("In Mouse AbstractReset");
@@ -230,7 +242,7 @@ function Mouse:abstractReset()
 	-- Load Knowledge Base in
 	self.mouseDataTable = self:LoadXMLData() -- Optional Parameter to SPecify what file to read
 	
-	self:PrintTable(self.mouseDataTable)
+	--self:PrintTable(self.mouseDataTable)
 	
 	self:GotoState("Search");
 end
@@ -280,151 +292,8 @@ end
 -------------------------                      Functions                             ---------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
 
-function Mouse:turnLeftAlways()
-	--STATUS: Not finished for maze2
 
-	local rowcol = Mouse.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
-	local row = rowcol.row;
-	local col = rowcol.col;
 
-end
-
-function Mouse:depthFirstSearch()
-
-	--STATUS: Not finished for any maze
-
-end
-
-function Mouse:randomWalk() 
-
-	--STATUS: Cryengine only - will push when works with lumberyard
-
-	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
-	local row = rowcol.row;
-	local col = rowcol.col;
-
-end
-
-function Mouse:getUnoccupiedNeighbors(loc_row, loc_col)
-	
-	local grid = self.Maze_Properties.grid
-	local empty_neighbors = {};
-	
-	for key,value in pairs(self.directions) do
-		local row_index = value.row_inc + loc_row
-		local col_index = value.col_inc + loc_col
-		
-		if row_index > 0 and col_index > 0 and row_index <= #grid and col_index <= #grid[1] then 
-			Log("row_index = %d, col_index = %d", row_index, col_index)
-			
-			if grid[row_index][col_index].occupied == false then
-				--Log("continue moving in same direction");
-				--Log(tostring(loc_row + loc_row_inc));
-				--Log(tostring(loc_col + loc_col_inc));
-				empty_neighbors[#empty_neighbors+1] = {row =row_index, col = col_index, direction = value};
-				--Log(tostring(#empty_neighbors));
-			end
-		end
-	end
-	
-	return empty_neighbors;
-end
-
-function Mouse:randomDirectionalWalk(frameTime)
-	
-	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
-	
-	local row = rowcol.row;
-	local col = rowcol.col;
-	
-	local loc_row_inc = self.direction.row_inc;
-	local loc_col_inc = self.direction.col_inc;
-	
-	if loc_row_inc ~= 0 or loc_col_inc ~= 0 then
-		if self.Maze_Properties.grid[row+loc_row_inc][col+loc_col_inc].occupied == false then
-			--Log("continue moving in same direction");
-			local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
-			self:Move_to_Pos(frameTime, target_pos);
-			return;
-		end
-	end
-
-	
-	Log("row: " .. tostring(row));
-	Log("col: " .. tostring(col));
-
---[[	
-	Log(tostring(self.Maze_Properties.grid[row][col].occupied));
-	Log(tostring(self.Maze_Properties.grid[row + 1][col].occupied));
-	Log(tostring(self.Maze_Properties.grid[row - 1][col].occupied));
-	Log(tostring(self.Maze_Properties.grid[row][col + 1].occupied));
-	Log(tostring(self.Maze_Properties.grid[row][col - 1].occupied));
-	--]]
-	
-	-- TODO: AMAL FOR SOME REASON SOMETIMES THIS GETS CALLED WITH NIL VALs
-	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
-	
-	Log(tostring(#empty_neighbors));
-	Log(tostring(frameTime))
-	
-	local rnd_idx = random(#empty_neighbors);
-	--if rnd_idx >1 then rnd_idx = rnd_idx-1 end
-	self.direction = empty_neighbors[rnd_idx].direction;
-	--local target_cell = empty_neighbors[rnd_idx];
-	--local target_pos = self.Maze_Properties.ID:rowcol_to_pos(target_cell.row, target_cell.col);
-	--self:Move_to_Pos(frameTime, target_pos);
-end
-
-function Mouse:directionalWalk(frameTime)
-
-	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
-	
-	local row = rowcol.row;
-	local col = rowcol.col;
-	
-	local loc_row_inc = self.direction.row_inc;
-	local loc_col_inc = self.direction.col_inc;
-	
-	if loc_row_inc ~= 0 or loc_col_inc ~= 0 then
-		if self.Maze_Properties.grid[row+loc_row_inc][col+loc_col_inc].occupied == false then
-			--Log("continue moving in same direction");
-			local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
-			self:Move_to_Pos(frameTime, target_pos);
-			return;
-		end
-	end
-
-	--[[
-	Log("row: " .. tostring(row));
-	Log("col: " .. tostring(col));
-	
-	Log(tostring(self.Maze_Properties.grid[row][col].occupied));
-	Log(tostring(self.Maze_Properties.grid[row + 1][col].occupied));
-	Log(tostring(self.Maze_Properties.grid[row - 1][col].occupied));
-	Log(tostring(self.Maze_Properties.grid[row][col + 1].occupied));
-	Log(tostring(self.Maze_Properties.grid[row][col - 1].occupied));
-	--]]
-	
-	
-	for key,value in pairs(self.directions) do
-		loc_row_inc = value.row_inc;
-		loc_col_inc = value.col_inc;
-		if self.Maze_Properties.grid[row+loc_row_inc][col+loc_col_inc].occupied == false then
-			--Log("continue moving in same direction");
-			self.direction = {row_inc = loc_row_inc, col_inc = loc_col_inc};
-			local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
-			self:Move_to_Pos(frameTime, target_pos);
-			return;
-		end
-	end
-
-end
-
-function Mouse:raytrace()
-
-	--STATUS: totally broken - will work on tomorrow
-
-end
 
 function Mouse:breathing_animation(frameTime)
 
@@ -436,12 +305,6 @@ function Mouse:breathing_animation(frameTime)
 	Log("cycle" .. tostring(frameTime));
 	Log("New height" .. tostring(32 + 0.9+(0.2 * frameTime % cycle_time)));
 	self:SetPos({self.pos.x, self.pos.y, 32 + 0.9+(0.2/50 * frameTime % cycle_time)});
-end
-
-function Mouse:MoveXForward() 
-	self:move_xy({x = (self.pos.x + self.Properties.m_speed), y = self.pos.y});
-
-	--Log(tostring(self:GetPos().x) .. tostring(self.pos.x));
 end
 
 function Mouse:Avoid()
@@ -481,11 +344,6 @@ end
 
 function Mouse:PowerMode()
 
-end
-
-function Mouse:GetEaten()
-	Log("RIP Mouse")
-	self:DeleteThis()
 end
 
 function Mouse:PrintTable(t)
