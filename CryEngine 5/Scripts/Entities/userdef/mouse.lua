@@ -232,6 +232,7 @@ Mouse.Power =
 
 function Mouse:GetEaten()
 	Log("RIP Mouse")
+	-- self:GotoState("Dead")
 	self:DeleteThis()
 end
 
