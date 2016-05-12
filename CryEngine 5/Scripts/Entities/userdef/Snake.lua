@@ -79,10 +79,10 @@ Snake.Patrol =
 		  self:myPatrol(time)
 		  
 		  Log("Is colliding: " .. tostring(self:IsColliding()));
-		  local collision_table = self:CheckCollisions();
+		  --[[local collision_table = self:CheckCollisions();
 		  for key, value in pairs(collision_table) do
 			Log(tostring(key) .. ":" .. tostring(value));
-		end
+		end]]
 		  --Log("Check collisions: " .. tostring(self:CheckCollisions()));
 		  
 		  --self:bounce(time);
