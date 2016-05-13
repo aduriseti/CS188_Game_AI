@@ -1,8 +1,8 @@
 --Amal's file path
-Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
+--Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
 
 --Mitchel's file path
---Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
+Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
 
 
 -- Globals
@@ -361,19 +361,19 @@ end
 
 function Mouse:Eating(foodType)
 
-	if foodType == "0" then     -- Cheese
+	if foodType == "Cheese" then     -- Cheese
         Log("Mouse:OnEat = I am eating Cheese")
 		-- Update food table
-    elseif foodType == "1" then -- Berry
+    elseif foodType == "Berry" then -- Berry
         Log("Mouse:OnEat = I am eating Berry")
 		-- Update food table
-    elseif foodType == "2" then -- Potato
+    elseif foodType == "Potato" then -- Potato
         Log("Mouse:OnEat = I am eating Potato")
 		-- Update food table
-    elseif foodType == "3" then -- Grains
+    elseif foodType == "Grains" then -- Grains
         Log("Mouse:OnEat = I am eating Grains")
 		-- Update food table
-    elseif foodType == "4" then -- PowerBall
+    elseif foodType == "PowerBall" then -- PowerBall
         Log("Mouse:OnEat = I am eating PowerBall")
 		self:GotoState("Power")
     else

@@ -27,7 +27,13 @@ Maze2 = {
   myWalls = {},
   myMice = {},
   mySnakes = {},
-  myFoods = {},
+  myFoods = {
+      Cheese = {},
+      Berry = {},
+      Grains = {},
+      Potato = {},
+      PowerBall = {},
+  },
   
   -- Copied from BasicEntity.lua
   Properties = {
@@ -228,15 +234,11 @@ function Maze2:RemoveSnakes()
 end
 function Maze2:RemoveFoods()
     Log("Removing All Foods")
-    for k,v in pairs(self.myFoods) do
+    for x,y in pairs(self.myFoods) do  
+        for y,v in pairs(self.mySnakes) do
+            System.RemoveEntity(v.id)
 
-        --local EntID=System.GetEntityByName(v);
-        --local EntID = System.GetEntityByName("WALLS");
-
-        --System.RemoveEntity(EntID)
-        System.RemoveEntity(v.id)
-        --v:DeleteThis()
-        --v:TestDelete()
+        end
     end
     
 end
@@ -565,13 +567,9 @@ function Maze2:New()
    end
    
    self:SpawnMice()
-   self:SpawnSnakes()
-   self:SpawnFood(2,5)
-   self:SpawnFood(4,4)
-   self:SpawnFood(self:width()*2+1-1,6)
-   self:SpawnFood(self:width()*2+1-3,self:height()*2+1-1 )
-   self:SpawnFood(2, self:height()*2+1-3)
-   self:SpawnFood(self:width(), self:height())
+   self:SpawnSnakes(5)
+   self:SpawnFood()
+  
 end
 
 --Door class/ called to create doors
@@ -1026,54 +1024,133 @@ function Maze2:SpawnMice()
 
 end
 
-function Maze2:SpawnSnakes()
-        local w, h = 4,16
+function Maze2:SpawnSnakes(num)
         local Properties = self.Properties;
         local width = 1+ self:width()*(self:corridorSize()+1)
-        local nSlot = (h-1)*width + w;
         
-        local objX = self.Model_Width;
-        local objY = self.Model_Height;
+        for i =1, num do
+            -- Get random open coord
+            local h = random(self:height()*2+1)
+            if h < 1 then h = h+1 end
+            if h%2 ~= 0 and h > 0 then h = h-1 end
+            
+            local w = random(self:width()*2+1)
+            if w < 1 then w = w+1 end
+            if w%2 ~= 0 and w > 0 then w = w-1 end 
+            
+            -- Make sure its not Mouse position 
+            if w == 2 then w = w+2 end 
+            
+            -- Spawn Logic
+            local objX = self.Model_Width;
+            local objY = self.Model_Height;
 
-        if self.Origin.x == 0 then 
-            self.Origin = self:GetPos()
-        end 
-        local xOffset = self.Origin.x;
-        local yOffset = self.Origin.y;
-        local sx = objX*(w-1) + xOffset
-        local sy = objY*(h-1) + yOffset
+            if self.Origin.x == 0 then 
+                self.Origin = self:GetPos()
+            end 
+            local xOffset = self.Origin.x;
+            local yOffset = self.Origin.y;
+            local sx = objX*(w-1) + xOffset
+            local sy = objY*(h-1) + yOffset
 
-        --Log("Spawning at (%d, %d)", sx, sy);
-        local spawnPos = {x=sx,y=sy,z=32}
-        local dVec = self:GetDirectionVector()
-        --LogVec("Maze orientation: ", dVec)
-        local params = {
-            class = "Snake";
-            name = "S";
-            position = spawnPos;
-            --orientation = dVec;
-            properties = {
-                bActive = 1;
+            --Log("Spawning at (%d, %d)", sx, sy);
+            local spawnPos = {x=sx,y=sy,z=32}
+            --local dVec = self:GetDirectionVector()
+            --LogVec("Maze orientation: ", dVec)
+            local params = {
+                class = "Snake";
+                name = "S";
+                position = spawnPos;
+                --orientation = dVec;
+                properties = {
+                    bActive = 1;
 
-                --initial_direction = "up",
-              --  object_Model = self.Model;
+                    --initial_direction = "up",
+                --  object_Model = self.Model;
+                };
             };
-        };
-        
 
+            local snake = System.SpawnEntity(params);
+            snake.direction = snake.directions[up];
 
-        local snake = System.SpawnEntity(params);
-        snake.direction = snake.directions[up];
-
-         self.mySnakes[#self.mySnakes+1] = snake;
-
+            self.mySnakes[#self.mySnakes+1] = snake;
+        end
+                    
 end
 
-function Maze2:SpawnFood(w,h)
+function Maze2:SpawnFood(nCheese, nBerry, nPotato, nGrains, powerBallProb)
+        
+        local numCheese = nCheese or 3
+        local numBerry = nBerry or 3
+        local numPotato = nPotato or 3
+        local numGrains = nGrains or 3
+        local PB_Prob = powerBallProb or 1
+        
+        -- Spawn Cheese
+        while #self.myFoods.Cheese < numCheese do
+            -- NorthEast
+            local w = random(self:width(), self:width()*2+1)
+            if w%2 ~= 0 then w = w-1 end
+            local h = random(self:height(), self:height()*2+1)
+            if h%2 ~= 0 then h = h-1 end
+            
+            self.myFoods.Cheese[#self.myFoods.Cheese+1] = self:FoodSpawnHelper(w,h,"Cheese")
+            
+        end
+        
+        -- Spawn Berry 
+        while #self.myFoods.Berry < numBerry do
+            -- NorthWest
+            local w = random(2, self:width())
+            if w%2 ~= 0 then w = w-1 end
+            local h = random(self:height(), self:height()*2+1)
+            if h%2 ~= 0 then h = h-1 end
+            
+            self.myFoods.Berry[#self.myFoods.Berry+1] = self:FoodSpawnHelper(w,h,"Berry")
+            
+        end
+        
+        -- Spawn Potato
+        while #self.myFoods.Potato < numPotato do
+            -- South East
+            local w = random(self:width(), self:width()*2+1)
+            if w%2 ~= 0 then w = w-1 end
+            local h = random(2, self:height())
+            if h%2 ~= 0 then h = h-1 end
+            
+            self.myFoods.Potato[#self.myFoods.Potato+1] = self:FoodSpawnHelper(w,h,"Potato")
+        end
+        
+        -- Spawn Grains
+        while #self.myFoods.Grains < numGrains do 
+            -- South West
+            local w = random(2, self:width())
+            if w%2 ~= 0 and w > 0 then w = w-1 end
+            local h = random(2, self:height())
+            if h%2 ~= 0 then h = h-1 end
+            
+            self.myFoods.Grains[#self.myFoods.Grains+1] = self:FoodSpawnHelper(w,h,"Grains")
+        end
+        
+        -- Spawn PowerBalls
+        local i = 1
+        while i < PB_Prob do 
+            
+            if(PB_Prob > random(10)) then 
+            local w = random(2, self:width()*2+1) end
+            if w%2 ~= 0  then w = w-1 end
+            local h = random(2, self:height()*2+1)
+            if h%2 ~= 0  then h = h-1 end
+            
+            self.myFoods.PowerBall[#self.myFoods.PowerBall+1] = self:FoodSpawnHelper(w,h,"PowerBall")
+        end
+    
+      
+end
 
+function Maze2:FoodSpawnHelper(w,h, foodType)
         local Properties = self.Properties;
         local width = 1+ self:width()*(self:corridorSize()+1)
-        local nSlot = (h-1)*width + w;
 
         local objX = self.Model_Width;
         local objY = self.Model_Height;
@@ -1084,12 +1161,14 @@ function Maze2:SpawnFood(w,h)
 
         local xOffset = self.Origin.x;
         local yOffset = self.Origin.y;
-        local sx = objX*(w-1) + xOffset
+        
+         local sx = objX*(w-1) + xOffset
         local sy = objY*(h-1) + yOffset
 
         local spawnPos = {x=sx,y=sy,z=32}
-        local dVec = self:GetDirectionVector()
+       -- local dVec = self:GetDirectionVector()
 
+--[[
         local foodType = ""
 
         if w > self:width() and h > self:height() then
@@ -1105,8 +1184,7 @@ function Maze2:SpawnFood(w,h)
             -- South Wesst
             foodType = "Grains"
         end
-
-        if( random(10) > 9) then foodType = "PowerBall" end
+]]
 
         local params = {
             class = "Food";
@@ -1120,6 +1198,50 @@ function Maze2:SpawnFood(w,h)
         };
 
         local food = System.SpawnEntity(params);
-        self.myFoods[#self.myFoods+1] = food;
+        return food
+end
 
+function Maze2:PrintTable(t)
+
+    local print_r_cache={}
+
+    local function sub_print_r(t,indent)
+        if (print_r_cache[tostring(t)]) then
+            Log(indent.."*"..tostring(t))
+        else
+            print_r_cache[tostring(t)]=true
+            if (type(t)=="table") then
+                for pos,val in pairs(t) do
+                    if (type(val)=="table") then
+                        Log(indent.."["..pos.."] => "..tostring(t).." {")
+
+                        sub_print_r(val,indent..string.rep(" ",string.len(pos)+8))
+
+                        Log(indent..string.rep(" ",string.len(pos)+6).."}")
+
+                    elseif (type(val)=="string") then
+
+                        Log(indent.."["..pos..'] => "'..val..'"')
+
+                    else
+
+                        Log(indent.."["..pos.."] => "..tostring(val))
+
+                    end
+
+                end
+
+            else
+                Log(indent..tostring(t))
+            end
+        end
+    end
+
+    if (type(t)=="table") then
+        Log(tostring(t).." {")
+        sub_print_r(t,"  ")
+        Log("}")
+    else
+        sub_print_r(t,"  ")
+    end
 end
