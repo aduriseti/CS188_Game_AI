@@ -102,9 +102,9 @@ function Maze2:OnInit()
     --self:OnReset()
     
     self:SetupModel()
-    self:New()    
+    --self:New()    
     self:OnPropertyChange()
-    
+    self:New()  
 end
 
 function Maze2:OnPropertyChange()
@@ -567,8 +567,8 @@ function Maze2:New()
    end
    
    self:SpawnMice()
-   self:SpawnSnakes(5)
-   self:SpawnFood()
+   --self:SpawnSnakes(5)
+   --self:SpawnFood()
   
 end
 

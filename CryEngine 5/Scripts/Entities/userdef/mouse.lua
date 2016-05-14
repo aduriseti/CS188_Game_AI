@@ -37,7 +37,7 @@ Mouse = {
 		bUsable = 0,
         object_Model = "objects/default/primitive_cube_small.cgf",
 		fRotSpeed = 3, --[0.1, 20, 0.1, "Speed of rotation"]
-		m_speed = 0.1;   
+		--m_speed = 0.1;   
 
 		maze_ent_name = "",         --maze_ent_name = "Maze1",
 
