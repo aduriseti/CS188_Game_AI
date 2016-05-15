@@ -106,6 +106,8 @@ function LivingEntityBase:OnPropertyChange()
 end
 
 function LivingEntityBase:OnReset()
+	--OK wtf is it really not possible to reload this script from maze2?
+	--Log("test reload from maze");
 
     self:SetFromProperties()  
 
@@ -209,7 +211,7 @@ function LivingEntityBase:SetFromProperties()
 end
 
 function LivingEntityBase:SetupMaze()
-
+	Log("In living entity maze setup");
     --populate Maze_Properties and put LivingEntityBase in maze
     --populate Maze Properties
     self.Maze_Properties.cell_height = self.Maze_Properties.ID:height();
@@ -234,9 +236,12 @@ function LivingEntityBase:SetupMaze()
                 else
                     self.Maze_Properties.grid[row][col] = {occupied = false, nlsot = -1, n_visited = 0};
                 end
+				--Log(tostring(row) .. "," .. tostring(col) .. " occupied: " .. tostring(self.Maze_Properties.grid[row][col].occupied));
             end
         end
     end	
+	
+	--self:PrintTable(self.Maze_Properties.grid);
 
 end
 
@@ -335,6 +340,10 @@ function LivingEntityBase:getUnoccupiedNeighbors(loc_row, loc_col)
 		if row_index > 0 and col_index > 0 and row_index <= #grid and col_index <= #grid[1] then 
 			--Log("row_index = %d, col_index = %d", row_index, col_index)
 			if grid[row_index][col_index].occupied == false then
+			
+				try_pos = self.Maze_Properties.ID:rowcol_to_pos(row_index, col_index);
+			
+				System.DrawLine(self.pos, {try_pos.x, try_pos.y, self.pos.z}, 0, 1, 0, 1);
 
 				--Log("continue moving in same direction");
 
@@ -491,6 +500,8 @@ function LivingEntityBase:exploratoryWalk(frameTime)
 
 	local loc_row_inc = self.direction.row_inc;
 	local loc_col_inc = self.direction.col_inc;
+	
+	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
 
 	--if we haven't moved out of a grid space yet, continue as before
 	if row == self.previous_row and
@@ -501,6 +512,17 @@ function LivingEntityBase:exploratoryWalk(frameTime)
 		self:Move_to_Pos(frameTime, target_pos);
 		return;
 	end
+	
+	--[[
+	Log("row: " .. tostring(row));
+	Log("col: " .. tostring(col));
+	
+	Log(tostring(self.Maze_Properties.grid[row][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row + 1][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row - 1][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row][col + 1].occupied));
+	Log(tostring(self.Maze_Properties.grid[row][col - 1].occupied));
+	]]--
 
 	--else change our behavior
 	self.previous_col = col;
@@ -511,7 +533,7 @@ function LivingEntityBase:exploratoryWalk(frameTime)
 	self.Maze_Properties.grid[row][col].n_visited = self.Maze_Properties.grid[row][col].n_visited + 1;
 	--Log(tostring(self.Maze_Properties.grid[row][col].n_visited));
 
-	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
+	--local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
 
 	--Log("Num Empty_neighbors: " .. tostring(#empty_neighbors));
 
@@ -649,7 +671,7 @@ function LivingEntityBase:chase(target_class, time)
 			--Log("In if state")
 			local distance = vecLen(vecSub(target.pos, self.pos));
 			--Log("Distance = %d", distance)
-			if distance < 2 then
+			if distance < 1.1 then
 				--Log("Distance <= 1, Eat")
 				target:OnEat(self, 2);
 				self.target = nil;
@@ -663,6 +685,8 @@ function LivingEntityBase:chase(target_class, time)
 		else
 			return false;
 		end
+	else 
+		return false;
 	end
 end
 

@@ -92,6 +92,17 @@ local Physics_DX9MP_Simple = {
 ----------------------------------------------------------------------------------------------------------------------------------
 
 function Maze2:OnInit()
+	Log("test reload script from maze");
+	Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
+	Script.ReloadScript( "SCRIPTS/Entities/userdef/mouse.lua");
+	Script.ReloadScript( "SCRIPTS/Entities/userdef/Snake.lua");
+	
+	Log("Reload Entity script");
+	Script.ReloadEntityScript("Mouse");
+	
+	Log("Reload all scripts");
+	Script.ReloadScripts();
+
     Log("OnInit is running");
     self.Width = self.Properties.iM_Width
     self.Height = self.Properties.iM_Height
@@ -199,6 +210,7 @@ function Maze2:RemoveWalls()
 
         --System.RemoveEntity(EntID)
         System.RemoveEntity(v.id)
+		self.myWalls[k] = nil;
         --v:DeleteThis()
         --v:TestDelete()
     end

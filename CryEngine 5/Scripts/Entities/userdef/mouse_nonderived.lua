@@ -115,55 +115,7 @@ function Mouse_ND:OnReset()
 		self.pos.z = 33;
 		self:SetPos({self.pos.x, self.pos.y, self.pos.z});
 		
-		Log("XPos: " .. tostring(self.pos.x));
-		
-		--populate Maze_Properties and put Mouse_ND in maze
-		--populate Maze Properties
-		self.Maze_Properties.cell_height = self.Maze_Properties.ID:height();
-		self.Maze_Properties.cell_width = self.Maze_Properties.ID:width();
-		self.Maze_Properties.height = (self.Maze_Properties.ID:height()*(self.Maze_Properties.ID:corridorSize() + 1) + 1);
-		self.Maze_Properties.width = (self.Maze_Properties.ID:width()*(self.Maze_Properties.ID:corridorSize() + 1) + 1);
-		self.Maze_Properties.directions = self.Maze_Properties.ID.directions;
-		self.Maze_Properties.model_height = self.Maze_Properties.ID.Model_Height;
-		self.Maze_Properties.model_width = self.Maze_Properties.ID.Model_Width;
-		self.Maze_Properties.corridor_width = self.Maze_Properties.ID.corridorSize;
-		
-		
-		
-		
-		Log("Maze height (including walls): " .. tostring(self.Maze_Properties.height));
-		
-		
-		if #self.Maze_Properties.grid ~= self.Maze_Properties.height then
-			self.Maze_Properties.grid = {};
-			for row = 1, self.Maze_Properties.height do
-				self.Maze_Properties.grid[row] = {};
-				for col = 1, self.Maze_Properties.width do
-					local cur_nslot = self.Maze_Properties.ID:rowcol_to_nslot(row, col);
-					local cur_wall = self.Maze_Properties.ID.myWalls[cur_nslot];
-					--Log(tostring(cur_nslot));
-					--Log(tostring(cur_wall));
-					if cur_wall ~= nil then
-						self.Maze_Properties.grid[row][col] = {occupied = true, nslot = cur_nslot};
-					else
-						self.Maze_Properties.grid[row][col] = {occupied = false, nlsot = -1};
-					end
-				end
-			end
-		end
-		
-		(function ()
-		
-			for row = 1, self.Maze_Properties.height do
-				for col = 1, self.Maze_Properties.width do
-					if self.Maze_Properties.grid[row][col].occupied == false then
-						self:move_xy(self.Maze_Properties.ID:rowcol_to_pos(row, col));
-						return;
-					end
-				end
-			end
-		
-		end ) ()
+		self:SetupMaze();
 		
 		self.direction = self.directions.none;
 		
@@ -173,64 +125,305 @@ function Mouse_ND:OnReset()
    else Log("Error: Modelname not found!"); end
 end
 
+function Mouse_ND:SetupMaze()
+	 --populate Maze_Properties and put LivingEntityBase in maze
+    --populate Maze Properties
+    self.Maze_Properties.cell_height = self.Maze_Properties.ID:height();
+    self.Maze_Properties.cell_width = self.Maze_Properties.ID:width();
+    self.Maze_Properties.height = (self.Maze_Properties.ID:height()*(self.Maze_Properties.ID:corridorSize() + 1) + 1);
+    self.Maze_Properties.width = (self.Maze_Properties.ID:width()*(self.Maze_Properties.ID:corridorSize() + 1) + 1);
+    self.Maze_Properties.directions = self.Maze_Properties.ID.directions;
+    self.Maze_Properties.model_height = self.Maze_Properties.ID.Model_Height;
+    self.Maze_Properties.model_width = self.Maze_Properties.ID.Model_Width;
+    self.Maze_Properties.corridor_width = self.Maze_Properties.ID.corridorSize;       
+
+    if #self.Maze_Properties.grid ~= self.Maze_Properties.height then
+        self.Maze_Properties.grid = {};
+        for row = 1, self.Maze_Properties.height do
+            self.Maze_Properties.grid[row] = {};
+            for col = 1, self.Maze_Properties.width do
+                local cur_nslot = self.Maze_Properties.ID:rowcol_to_nslot(row, col);
+                local cur_wall = self.Maze_Properties.ID.myWalls[cur_nslot];
+
+                if cur_wall ~= nil then
+                    self.Maze_Properties.grid[row][col] = {occupied = true, nslot = cur_nslot, n_visited = 0};
+                else
+                    self.Maze_Properties.grid[row][col] = {occupied = false, nlsot = -1, n_visited = 0};
+                end
+				--Log(tostring(row) .. "," .. tostring(col) .. " occupied: " .. tostring(self.Maze_Properties.grid[row][col].occupied));
+            end
+        end
+    end
+
+	(function ()
+		for row = 1, self.Maze_Properties.height do
+			for col = 1, self.Maze_Properties.width do
+				if self.Maze_Properties.grid[row][col].occupied == false then
+					self:move_xy(self.Maze_Properties.ID:rowcol_to_pos(row, col));
+					return;
+				end
+			end
+		end
+	
+	end ) ()
+end
+		
+
 function Mouse_ND:move_xy(xy)
 	self:SetPos({xy.x, xy.y, self.pos.z});
 	self.pos.x = xy.x;
 	self.pos.y = xy.y;
 end
 
-function Mouse_ND:turnLeftAlways()
-	--STATUS: Not finished for maze2
-	
-	local rowcol = Mouse_ND.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
-	
-	local row = rowcol.row;
-	local col = rowcol.col;
-	
-	
-end
-
-function Mouse_ND:depthFirstSearch()
-	--STATUS: Not finished for any maze
-end
-
-function Mouse_ND:randomWalk() 
-	--STATUS: Cryengine only - will push when works with lumberyard
-	
-	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
-	
-	local row = rowcol.row;
-	local col = rowcol.col;
-	
-end
-
 function Mouse_ND:getUnoccupiedNeighbors(loc_row, loc_col)
+
+	local grid = self.Maze_Properties.grid
 	local empty_neighbors = {};
+
 	for key,value in pairs(self.directions) do
-		local loc_row_inc = value.row_inc;
-		local loc_col_inc = value.col_inc;
-		if self.Maze_Properties.grid[loc_row+loc_row_inc][loc_col+loc_col_inc].occupied == false then
-			--Log("continue moving in same direction");
-			--Log(tostring(loc_row + loc_row_inc));
-			--Log(tostring(loc_col + loc_col_inc));
-			empty_neighbors[#empty_neighbors+1] = {row = loc_row + loc_row_inc, col = loc_col + loc_col_inc, direction = value};
-			--Log(tostring(#empty_neighbors));
+		local row_index = value.row_inc + loc_row
+		local col_index = value.col_inc + loc_col
+
+		if row_index > 0 and col_index > 0 and row_index <= #grid and col_index <= #grid[1] then 
+			--Log("row_index = %d, col_index = %d", row_index, col_index)
+			if grid[row_index][col_index].occupied == false then
+			
+				try_pos = self.Maze_Properties.ID:rowcol_to_pos(row_index, col_index);
+			
+				System.DrawLine(self.pos, {try_pos.x, try_pos.y, self.pos.z}, 0, 1, 0, 1);
+
+				--Log("continue moving in same direction");
+
+				--Log(tostring(loc_row + loc_row_inc));
+
+				--Log(tostring(loc_col + loc_col_inc));
+
+				empty_neighbors[#empty_neighbors+1] = {row =row_index, col = col_index, n_visited = grid[row_index][col_index].n_visited, direction = value};
+
+				--Log(tostring(#empty_neighbors));
+			end
+		end
+	end
+
+	return empty_neighbors;
+
+end
+
+function Mouse_ND:getLeftRight()
+	local dir = self.direction;
+	local dirs = self.directions;
+	if dir.name == "up" then
+		return dirs.left, dirs.right;
+	elseif dir.name == "down" then
+		return dirs.right, dirs.left;
+	elseif dir.name == "left" then 
+		return dirs.up, dirs.down;
+	elseif dir.name == "right" then
+		return dirs.down, dirs.up;
+	else
+		return nil;
+	end
+end
+
+function Mouse_ND:runFrom(target, frameTime)
+	--Cryengine
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
+	--Lumberyard
+	--local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+
+	local row = rowcol.row;
+	local col = rowcol.col;
+
+	local loc_row_inc = self.direction.row_inc;
+	local loc_col_inc = self.direction.col_inc;
+
+	--if we haven't moved out of a grid space yet, continue as before
+	if row == self.previous_row and
+			col == self.previous_col and 
+			(loc_row_inc ~= 0 or loc_col_inc) ~= 0 then
+		--Log("STAY ON COURSE");
+		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
+		self:Move_to_Pos(frameTime, target_pos);
+		return;
+	end
+
+	--else change our behavior
+	self.previous_col = col;
+	self.previous_row = row;
+
+	--increment visit counter of current grid space
+	--Log(tostring(self.Maze_Properties.grid[row][col].n_visited));
+	self.Maze_Properties.grid[row][col].n_visited = self.Maze_Properties.grid[row][col].n_visited + 1;
+	--Log(tostring(self.Maze_Properties.grid[row][col].n_visited));
+
+	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
+
+	--Log("Num Empty_neighbors: " .. tostring(#empty_neighbors));
+
+	--get direction vector of target
+	local target_col_inc, target_row_inc;
+	block_offset_x = math.floor((target.pos.x - self.pos.x)/2 + 0.5);
+	block_offset_y = math.floor((target.pos.y - self.pos.y)/2 + 0.5);
+	if block_offset_x < 0 then
+		target_col_inc = -1;
+	elseif block_offset_x > 0 then
+		target_col_inc = 1;
+	else
+		target_col_inc = 0;
+	end
+
+	if block_offset_y < 0 then
+		target_row_inc = -1;
+	elseif block_offset_y > 0 then
+		target_row_inc = 1;
+	else
+		target_row_inc = 0;
+	end
+
+	local target_direction = {row_inc = target_row_inc, col_inc = target_col_inc};
+
+	-- if there are more options than mvoing towards target
+	if #empty_neighbors >=2 then
+		--remove moving towards target as an option
+		for key, value in pairs(empty_neighbors) do
+			--remove moving towards target as an option
+			try_dir = empty_neighbors[key].direction;
+			if try_dir.row_inc ==  target_row_inc and
+					try_dir.col_inc == target_col_inc then
+				--Log("REMOVE BACKTRACKING AS OPTION");
+				empty_neighbors[key] = nil;
+			--if a movement direction takes the mouse out of the sight of the snake - take it
+			else
+				try_pos = self.Maze_Properties.ID:rowcol_to_pos(value.row, value.col);
+				
+				local diff = {x = target.pos.x - try_pos.x, y = target.pos.y - try_pos.y, z = 0};
+
+				--Log(Vec2Str(diff));
+
+			 	local fucker = {};
+
+			 	Physics.RayWorldIntersection({try_pos.x, try_pos.y, self.pos.z}, diff, 1, ent_all, self.id, target.id, fucker);--, self:GetRawId(), target_mouse:GetRawId());
+
+				local n_hits = 0;
+
+				--self:PrintTable(fucker);
+
+				for key, value in pairs(fucker) do
+					n_hits = n_hits + 1
+				end
+
+				if (n_hits > 0) then
+					Log("HIDE AND SEEK");
+					self.direction = value.direction;
+					return;
+				end
+			end
+		end
+	else end
+	
+	local min_val = 10000;
+	local min_key = 0
+
+	for key, value in pairs(empty_neighbors) do
+		--Log(tostring(value.n_visited));
+		if value.n_visited < min_val then
+			min_val = value.n_visited;
+			min_key = key;
 		end
 	end
 	
-	return empty_neighbors;
+	--select minimally visited neighbor
+	self.direction = empty_neighbors[min_key].direction;
+end
+
+function Mouse_ND:exploratoryWalk(frameTime)
+	--Cryengine
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
+	--Lumberyard
+	--local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+
+	local row = rowcol.row;
+	local col = rowcol.col;
+
+	local loc_row_inc = self.direction.row_inc;
+	local loc_col_inc = self.direction.col_inc;
+	
+	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
+
+	--if we haven't moved out of a grid space yet, continue as before
+	if row == self.previous_row and
+			col == self.previous_col and 
+			(loc_row_inc ~= 0 or loc_col_inc) ~= 0 then
+		--Log("STAY ON COURSE");
+		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
+		self:Move_to_Pos(frameTime, target_pos);
+		return;
+	end
+	
+	--[[
+	Log("row: " .. tostring(row));
+	Log("col: " .. tostring(col));
+	
+	Log(tostring(self.Maze_Properties.grid[row][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row + 1][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row - 1][col].occupied));
+	Log(tostring(self.Maze_Properties.grid[row][col + 1].occupied));
+	Log(tostring(self.Maze_Properties.grid[row][col - 1].occupied));
+	]]--
+
+	--else change our behavior
+	self.previous_col = col;
+	self.previous_row = row;
+
+	--increment visit counter of current grid space
+	--Log(tostring(self.Maze_Properties.grid[row][col].n_visited));
+	self.Maze_Properties.grid[row][col].n_visited = self.Maze_Properties.grid[row][col].n_visited + 1;
+	--Log(tostring(self.Maze_Properties.grid[row][col].n_visited));
+
+	--local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
+
+	--Log("Num Empty_neighbors: " .. tostring(#empty_neighbors));
+
+	-- if there are more options than backwards
+	if #empty_neighbors >=2 then
+		--remove backtracking as an option
+		for key, value in pairs(empty_neighbors) do
+			try_dir = empty_neighbors[key].direction;
+			if try_dir.row_inc ==  -self.direction.row_inc and
+					try_dir.col_inc == -self.direction.col_inc then
+				--Log("REMOVE BACKTRACKING AS OPTION");
+				empty_neighbors[key] = nil;
+			end
+		end
+	else end
+	
+	local min_val = 10000;
+	local min_key = 0
+
+	for key, value in pairs(empty_neighbors) do
+		--Log(tostring(value.n_visited));
+		if value.n_visited < min_val then
+			min_val = value.n_visited;
+			min_key = key;
+		end
+	end
+	
+	--select minimally visited neighbor
+	self.direction = empty_neighbors[min_key].direction;
 end
 
 function Mouse_ND:randomDirectionalWalk(frameTime)
-	
+	--Cryengine
 	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
-	
+	--Lumberyard
+	--local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+
 	local row = rowcol.row;
 	local col = rowcol.col;
-	
+
 	local loc_row_inc = self.direction.row_inc;
 	local loc_col_inc = self.direction.col_inc;
-	
+
 	if loc_row_inc ~= 0 or loc_col_inc ~= 0 then
 		if self.Maze_Properties.grid[row+loc_row_inc][col+loc_col_inc].occupied == false then
 			--Log("continue moving in same direction");
@@ -240,38 +433,55 @@ function Mouse_ND:randomDirectionalWalk(frameTime)
 		end
 	end
 
-	--[[
-	Log("row: " .. tostring(row));
-	Log("col: " .. tostring(col));
-	
-	Log(tostring(self.Maze_Properties.grid[row][col].occupied));
-	Log(tostring(self.Maze_Properties.grid[row + 1][col].occupied));
-	Log(tostring(self.Maze_Properties.grid[row - 1][col].occupied));
-	Log(tostring(self.Maze_Properties.grid[row][col + 1].occupied));
-	Log(tostring(self.Maze_Properties.grid[row][col - 1].occupied));
-	--]]
-	
 	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
-	
-	--Log(tostring(#empty_neighbors));
-	
 	local rnd_idx = random(#empty_neighbors);
 	self.direction = empty_neighbors[rnd_idx].direction;
-	local target_cell = empty_neighbors[rnd_idx];
-	local target_pos = self.Maze_Properties.ID:rowcol_to_pos(target_cell.row, target_cell.col);
-	self:Move_to_Pos(frameTime, target_pos);
+
 end
 
-function Mouse_ND:directionalWalk(frameTime)
-	
+--function which makes living entity patrol the straight line pathway its spawned in
+function Mouse_ND:bounce(frameTime)
+	--Cryengine
 	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
-	
+	--Lumberyard
+
+	--local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+
 	local row = rowcol.row;
 	local col = rowcol.col;
-	
+
 	local loc_row_inc = self.direction.row_inc;
 	local loc_col_inc = self.direction.col_inc;
-	
+
+	if loc_row_inc ~= 0 or loc_col_inc ~= 0 then
+		if self.Maze_Properties.grid[row+loc_row_inc][col+loc_col_inc].occupied == false then
+			--Log("continue moving in same direction");
+			local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
+			self:Move_to_Pos(frameTime, target_pos);
+			return;
+		else
+			--reverse direction if living enity has one
+			self.direction = {row_inc = -loc_row_inc, col_inc = -loc_col_inc};
+			return;
+		end
+	end
+
+	--choose random starting direction
+	--Log("choose rand initial direction");
+	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
+	local rnd_idx = random(#empty_neighbors);
+	self.direction = empty_neighbors[rnd_idx].direction;
+end	
+
+function Mouse_ND:directionalWalk(frameTime)
+
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
+	local row = rowcol.row;
+	local col = rowcol.col;
+
+	local loc_row_inc = self.direction.row_inc;
+	local loc_col_inc = self.direction.col_inc;
+
 	if loc_row_inc ~= 0 or loc_col_inc ~= 0 then
 		if self.Maze_Properties.grid[row+loc_row_inc][col+loc_col_inc].occupied == false then
 			--Log("continue moving in same direction");
@@ -281,18 +491,6 @@ function Mouse_ND:directionalWalk(frameTime)
 		end
 	end
 
-	--[[
-	Log("row: " .. tostring(row));
-	Log("col: " .. tostring(col));
-	
-	Log(tostring(self.Maze_Properties.grid[row][col].occupied));
-	Log(tostring(self.Maze_Properties.grid[row + 1][col].occupied));
-	Log(tostring(self.Maze_Properties.grid[row - 1][col].occupied));
-	Log(tostring(self.Maze_Properties.grid[row][col + 1].occupied));
-	Log(tostring(self.Maze_Properties.grid[row][col - 1].occupied));
-	--]]
-	
-	
 	for key,value in pairs(self.directions) do
 		loc_row_inc = value.row_inc;
 		loc_col_inc = value.col_inc;
@@ -304,11 +502,136 @@ function Mouse_ND:directionalWalk(frameTime)
 			return;
 		end
 	end
+
 end
 
-function Mouse_ND:raytrace()
-	--STATUS: totally broken - will work on tomorrow
+----------------------------------------------------------------------------------------------------------------------------------
+-------------------------              Behaviors                             ---------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------
+function Mouse_ND:chase(target_class, time)
+	--Log("In Chase")
+	local target = self:ray_cast(target_class);
+
+	if (target ~= nil) then
+		--self:PrintTable(target)
+		if (target.class ~= "") then
+			--Log("In if state")
+			local distance = vecLen(vecSub(target.pos, self.pos));
+			--Log("Distance = %d", distance)
+			if distance < 1.1 then
+				--Log("Distance <= 1, Eat")
+				target:OnEat(self, 2);
+				self.target = nil;
+
+				return false;
+			end
+
+			self:Move_to_Pos(time, target.pos);
+
+			return true;
+		else
+			return false;
+		end
+	else 
+		return false;
+	end
 end
+
+
+function Mouse_ND:run(target_class, time)
+
+	local target = self:ray_cast(target_class);
+
+	if (target ~= nil) then
+		self:runFrom(target, time);
+		return true;
+	else
+		return false;
+	end
+end
+
+----------------------------------------------------------------------------------------------------------------------------------
+-------------------------              Utility Functions                             ---------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------
+function Mouse_ND:ray_cast(target_class)
+
+	local target = System.GetNearestEntityByClass({self.pos.x, self.pos.y, self.pos.z},
+ 			 20, target_class);
+
+	if target == nil then
+		return nil;
+	end
+
+ 	--Log(tostring(target));
+
+ 	System.DrawLine(self.pos, target.pos, 1, 0, 0, 1);
+
+ 	local diff = {x = target.pos.x - self.pos.x, y = target.pos.y - self.pos.y, z = 0};
+
+ 	local fucker = {};
+
+ 	Physics.RayWorldIntersection(self.pos, diff, 1, ent_all, self.id, target.id, fucker);--, self:GetRawId(), target_mouse:GetRawId());
+
+	local n_hits = 0;
+
+	for key, value in pairs(fucker) do
+		n_hits = n_hits + 1
+	end
+
+	if (n_hits > 0) then
+		--Log("Raycast intersect");
+		return nil;
+	end
+
+	return target;
+end
+
+
+function Mouse_ND:PrintTable(t)
+
+    local print_r_cache={}
+
+    local function sub_print_r(t,indent)
+        if (print_r_cache[tostring(t)]) then
+            Log(indent.."*"..tostring(t))
+        else
+            print_r_cache[tostring(t)]=true
+            if (type(t)=="table") then
+                for pos,val in pairs(t) do
+                    if (type(val)=="table") then
+                        Log(indent.."["..pos.."] => "..tostring(t).." {")
+
+                        sub_print_r(val,indent..string.rep(" ",string.len(pos)+8))
+
+                        Log(indent..string.rep(" ",string.len(pos)+6).."}")
+
+                    elseif (type(val)=="string") then
+
+                        Log(indent.."["..pos..'] => "'..val..'"')
+
+                    else
+
+                        Log(indent.."["..pos.."] => "..tostring(val))
+
+                    end
+
+                end
+
+            else
+                Log(indent..tostring(t))
+            end
+        end
+    end
+
+    if (type(t)=="table") then
+        Log(tostring(t).." {")
+        sub_print_r(t,"  ")
+        Log("}")
+    else
+        sub_print_r(t,"  ")
+    end
+end
+
 
 function Mouse_ND:breathing_animation(frameTime)
 	local cycle_time = 50;
@@ -344,7 +667,9 @@ function Mouse_ND:OnUpdate(frameTime)
 	
 	--self:directionalWalk(frameTime);
 	
-	self:randomDirectionalWalk(frameTime);
+	--self:randomDirectionalWalk(frameTime);
+	
+	self:exploratoryWalk(frameTime);
 end
 
 function Mouse_ND:Move_to_Pos(frameTime, pos) 
