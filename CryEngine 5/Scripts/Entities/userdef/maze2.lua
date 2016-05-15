@@ -101,9 +101,9 @@ function Maze2:OnInit()
     self.Origin = self:GetPos()
     --self:OnReset()
     
-    self:SetupModel()
+    --self:SetupModel()
     --self:New()    
-    self:OnPropertyChange()
+    self:SetFromProperties()
     self:New()  
 end
 
@@ -501,7 +501,7 @@ function Maze2:New()
         Log("Map property isn't empty");
         success = self:ReadMaze2();
         --Properties.file_map_txt = "";
-    end
+  end
     
     if (not success) then
         Log("Map property was empty");
@@ -567,8 +567,8 @@ function Maze2:New()
    end
    
    self:SpawnMice()
-   --self:SpawnSnakes(5)
-   --self:SpawnFood()
+   self:SpawnSnakes(5)
+   self:SpawnFood()
   
 end
 

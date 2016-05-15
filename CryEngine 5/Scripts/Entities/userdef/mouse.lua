@@ -288,7 +288,7 @@ end
 
 --sets the Mouse's properties
 function Mouse:abstractReset()
-	--Log("In Mouse AbstractReset");
+	Log("In Mouse AbstractReset");
 	
 	-- Load Knowledge Base in
 	self.mouseDataTable = self:LoadXMLData() -- Optional Parameter to SPecify what file to read

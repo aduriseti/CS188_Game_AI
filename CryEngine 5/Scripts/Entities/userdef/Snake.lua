@@ -1,7 +1,7 @@
 --CryEngine
-Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
+--Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
 --Lumberyard
---Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
+Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    Snake Table Declaration                 ---------------------------------------------
