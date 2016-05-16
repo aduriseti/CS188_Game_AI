@@ -181,9 +181,9 @@ Snake.Destroyed =
 -------------------------                     State Functions                        --------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------
 
---sets the Mouse's properties
+--sets the Snake's properties
 function Snake:abstractReset()
-	--Log("In OnResettttttttt")
+	Log("Snake: In OnResettttttttt")
 
 	--self.direction = self.directions.up;
 	--Log(tostring(self.direction.row_inc));

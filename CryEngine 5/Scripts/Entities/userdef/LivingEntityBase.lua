@@ -92,14 +92,12 @@ local Physics_DX9MP_Simple = {
 ---------------------------------------------------------------------------------------------------------------------------------
 
 function LivingEntityBase:OnInit() 
-
+	Log("LivingEntityBase: OnInit()")
     self:OnReset();
-
 end
 
 function LivingEntityBase:OnPropertyChange() 
-
-	Log("In OnPropertyChange");
+	Log("LivingEntityBase: OnPropertyChange()")
 
     self:OnReset();
 
@@ -108,15 +106,18 @@ end
 function LivingEntityBase:OnReset()
 	--OK wtf is it really not possible to reload this script from maze2?
 	--Log("test reload from maze");
+	Log("LivingEntityBase: OnReset()")
 
     self:SetFromProperties()  
 
+	Log("About to call abstractReset")
     self:abstractReset()
-
+	Log("Should have called abstractReset")
 end
 
 -- This abstract reset is empty in Base, it purely exists if you want extra functionality from reset in subclass
 function LivingEntityBase:abstractReset()
+		Log("LivingEntityBase: AbstractReset()")
 end
 
 
@@ -125,7 +126,7 @@ end
 ----------------------------------------------------------------------------------------------------------------------------------
 
 function LivingEntityBase:SetupModel()
-
+	Log("LivingEntityBase: SetupModel()")
     local Properties = self.Properties;
 
     if(Properties.object_Model ~= "") then          -- Make sure objectModel is specified
@@ -155,6 +156,7 @@ end
 
 function LivingEntityBase:PhysicalizeThis() -- Helper function to physicalize, Copied from BasicEntity.lua
     -- Init physics.
+	Log("LivingEntityBase: PhysicalizeThis()")
 	local Physics = self.Properties.Physics;
 	if (CryAction.IsImmersivenessEnabled() == 0) then
 		Physics = Physics_DX9MP_Simple;
@@ -163,6 +165,7 @@ function LivingEntityBase:PhysicalizeThis() -- Helper function to physicalize, C
 end
 
 function LivingEntityBase:SetFromProperties()
+	Log("LivingEntityBase: SetFromProperties()")
 
     self:SetupModel();
 	self.angles = self:GetAngles(); --gets the current angles of Rotating
@@ -206,12 +209,12 @@ function LivingEntityBase:SetFromProperties()
 
     --self.direction = self.directions.none
 
-    self:Activate(self.Properties.bActive); --set OnUpdate() on/off
+    self:Activate(1); --set OnUpdate() on/off
 
 end
 
 function LivingEntityBase:SetupMaze()
-	Log("In living entity maze setup");
+	Log("LivingEntityBase: SetupMaze()");
     --populate Maze_Properties and put LivingEntityBase in maze
     --populate Maze Properties
     self.Maze_Properties.cell_height = self.Maze_Properties.ID:height();

@@ -286,18 +286,21 @@ function Mouse:OnEat()
 	self:GotoState("Dead")
 end
 
+
 --sets the Mouse's properties
 function Mouse:abstractReset()
-	Log("In Mouse AbstractReset");
-	
+	Log("Mouse: In AbstractReset")
+
+	--self.direction = self.directions.up;
+	--Log(tostring(self.direction.row_inc));
 	-- Load Knowledge Base in
 	self.mouseDataTable = self:LoadXMLData() -- Optional Parameter to SPecify what file to read
 	
 	--self:PrintTable(self.mouseDataTable)
-	
-	self:GotoState("Search");
-end
 
+	self:GotoState("Search");
+
+end
 
 -- Loads a XML data file and returns it as a script table
 function Mouse:LoadXMLData(dataFile)

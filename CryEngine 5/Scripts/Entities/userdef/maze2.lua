@@ -251,7 +251,7 @@ function Maze2:RemoveSnakes()
 end
 function Maze2:RemoveFoods()
     Log("Removing All Foods")
-    self:PrintTable(self.myFoods)
+    --self:PrintTable(self.myFoods)
     for key,value in pairs(self.myFoods) do  
         --Log("Key is: "..key)
         --Log("Printing Table value")
