@@ -5,12 +5,13 @@
 Trap1 =
 {
   type = "Trap_Spring",
-  States = {"Ready","Sprung",},
-
+  States = {"Ready","Sprung"},
+  pos = {},
+  
   Properties =
   {
    object_Model = "objects/default/primitive_box.cgf",
-
+   bActive = 1,
    Physics = {
         bPhysicalize = 1, -- True if object should be physicalized at all.
         bRigidBody = 1, -- True if rigid body, False if static.
@@ -39,8 +40,8 @@ Trap1.Ready =
         Log("Trap1: Lying in wait to kill")
     end,
 
-    OnUpdate = function(self,time)
-            Log("Trap1: Updating")
+    OnUpdate = function(self, dt)
+           -- Log("Trap1: Updating")
             local stepped_on, mouse = self:Collide("Mouse")
             if stepped_on then
                 mouse:OnEat(self, 2); 
@@ -78,7 +79,8 @@ end
 
 function Trap1:OnReset()
     self:SetupModel()
-    
+    self.pos = self:GetPos(); --gets the current position of Rotating
+    self:Activate(1)
     self:GotoState("Ready")
 end
 
@@ -142,11 +144,13 @@ end
 
 function Trap1:Collide(target_class)
     local target = self:ray_cast(target_class)
-    Log("In Collide")
+    --Log("In Collide")
     if(target ~=nil) then
+        Log("Trap: I HAVE SEEN A MOUSE")
         if(target.class ~= "") then 
             local distance = vecLen(vecSub(target.pos, self.pos));
             if distance < 1.1 then 
+                Log("Trap: KILL IT")
                 return true, target;                
             end 
         end 
