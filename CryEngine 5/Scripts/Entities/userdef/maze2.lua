@@ -92,16 +92,16 @@ local Physics_DX9MP_Simple = {
 ----------------------------------------------------------------------------------------------------------------------------------
 
 function Maze2:OnInit()
-	Log("test reload script from maze");
-	Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
-	Script.ReloadScript( "SCRIPTS/Entities/userdef/mouse.lua");
-	Script.ReloadScript( "SCRIPTS/Entities/userdef/Snake.lua");
+	--Log("test reload script from maze");
+	--Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
+	--Script.ReloadScript( "SCRIPTS/Entities/userdef/mouse.lua");
+	--Script.ReloadScript( "SCRIPTS/Entities/userdef/Snake.lua");
 	
-	Log("Reload Entity script");
-	Script.ReloadEntityScript("Mouse");
+	--Log("Reload Entity script");
+	--Script.ReloadEntityScript("Mouse");
 	
-	Log("Reload all scripts");
-	Script.ReloadScripts();
+	--Log("Reload all scripts");
+	--Script.ReloadScripts();
 
     Log("OnInit is running");
     self.Width = self.Properties.iM_Width
@@ -203,6 +203,7 @@ end
 
 function Maze2:RemoveWalls()
     Log("Removing All Walls")
+    --self:PrintTable(self.myWalls)
     for k,v in pairs(self.myWalls) do
 
         --local EntID=System.GetEntityByName(v);
@@ -218,6 +219,7 @@ function Maze2:RemoveWalls()
 end
 function Maze2:RemoveMice()
     Log("Removing All Mice")
+    --self:PrintTable(self.myMice)
     for k,v in pairs(self.myMice) do
 
         --local EntID=System.GetEntityByName(v);
@@ -225,6 +227,7 @@ function Maze2:RemoveMice()
 
         --System.RemoveEntity(EntID)
         System.RemoveEntity(v.id)
+        self.myMice[k] = nil;
         --v:DeleteThis()
         --v:TestDelete()
     end
@@ -232,6 +235,7 @@ function Maze2:RemoveMice()
 end
 function Maze2:RemoveSnakes()
     Log("Removing All Snakes")
+    --self:PrintTable(self.mySnakes)
     for k,v in pairs(self.mySnakes) do
 
         --local EntID=System.GetEntityByName(v);
@@ -239,6 +243,7 @@ function Maze2:RemoveSnakes()
 
         --System.RemoveEntity(EntID)
         System.RemoveEntity(v.id)
+        self.mySnakes[k] = nil
         --v:DeleteThis()
         --v:TestDelete()
     end
@@ -246,10 +251,16 @@ function Maze2:RemoveSnakes()
 end
 function Maze2:RemoveFoods()
     Log("Removing All Foods")
-    for x,y in pairs(self.myFoods) do  
-        for y,v in pairs(self.mySnakes) do
-            System.RemoveEntity(v.id)
-
+    self:PrintTable(self.myFoods)
+    for key,value in pairs(self.myFoods) do  
+        --Log("Key is: "..key)
+        --Log("Printing Table value")
+        --self:PrintTable(value)
+        for key2,value2 in pairs(value) do
+            --Log("Key2 is (Should be an int): "..key2)
+            --Log("Printing Table value2, should be a food entity")
+            System.RemoveEntity(value2.id)
+            value[key2] = nil;
         end
     end
     
@@ -999,6 +1010,7 @@ function Maze2:CoordTransform(x,y)
 end
 
 function Maze2:SpawnMice()
+        Log("Spawning Mice")
         local w, h = 2,2
         local Properties = self.Properties;
         local width = 1+ self:width()*(self:corridorSize()+1)
@@ -1042,11 +1054,11 @@ function Maze2:SpawnSnakes(num)
         
         for i =1, num do
             -- Get random open coord
-            local h = random(self:height()*2+1)
+            local h = random(2, self:height()*2+1)
             if h < 1 then h = h+1 end
             if h%2 ~= 0 and h > 0 then h = h-1 end
             
-            local w = random(self:width()*2+1)
+            local w = random(2, self:width()*2+1)
             if w < 1 then w = w+1 end
             if w%2 ~= 0 and w > 0 then w = w-1 end 
             
@@ -1107,7 +1119,8 @@ function Maze2:SpawnFood(nCheese, nBerry, nPotato, nGrains, powerBallProb)
             if h%2 ~= 0 then h = h-1 end
             
             self.myFoods.Cheese[#self.myFoods.Cheese+1] = self:FoodSpawnHelper(w,h,"Cheese")
-            
+            --Log("Cheese Added, Should not be empty...")
+            --self:PrintTable(self.myFoods)
         end
         
         -- Spawn Berry 

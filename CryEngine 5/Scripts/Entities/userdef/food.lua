@@ -66,22 +66,22 @@ function Food:SetupModel()
     local Properties = self.Properties;
     local foodType = Properties.esFoodType;
     local model = "";
-    Log(foodType)
+    --Log(foodType)
     
     if foodType == "Cheese" or foodType == "0" then     -- Cheese
-        Log("I am cheese")
-        model = "Objects/yellow cheese.cgf"
+        --Log("I am cheese")
+        model = "Objects/FireHydrant/firehydrant_01.cgf"
     elseif foodType == "Berry" or foodType == "1" then -- Berry
-        Log("I am Berry")
-        model = "Objects/apple.cgf"
+        --Log("I am Berry")
+        model = "Objects/default/primitive_sphere_small.cgf"
     elseif foodType == "Potato" or foodType == "2" then -- Potato
-        model = "Objects/croissant.cgf"
-    elseif foodType == "3" or foodType == "Grains" then -- Grains
-        model = "Objects/walnut.cgf"
-    elseif foodType == "4" or foodType == "PowerBall" then -- PowerBall
         model = "Objects/default/primitive_cylinder.cgf"
+    elseif foodType == "3" or foodType == "Grains" then -- Grains
+        model = "Objects/default/primitive_pyramid.cgf"
+    elseif foodType == "4" or foodType == "PowerBall" then -- PowerBall
+        model = "Objects/BankBag/BankBag.cgf"
     else
-        Log("Going to default")
+        --Log("Going to default")
         model = Properties.object_Model
     end
     
