@@ -7,6 +7,7 @@ Trap1 =
   type = "Trap_Spring",
   States = {"Ready","Sprung"},
   pos = {},
+  myFood = {},
   
   Properties =
   {
@@ -88,7 +89,11 @@ function Trap1:OnReset()
 
     self:GotoState("Ready")
 end
-
+--[[
+function Trap1:OnDestroy()
+      self.myFood[1]:DeleteThis()
+end 
+]]
 --[[
 function Trap1:OnEnterArea(entity, areaID)
     Log("MOTHER FUCKER ENTERED ME BOX")
@@ -122,8 +127,13 @@ function Trap1:SetupModel()
         };
 
         local food = System.SpawnEntity(params);
+        --local trapPos = self:GetPos();
+        --local foodPos = {trapPos.x , trapPos.y - 2, trapPos.z}
+        --food:SetPos(foodPos);
+
+       -- self.myFood[1] = food
         self:AttachChild(food.id, 0)
-                
+
     end
     
 end

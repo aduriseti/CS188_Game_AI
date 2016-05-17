@@ -88,7 +88,7 @@ Mouse.Search =
 
   OnUpdate = function(self,time)
   	
-
+  	  local trap;
 	  local enemy = self:ray_cast("Snake");
 	 -- local trap = self:ray_cast("Trap1");
 	  local target = self:ray_cast("Food");
@@ -102,20 +102,22 @@ Mouse.Search =
 	  local dir = self:GetDirectionVector();
 	  dir = vecScale(dir, 50);
 	  --LogVec("Direction", dir)
-	  local hits = Physics.RayWorldIntersection(self:GetPos(), dir, 2, ent_all, self.id, nil, hitData )
+	  local hits = Physics.RayWorldIntersection(self:GetPos(), dir, 1, ent_all, self.id, nil, hitData )
 	  --Log(hits)
 	  if(hits > 0) then 
 	  	--self:PrintTable(hitData)
-		  if(hitData[1].entity) then 
-		  	self:PrintTable(hitData[1])
+		  if(hitData[1].entity and hitData[1].entity.class == "Trap1") then 
+		  	  trap = hitData[1].entity
 		  end 
 	  end 
 	  
-	  --if(trap ~=nil) then 
-	      -- Log("Mouse: Sees trap")
-		--   local child = self:GetChild(0)
-		 --  target = child;	
-	  --end 
+	  
+	  if(trap ~=nil) then 
+	       Log("Mouse: Sees trap")
+		   local child = trap:GetChild(0)
+		   self:PrintTable(child)
+		   target = child;	
+	  end 
 	  --Log(tostring(enemy));
 	  --Log(tostring(target));
 

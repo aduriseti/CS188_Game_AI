@@ -608,7 +608,7 @@ function Maze2:New()
    self:SpawnMice()
    self:SpawnSnakes(5)
    self:SpawnFood()
-   self:SpawnTraps()
+   self:SpawnTraps(5)
   
 end
 
@@ -1244,9 +1244,10 @@ function Maze2:FoodSpawnHelper(w,h, foodType)
         return food
 end
 
-function Maze2:SpawnTraps()
+function Maze2:SpawnTraps(num)
         Log("Spawning Traps")
-        local w, h = 2, 16
+            
+      --  local w, h = 2, 16
         local Properties = self.Properties;
         local width = 1+ self:width()*(self:corridorSize()+1)
         
@@ -1258,27 +1259,37 @@ function Maze2:SpawnTraps()
         end 
         local xOffset = self.Origin.x;
         local yOffset = self.Origin.y;
-        local sx = objX*(w-1) + xOffset
-        local sy = objY*(h-1) + yOffset
+        local i = 0;
+        while i < num do
+            i = i +1
+            local w = random(2, self:width()*2+1) end
+            if w%2 ~= 0  then w = w-1 end
+            local h = random(2, self:height()*2+1)
+            if h%2 ~= 0  then h = h-1 end
+            
+            local sx = objX*(w-1) + xOffset
+            local sy = objY*(h-1) + yOffset
 
-        --Log("Spawning at (%d, %d)", sx, sy);
-        local spawnPos = {x=sx,y=sy,z=32}
-        local dVec = self:GetDirectionVector()
-        --LogVec("Maze orientation: ", dVec)
-        local params = {
-            class = "Trap1";
-            name = "T";
-            position = spawnPos;
-            --orientation = dVec;
-            properties = {
-                bActive = 1;
-              --  object_Model = self.Model;
+            --Log("Spawning at (%d, %d)", sx, sy);
+            local spawnPos = {x=sx,y=sy,z=32}
+            local dVec = self:GetDirectionVector()
+            --LogVec("Maze orientation: ", dVec)
+            local params = {
+                class = "Trap1";
+                name = "T";
+                position = spawnPos;
+                --orientation = dVec;
+                properties = {
+                    bActive = 1;
+                    object_Model = "objects/default/primitive_box.cgf";
+                --  object_Model = self.Model;
+                };
             };
-        };
-        
-        --local Trap = System.SpawnEntity(params);
-        
-          --self.myTraps[#self.myTraps+1] = Trap;
+            
+            local Trap = System.SpawnEntity(params);
+            
+            self.myTraps[#self.myTraps+1] = Trap;
+       end
 end
 
 function Maze2:PrintTable(t)
