@@ -70,6 +70,10 @@ LivingEntityBase = {
 
 	direction = {row_inc = 0, col_inc = 0},
 	Previous_Loc={},
+	
+	movement_stack = {};
+	
+	movement_queue = {};
 
 	target = "",
 
@@ -113,8 +117,8 @@ function LivingEntityBase:OnReset()
 
 	Log("About to call abstractReset")
     self:abstractReset()
-	self:THEFUCK()
-	Log("Should have called abstractReset")
+	--self:THEFUCK()
+	--Log("Should have called abstractReset")
 end
 
 -- This abstract reset is empty in Base, it purely exists if you want extra functionality from reset in subclass
@@ -194,6 +198,7 @@ function LivingEntityBase:SetFromProperties()
         for key, value in pairs( nearby_entities ) do
             if (tostring(value.type) == "Maze2") then
                 self.Maze_Properties.ID = value;
+				Log("MazeID: " .. tostring(value));
             end 
         end
     end
@@ -231,9 +236,12 @@ function LivingEntityBase:SetupMaze()
     self.Maze_Properties.model_height = self.Maze_Properties.ID.Model_Height;
     self.Maze_Properties.model_width = self.Maze_Properties.ID.Model_Width;
     self.Maze_Properties.corridor_width = self.Maze_Properties.ID.corridorSize;       
+	self.Maze_Properties.grid = {}; -- idk if we always want to do this
 
+	--this conditional prevents a living entity from reloading its maze model if it already has one of the appropriate size
+	--this is fine if you assume that grid will be empty on entity spawn but breaks down when System.spawnEntity is called
     if #self.Maze_Properties.grid ~= self.Maze_Properties.height then
-        self.Maze_Properties.grid = {};
+        --self.Maze_Properties.grid = {};
         for row = 1, self.Maze_Properties.height do
             self.Maze_Properties.grid[row] = {};
             for col = 1, self.Maze_Properties.width do
@@ -341,12 +349,6 @@ function LivingEntityBase:turnLeftAlways()
 
 end
 
-function LivingEntityBase:depthFirstSearch()
-
-	--STATUS: Not finished for any maze
-
-end
-
 function LivingEntityBase:randomWalk() 
 
 	--STATUS: Cryengine only - will push when works with lumberyard
@@ -382,6 +384,12 @@ function LivingEntityBase:getUnoccupiedNeighbors(loc_row, loc_col)
 	end
 
 	return empty_neighbors;
+
+end
+
+function LivingEntityBase:depthFirstSearch()
+
+	--STATUS: Not finished for any maze
 
 end
 
