@@ -1259,10 +1259,11 @@ function Maze2:SpawnTraps(num)
         end 
         local xOffset = self.Origin.x;
         local yOffset = self.Origin.y;
+        
         local i = 0;
         while i < num do
             i = i +1
-            local w = random(2, self:width()*2+1) end
+            local w = random(2, self:width()*2+1) 
             if w%2 ~= 0  then w = w-1 end
             local h = random(2, self:height()*2+1)
             if h%2 ~= 0  then h = h-1 end
@@ -1289,7 +1290,7 @@ function Maze2:SpawnTraps(num)
             local Trap = System.SpawnEntity(params);
             
             self.myTraps[#self.myTraps+1] = Trap;
-       end
+        end
 end
 
 function Maze2:PrintTable(t)
