@@ -470,7 +470,7 @@ function Maze2:pos_to_rowcol(pos)
   local grid_dec_y = offset_blocks_y + 1;
 
   return {col = math.floor(grid_dec_x+0.5), 
-    row = math.floor(grid_dec_y+0.5)};
+          row = math.floor(grid_dec_y+0.5)};
 
 end
 
@@ -1053,6 +1053,7 @@ function Maze2:SpawnMice()
             name = "M";
             position = spawnPos;
             orientation = dVec;
+           -- scale = 3;
             properties = {
                 bActive = 1;
               --  object_Model = self.Model;
@@ -1060,7 +1061,7 @@ function Maze2:SpawnMice()
         };
         
         local mouse = System.SpawnEntity(params);
-        
+        mouse:SetScale(3)
           self.myMice[#self.myMice+1] = mouse;
 
 end
@@ -1275,9 +1276,9 @@ function Maze2:SpawnTraps()
             };
         };
         
-        local Trap = System.SpawnEntity(params);
+        --local Trap = System.SpawnEntity(params);
         
-          self.myTraps[#self.myTraps+1] = Trap;
+          --self.myTraps[#self.myTraps+1] = Trap;
 end
 
 function Maze2:PrintTable(t)

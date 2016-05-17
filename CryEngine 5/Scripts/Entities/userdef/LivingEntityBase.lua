@@ -69,6 +69,7 @@ LivingEntityBase = {
 		},
 
 	direction = {row_inc = 0, col_inc = 0},
+	Previous_Loc={},
 
 	target = "",
 
@@ -137,6 +138,10 @@ function LivingEntityBase:SetupModel()
             self:PhysicalizeThis();
         end
     end
+	
+	if(self.type == "Mouse") then 
+		self:SetScale(3)
+	end 
 
     
     --[[
@@ -245,6 +250,7 @@ function LivingEntityBase:SetupMaze()
         end
     end	
 	
+	self.Previous_Loc = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos())
 	--self:PrintTable(self.Maze_Properties.grid);
 
 end
@@ -265,9 +271,10 @@ function LivingEntityBase:Move_to_Pos(frameTime, pos)
 
 	local a = self:GetPos();
 	local b = pos;
+	
 	self:FaceAt(b, frameTime);
+	
 	local diff = {x = b.x - a.x, y = b.y - a.y};
-
 	local diff_mag = math.sqrt(diff.x^2 + diff.y^2);
 	local speed_mag = self.Properties.m_speed / diff_mag;
 
@@ -279,24 +286,29 @@ end
 function LivingEntityBase:FaceAt(pos, frameTime)
    local a = self:GetPos();
    local b = pos;
-   local C = math.sqrt((b.y-a.y)^2 + (b.x-a.x)^2);
+   --local C = math.sqrt((b.y-a.y)^2 + (b.x-a.x)^2);
    
    -- Calculate Rotation on Z-axis
-   local newAngleZ = math.atan2 (b.y-a.y, b.x-a.x);
-   local differenceZ =((((newAngleZ - self.angles.z) % (2 * math.pi)) + (3 * math.pi)) % (2 * math.pi)) - math.pi;
-   newAngleZ = (self.angles.z + differenceZ);
+   --local newAngleZ = math.atan2 (b.y-a.y, b.x-a.x);
+  -- local differenceZ =((((newAngleZ - self.angles.z) % (2 * math.pi)) + (3 * math.pi)) % (2 * math.pi)) - math.pi;
+   --newAngleZ = (self.angles.z + differenceZ);
    
    -- Calculate Rotation on Y-axis
-   local newAngleY = math.atan2 (b.z-a.z, C); 
-   local differenceY =((((newAngleY - self.angles.y) % (2 * math.pi)) + (3 * math.pi)) % (2 * math.pi)) - math.pi;
-   newAngleY = (self.angles.y + differenceY)*-1;
+   --local newAngleY = math.atan2 (b.z-a.z, C); 
+   --local differenceY =((((newAngleY - self.angles.y) % (2 * math.pi)) + (3 * math.pi)) % (2 * math.pi)) - math.pi;
+  -- newAngleY = (self.angles.y + differenceY)*-1;
    
    -- Set rotation
-   self.angles.z = Lerp(self.angles.z, newAngleZ, (self.Properties.fRotSpeed*frameTime));   
-   self.angles.y = Lerp(self.angles.y, newAngleY, (self.Properties.fRotSpeed*frameTime));
-   self:SetAngles(self.angles);
+  -- self.angles.z = Lerp(self.angles.z, newAngleZ, (self.Properties.fRotSpeed*frameTime));   
+   --self.angles.y = Lerp(self.angles.y, newAngleY, (self.Properties.fRotSpeed*frameTime));
+   --self:SetAngles(self.angles);
    
-   --self:SetDirectionVector({x=self.angles.x,  y=Lerp(self.angles.y, newAngleY, (self.Properties.fRotSpeed*frameTime)), z=Lerp(self.angles.z, newAngleZ, (self.Properties.fRotSpeed*frameTime))})
+     local vector=DifferenceVectors(b, a);  -- Vector from player to target
+
+     vector=NormalizeVector(vector);  -- Ensure vector is normalised (unit length)
+
+     self:SetDirectionVector(vector); -- Orient player to the vector
+
 end
 
 
@@ -362,12 +374,6 @@ function LivingEntityBase:getUnoccupiedNeighbors(loc_row, loc_col)
 			
 				System.DrawLine(self.pos, {try_pos.x, try_pos.y, self.pos.z}, 0, 1, 0, 1);
 
-				--Log("continue moving in same direction");
-
-				--Log(tostring(loc_row + loc_row_inc));
-
-				--Log(tostring(loc_col + loc_col_inc));
-
 				empty_neighbors[#empty_neighbors+1] = {row =row_index, col = col_index, n_visited = grid[row_index][col_index].n_visited, direction = value};
 
 				--Log(tostring(#empty_neighbors));
@@ -407,10 +413,9 @@ function LivingEntityBase:runFrom(target, frameTime)
 	local loc_row_inc = self.direction.row_inc;
 	local loc_col_inc = self.direction.col_inc;
 
+	local prev_pos = self.Previous_Loc
 	--if we haven't moved out of a grid space yet, continue as before
-	if row == self.previous_row and
-			col == self.previous_col and 
-			(loc_row_inc ~= 0 or loc_col_inc) ~= 0 then
+	if row == prev_pos.row and col == prev_pos.col and (loc_row_inc ~= 0 or loc_col_inc) ~= 0 then
 		--Log("STAY ON COURSE");
 		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
 		--target_pos.z = 32;
@@ -419,8 +424,8 @@ function LivingEntityBase:runFrom(target, frameTime)
 	end
 
 	--else change our behavior
-	self.previous_col = col;
-	self.previous_row = row;
+	self.Previous_Loc.col = col;
+	self.Previous_Loc.row = row;
 
 	--increment visit counter of current grid space
 	--Log(tostring(self.Maze_Properties.grid[row][col].n_visited));
@@ -521,52 +526,35 @@ function LivingEntityBase:exploratoryWalk(frameTime)
 	
 	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
 
+	local prev_pos = self.Previous_Loc
 	--if we haven't moved out of a grid space yet, continue as before
-	if row == self.previous_row and
-			col == self.previous_col and 
-			(loc_row_inc ~= 0 or loc_col_inc) ~= 0 then
+	if row == prev_pos.row and col == prev_pos.col and (loc_row_inc ~= 0 or loc_col_inc) ~= 0 then
 		--Log("STAY ON COURSE");
 		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
 		self:Move_to_Pos(frameTime, target_pos);
 		return;
 	end
-	
-	--[[
-	Log("row: " .. tostring(row));
-	Log("col: " .. tostring(col));
-	
-	Log(tostring(self.Maze_Properties.grid[row][col].occupied));
-	Log(tostring(self.Maze_Properties.grid[row + 1][col].occupied));
-	Log(tostring(self.Maze_Properties.grid[row - 1][col].occupied));
-	Log(tostring(self.Maze_Properties.grid[row][col + 1].occupied));
-	Log(tostring(self.Maze_Properties.grid[row][col - 1].occupied));
-	]]--
 
 	--else change our behavior
-	self.previous_col = col;
-	self.previous_row = row;
+	self.Previous_Loc.col = col;
+	self.Previous_Loc.row = row;
 
 	--increment visit counter of current grid space
-	--Log(tostring(self.Maze_Properties.grid[row][col].n_visited));
 	self.Maze_Properties.grid[row][col].n_visited = self.Maze_Properties.grid[row][col].n_visited + 1;
-	--Log(tostring(self.Maze_Properties.grid[row][col].n_visited));
-
-	--local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
-
-	--Log("Num Empty_neighbors: " .. tostring(#empty_neighbors));
 
 	-- if there are more options than backwards
 	if #empty_neighbors >=2 then
 		--remove backtracking as an option
 		for key, value in pairs(empty_neighbors) do
 			try_dir = empty_neighbors[key].direction;
-			if try_dir.row_inc ==  -self.direction.row_inc and
-					try_dir.col_inc == -self.direction.col_inc then
+			if try_dir.row_inc ==  -self.direction.row_inc and try_dir.col_inc == -self.direction.col_inc then
 				--Log("REMOVE BACKTRACKING AS OPTION");
 				empty_neighbors[key] = nil;
 			end
 		end
-	else end
+	else 
+	
+	end
 	
 	local min_val = 10000;
 	local min_key = 0

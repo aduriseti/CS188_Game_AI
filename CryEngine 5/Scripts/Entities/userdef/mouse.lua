@@ -35,7 +35,8 @@ Mouse = {
 	
     Properties = {
 		bUsable = 0,
-        object_Model = "objects/default/primitive_cube_small.cgf",
+       -- object_Model = "objects/characters/animals/rat/rat.cdf",
+	   object_Model = "objects/default/primitive_cube_small.cgf"
 		fRotSpeed = 3, --[0.1, 20, 0.1, "Speed of rotation"]
 		--m_speed = 0.1;   
 
@@ -96,17 +97,17 @@ Mouse.Search =
 	  --self:PrintTable(myTest)
 	 
 	  local hitData = {};
-	  local angles = self:GetAngles()
-	  LogVec("angles", angles)
+	  --local angles = self:GetAngles()
+	  --LogVec("angles", angles)
 	  local dir = self:GetDirectionVector();
 	  dir = vecScale(dir, 50);
-	  LogVec("Direction", dir)
+	  --LogVec("Direction", dir)
 	  local hits = Physics.RayWorldIntersection(self:GetPos(), dir, 2, ent_all, self.id, nil, hitData )
 	  --Log(hits)
 	  if(hits > 0) then 
 	  	--self:PrintTable(hitData)
 		  if(hitData[1].entity) then 
-		  	--self:PrintTable(hitData[1])
+		  	self:PrintTable(hitData[1])
 		  end 
 	  end 
 	  
@@ -301,7 +302,9 @@ end
 function Mouse:THEFUCK()
 	Log("Mouse: :In THEFUCK")
 	--self:GotoState("Search")
+	--self:SetScale(3)
 	self.mouseDataTable = self:LoadXMLData()
+	self:PrintTable(self.mouseDataTable);
 	self:GotoState("Search")
 	Log("WTF")
 end 
