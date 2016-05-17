@@ -29,6 +29,7 @@ Github repository for quarter  project of UCLA CS188 Game AI course
  - [x] Mice detect food -> Eat state
  - [x] Mice detect state -> Run state
  - [ ] Mice Power state -> Can get Snakes (Replace wildcard food or maybe Snakes drop food like RPGs...?)
+ - [ ] Actually log stuff to XML
  - [ ] Ability to move blocks
 
 ###Snake (Gil)
