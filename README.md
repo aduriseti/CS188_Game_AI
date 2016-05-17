@@ -6,12 +6,31 @@ Github repository for quarter  project of UCLA CS188 Game AI course
 
 ###General
 
+###Movement (Anal)
+ - [x] "Greedy" DFS
+ - [x] DFS
+ - [ ] BFS/A* for pathfinding in already explored regions
+ - [ ] make faceAT not shitty
+ - [ ] change scale and make persist
+ - [ ] move based on physics - use impulse functions in API
+ - [ ] make chase function more like run from function
+ - [ ] make chase and run from functions update direction immediately on sight as opposed to on grid position change
+
+###Player (Amal)
+ - [ ] change camera view to switch between overseer and mouse mode
+ - [ ] get kepresses and use to control camera position
+ - [ ] get user view direction and use to control camera position
+ - [ ] get mouse clicks and location of clicks - correspond to some action in game world
+ - [ ] combine user input functionality to take over a mouse
+ - [ ] log user input while controlling a mouse as data for machine learning
+
 ###Mouse (Amal)
  - [x] Mouse/Mice freely roam maze, pick random direction at intersection, limited memory
  - [x] Mice detect food -> Eat state
- - [ ] Mice detect state -> Run state
+ - [x] Mice detect state -> Run state
  - [ ] Mice Power state -> Can get Snakes (Replace wildcard food or maybe Snakes drop food like RPGs...?)
- 
+ - [ ] Ability to move blocks
+
 ###Snake (Gil)
   - [x] Roam Maze (On Leash from spawned start)
   - [x] Detect Mice -> chase -> kill 
