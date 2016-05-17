@@ -41,7 +41,7 @@ Mouse = {
 
 		maze_ent_name = "",         --maze_ent_name = "Maze1",
 
-        bActive = 0,
+        bActive = 1,
 
         --Copied from BasicEntity.lua
         Physics = {
@@ -96,15 +96,17 @@ Mouse.Search =
 	  --self:PrintTable(myTest)
 	 
 	  local hitData = {};
+	  local angles = self:GetAngles()
+	  LogVec("angles", angles)
 	  local dir = self:GetDirectionVector();
 	  dir = vecScale(dir, 50);
 	  LogVec("Direction", dir)
 	  local hits = Physics.RayWorldIntersection(self:GetPos(), dir, 2, ent_all, self.id, nil, hitData )
-	  Log(hits)
+	  --Log(hits)
 	  if(hits > 0) then 
-	  	self:PrintTable(hitData)
+	  	--self:PrintTable(hitData)
 		  if(hitData[1].entity) then 
-		  	self:PrintTable(hitData[1])
+		  	--self:PrintTable(hitData[1])
 		  end 
 	  end 
 	  
@@ -296,6 +298,13 @@ function Mouse:OnEat()
 	self:GotoState("Dead")
 end
 
+function Mouse:THEFUCK()
+	Log("Mouse: :In THEFUCK")
+	--self:GotoState("Search")
+	self.mouseDataTable = self:LoadXMLData()
+	self:GotoState("Search")
+	Log("WTF")
+end 
 
 --sets the Mouse's properties
 function Mouse:abstractReset()
@@ -304,7 +313,7 @@ function Mouse:abstractReset()
 	--self.direction = self.directions.up;
 	--Log(tostring(self.direction.row_inc));
 	-- Load Knowledge Base in
-	self.mouseDataTable = self:LoadXMLData() -- Optional Parameter to SPecify what file to read
+	--self.mouseDataTable = self:LoadXMLData() -- Optional Parameter to SPecify what file to read
 	
 	--self:PrintTable(self.mouseDataTable)
 

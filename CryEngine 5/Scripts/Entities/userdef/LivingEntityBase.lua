@@ -20,7 +20,7 @@ LivingEntityBase = {
 
 		maze_ent_name = "",         --maze_ent_name = "Maze1",
 
-        bActive = 0,
+        bActive = 1,
 
         --Copied from BasicEntity.lua
         Physics = {
@@ -106,18 +106,19 @@ end
 function LivingEntityBase:OnReset()
 	--OK wtf is it really not possible to reload this script from maze2?
 	--Log("test reload from maze");
-	--Log("LivingEntityBase: OnReset()")
-
+	Log("LivingEntityBase: OnReset()")
+--self:Activate(1);
     self:SetFromProperties()  
 
-	--Log("About to call abstractReset")
+	Log("About to call abstractReset")
     self:abstractReset()
-	--Log("Should have called abstractReset")
+	self:THEFUCK()
+	Log("Should have called abstractReset")
 end
 
 -- This abstract reset is empty in Base, it purely exists if you want extra functionality from reset in subclass
 function LivingEntityBase:abstractReset()
-		--Log("LivingEntityBase: AbstractReset()")
+		Log("LivingEntityBase: AbstractReset()")
 end
 
 
@@ -126,7 +127,7 @@ end
 ----------------------------------------------------------------------------------------------------------------------------------
 
 function LivingEntityBase:SetupModel()
-	Log("LivingEntityBase: SetupModel()")
+	--Log("LivingEntityBase: SetupModel()")
     local Properties = self.Properties;
 
     if(Properties.object_Model ~= "") then          -- Make sure objectModel is specified
@@ -156,7 +157,7 @@ end
 
 function LivingEntityBase:PhysicalizeThis() -- Helper function to physicalize, Copied from BasicEntity.lua
     -- Init physics.
-	Log("LivingEntityBase: PhysicalizeThis()")
+	--Log("LivingEntityBase: PhysicalizeThis()")
 	local Physics = self.Properties.Physics;
 	if (CryAction.IsImmersivenessEnabled() == 0) then
 		Physics = Physics_DX9MP_Simple;
@@ -165,7 +166,7 @@ function LivingEntityBase:PhysicalizeThis() -- Helper function to physicalize, C
 end
 
 function LivingEntityBase:SetFromProperties()
-	Log("LivingEntityBase: SetFromProperties()")
+	--Log("LivingEntityBase: SetFromProperties()")
 
     self:SetupModel();
 	self.angles = self:GetAngles(); --gets the current angles of Rotating
@@ -294,6 +295,8 @@ function LivingEntityBase:FaceAt(pos, frameTime)
    self.angles.z = Lerp(self.angles.z, newAngleZ, (self.Properties.fRotSpeed*frameTime));   
    self.angles.y = Lerp(self.angles.y, newAngleY, (self.Properties.fRotSpeed*frameTime));
    self:SetAngles(self.angles);
+   
+   --self:SetDirectionVector({x=self.angles.x,  y=Lerp(self.angles.y, newAngleY, (self.Properties.fRotSpeed*frameTime)), z=Lerp(self.angles.z, newAngleZ, (self.Properties.fRotSpeed*frameTime))})
 end
 
 
