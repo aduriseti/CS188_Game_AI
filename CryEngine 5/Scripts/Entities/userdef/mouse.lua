@@ -87,31 +87,39 @@ Mouse.Search =
 
   OnUpdate = function(self,time)
   	
-	  --[[
-		  if SeeFood then 
-		  	self:ApproachEntity()
-			self:GotoState("Eat")
-		end
-		
-		if Danger then 
-			self:GotoState("Avoid")
-		end
-		
-		if Dead then
-			self:GotoState("Dead")
-		end
-		  
-	  ]]
 
 	  local enemy = self:ray_cast("Snake");
+	 -- local trap = self:ray_cast("Trap1");
 	  local target = self:ray_cast("Food");
-
+	  
+	  --local myTest = self:IntersectRay(0, self:GetPos(), self:GetDirectionVector(), 15)
+	  --self:PrintTable(myTest)
+	 
+	  local hitData = {};
+	  local dir = self:GetDirectionVector();
+	  dir = vecScale(dir, 50);
+	  LogVec("Direction", dir)
+	  local hits = Physics.RayWorldIntersection(self:GetPos(), dir, 2, ent_all, self.id, nil, hitData )
+	  Log(hits)
+	  if(hits > 0) then 
+	  	self:PrintTable(hitData)
+		  if(hitData[1].entity) then 
+		  	self:PrintTable(hitData[1])
+		  end 
+	  end 
+	  
+	  --if(trap ~=nil) then 
+	      -- Log("Mouse: Sees trap")
+		--   local child = self:GetChild(0)
+		 --  target = child;	
+	  --end 
 	  --Log(tostring(enemy));
 	  --Log(tostring(target));
 
 	  if enemy ~= nil then
 	  	self:GotoState("Avoid");
 	  elseif target ~= nil then
+	  	--Log("Gonna Eat")
 	  	self:GotoState("Eat");
 	  else end;
 
@@ -239,6 +247,8 @@ Mouse.Dead =
 	
 	OnBeginState = function(self)
 		Log("Mouse: Entering Dead State")
+			--self:SaveXMLData()
+
 			self:DeleteThis()
 
 		-- Mark as Loser
@@ -251,7 +261,7 @@ Mouse.Dead =
 	end,
 
   	OnEndState = function(self)
-		self:SaveXMLData()
+		--self:SaveXMLData()
   	end,
 }
 

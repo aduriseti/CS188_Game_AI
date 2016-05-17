@@ -92,12 +92,12 @@ local Physics_DX9MP_Simple = {
 ---------------------------------------------------------------------------------------------------------------------------------
 
 function LivingEntityBase:OnInit() 
-	Log("LivingEntityBase: OnInit()")
+	--Log("LivingEntityBase: OnInit()")
     self:OnReset();
 end
 
 function LivingEntityBase:OnPropertyChange() 
-	Log("LivingEntityBase: OnPropertyChange()")
+	--Log("LivingEntityBase: OnPropertyChange()")
 
     self:OnReset();
 
@@ -106,18 +106,18 @@ end
 function LivingEntityBase:OnReset()
 	--OK wtf is it really not possible to reload this script from maze2?
 	--Log("test reload from maze");
-	Log("LivingEntityBase: OnReset()")
+	--Log("LivingEntityBase: OnReset()")
 
     self:SetFromProperties()  
 
-	Log("About to call abstractReset")
+	--Log("About to call abstractReset")
     self:abstractReset()
-	Log("Should have called abstractReset")
+	--Log("Should have called abstractReset")
 end
 
 -- This abstract reset is empty in Base, it purely exists if you want extra functionality from reset in subclass
 function LivingEntityBase:abstractReset()
-		Log("LivingEntityBase: AbstractReset()")
+		--Log("LivingEntityBase: AbstractReset()")
 end
 
 
@@ -170,8 +170,8 @@ function LivingEntityBase:SetFromProperties()
     self:SetupModel();
 	self.angles = self:GetAngles(); --gets the current angles of Rotating
     self.pos = self:GetPos(); --gets the current position of Rotating
-    self.pos.z = 33
-    self:SetPos({self.pos.x, self.pos.y, self.pos.z})
+    --self.pos.z = 32
+    --self:SetPos({self.pos.x, self.pos.y, self.pos.z})
 
 	local Properties = self.Properties;
 	if (Properties.object_Model == "") then
@@ -214,7 +214,7 @@ function LivingEntityBase:SetFromProperties()
 end
 
 function LivingEntityBase:SetupMaze()
-	Log("LivingEntityBase: SetupMaze()");
+	--Log("LivingEntityBase: SetupMaze()");
     --populate Maze_Properties and put LivingEntityBase in maze
     --populate Maze Properties
     self.Maze_Properties.cell_height = self.Maze_Properties.ID:height();
@@ -262,7 +262,7 @@ end
 
 function LivingEntityBase:Move_to_Pos(frameTime, pos) 
 
-	local a = self.pos;
+	local a = self:GetPos();
 	local b = pos;
 	self:FaceAt(b, frameTime);
 	local diff = {x = b.x - a.x, y = b.y - a.y};
@@ -275,17 +275,28 @@ function LivingEntityBase:Move_to_Pos(frameTime, pos)
 
 end
 
-function LivingEntityBase:FaceAt(pos, fT)
-    local a = self.pos;
-    local b = pos;
-    local newAngle = math.atan2 (b.y-a.y, b.x-a.x);     
-
-    local difference =((((newAngle - self.angles.z) % (2 * math.pi)) + (3 * math.pi)) % (2 * math.pi)) - math.pi;
-    newAngle = (self.angles.z + difference);
-
-    self.angles.z = Lerp(self.angles.z, newAngle, (self.Properties.fRotSpeed*fT));  
-    self:SetAngles(self.angles);
+function LivingEntityBase:FaceAt(pos, frameTime)
+   local a = self:GetPos();
+   local b = pos;
+   local C = math.sqrt((b.y-a.y)^2 + (b.x-a.x)^2);
+   
+   -- Calculate Rotation on Z-axis
+   local newAngleZ = math.atan2 (b.y-a.y, b.x-a.x);
+   local differenceZ =((((newAngleZ - self.angles.z) % (2 * math.pi)) + (3 * math.pi)) % (2 * math.pi)) - math.pi;
+   newAngleZ = (self.angles.z + differenceZ);
+   
+   -- Calculate Rotation on Y-axis
+   local newAngleY = math.atan2 (b.z-a.z, C); 
+   local differenceY =((((newAngleY - self.angles.y) % (2 * math.pi)) + (3 * math.pi)) % (2 * math.pi)) - math.pi;
+   newAngleY = (self.angles.y + differenceY)*-1;
+   
+   -- Set rotation
+   self.angles.z = Lerp(self.angles.z, newAngleZ, (self.Properties.fRotSpeed*frameTime));   
+   self.angles.y = Lerp(self.angles.y, newAngleY, (self.Properties.fRotSpeed*frameTime));
+   self:SetAngles(self.angles);
 end
+
+
 
 function LivingEntityBase:FollowPlayer(frameTime)
 	self:FaceAt(self.Player_Properties.ID:GetPos(), frameTime);
@@ -399,6 +410,7 @@ function LivingEntityBase:runFrom(target, frameTime)
 			(loc_row_inc ~= 0 or loc_col_inc) ~= 0 then
 		--Log("STAY ON COURSE");
 		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
+		--target_pos.z = 32;
 		self:Move_to_Pos(frameTime, target_pos);
 		return;
 	end

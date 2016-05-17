@@ -15,6 +15,7 @@ Snake = {
 	max_patrol = 100,
     cur_patrol = 0,
     cur_direction = "NorthEast",
+	--pos = {},
 	
 	States = {"Opened","Closed","Destroyed", "Patrol", "Eat"},
 	
@@ -100,41 +101,6 @@ Snake.Patrol =
 
  }
 
- function Snake:ray_cas(target_class)
-
-	local target = System.GetNearestEntityByClass({self.pos.x, self.pos.y, self.pos.z},
- 			 1000, target_class);
-
-	if target == nil then
-		return nil;
-	end
-
- 	--Log(tostring(target));
-
- 	System.DrawLine(self.pos, target.pos, 1, 0, 0, 1);
-
- 	local diff = {x = target.pos.x - self.pos.x, y = target.pos.y - self.pos.y, z = 0};
-
- 	local fucker = {};
-
- 	Physics.RayWorldIntersection(self.pos, diff, 1, ent_all, self.id, target.id, fucker);--, self:GetRawId(), target_mouse:GetRawId());
-
-	local n_hits = 0;
-
-	for key, value in fucker do
-		n_hits = n_hits + 1
-	end
-
-	if (n_hits > 0) then
-		--Log("Raycast intersect");
-		return nil;
-	end
-
-	return target;
-end
-
-
-
 Snake.Eat =
 {
 	OnBeginState = function(self)
@@ -168,13 +134,6 @@ Snake.Destroyed =
 
     end,
 
-  
-
-    OnUpdate = function(self, dt)
-
-       -- self:OnUpdate();
-
-    end,
 
 }
 ---------------------------------------------------------------------------------------------------------------------------------
@@ -183,7 +142,7 @@ Snake.Destroyed =
 
 --sets the Snake's properties
 function Snake:abstractReset()
-	Log("Snake: In OnResettttttttt")
+	Log("Snake: In OnReset")
 
 	--self.direction = self.directions.up;
 	--Log(tostring(self.direction.row_inc));

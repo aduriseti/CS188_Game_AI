@@ -39,16 +39,16 @@ Trap1.Ready =
     OnBeginState = function(self)
         Log("Trap1: Lying in wait to kill")
     end,
+    
+    OnEnterArea = function(self,entity,areaId)
+      if (entity.type == "Mouse") then
+        Log("Mouse Entered my Box")
+        entity:OnEat(self,2)
+        self:GotoState("Sprung")
+      end;
+   
+   end;
 
-    OnUpdate = function(self, dt)
-           -- Log("Trap1: Updating")
-            local stepped_on, mouse = self:Collide("Mouse")
-            if stepped_on then
-                mouse:OnEat(self, 2); 
-                self:GotoState("Sprung")
-            end
-        
-    end,
 
   OnEndState = function(self)
   	Log("Trap1: Ima straight killa")
@@ -81,8 +81,19 @@ function Trap1:OnReset()
     self:SetupModel()
     self.pos = self:GetPos(); --gets the current position of Rotating
     self:Activate(1)
+    self:RegisterForAreaEvents(1);
+    local v1, v2 = self:GetLocalBBox()
+
+    self:SetTriggerBBox(v1, v2)
+
     self:GotoState("Ready")
 end
+
+--[[
+function Trap1:OnEnterArea(entity, areaID)
+    Log("MOTHER FUCKER ENTERED ME BOX")
+end
+]]
 
 function Trap1:SetupModel()
         
@@ -112,7 +123,7 @@ function Trap1:SetupModel()
 
         local food = System.SpawnEntity(params);
         self:AttachChild(food.id, 0)
-        
+                
     end
     
 end
@@ -144,13 +155,17 @@ end
 
 function Trap1:Collide(target_class)
     local target = self:ray_cast(target_class)
+    --local target = System.GetEntitiesByClass("Mouse")
+    --local target = self:GetEntitiesInContact()
+    
+    --Log(target)
     --Log("In Collide")
     if(target ~=nil) then
-        Log("Trap: I HAVE SEEN A MOUSE")
+        --Log("Trap: I HAVE SEEN A MOUSE")
         if(target.class ~= "") then 
             local distance = vecLen(vecSub(target.pos, self.pos));
             if distance < 1.1 then 
-                Log("Trap: KILL IT")
+                Log("Trap: Mouse Triggered -> KILL IT")
                 return true, target;                
             end 
         end 
