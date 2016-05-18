@@ -63,6 +63,8 @@ Mouse_ND = {
 	backtrack_stack = {},
 
 	movement_queue = {},
+
+	toggle = 0,
 	
 	state = "",
 };
@@ -119,13 +121,13 @@ function Mouse_ND:OnReset()
 		self.angles = self:GetAngles(); --gets the current angles of Mouse_ND
 		self.pos = self:GetPos(); --gets the current position of Mouse_ND
 		self.pos.z = 33;
-		self:SetPos({self.pos.x, self.pos.y, self.pos.z});
+		--self:SetPos({self.pos.x, self.pos.y, self.pos.z});
 		
 		self:SetupMaze();
 		
 		--self.direction = self.directions.none;
 
-		self.movement_stack = {};
+		--self.movement_stack = {};
 		
 		self:Activate(self.Properties.bActive); --set OnUpdate() on/off
 
@@ -183,6 +185,22 @@ function Mouse_ND:move_xy(xy)
 	self.pos.y = xy.y;
 end
 
+function Mouse_ND:getLeftRight()
+	local dir = self.direction;
+	local dirs = self.directions;
+	if dir.name == "up" then
+		return dirs.left, dirs.right;
+	elseif dir.name == "down" then
+		return dirs.right, dirs.left;
+	elseif dir.name == "left" then 
+		return dirs.up, dirs.down;
+	elseif dir.name == "right" then
+		return dirs.down, dirs.up;
+	else
+		return nil;
+	end
+end
+
 function Mouse_ND:getUnoccupiedNeighbors(loc_row, loc_col)
 
 	local grid = self.Maze_Properties.grid
@@ -195,17 +213,13 @@ function Mouse_ND:getUnoccupiedNeighbors(loc_row, loc_col)
 		if row_index > 0 and col_index > 0 and row_index <= #grid and col_index <= #grid[1] then 
 			--Log("row_index = %d, col_index = %d", row_index, col_index)
 			if grid[row_index][col_index].occupied == false then
-			
-			--	try_pos = self.Maze_Properties.ID:rowcol_to_pos(row_index, col_index);
-			
-				--System.DrawLine(self.pos, {try_pos.x, try_pos.y, self.pos.z}, 0, 1, 0, 1);
-
-				--Log("continue moving in same direction");
-
-				--Log(tostring(loc_row + loc_row_inc));
-
-				--Log(tostring(loc_col + loc_col_inc));
-
+				--[[
+				try_pos = self.Maze_Properties.ID:rowcol_to_pos(row_index, col_index);
+				System.DrawLine(self.pos, {try_pos.x, try_pos.y, self.pos.z}, 0, 1, 0, 1);
+				Log("continue moving in same direction");
+				Log(tostring(loc_row + loc_row_inc));
+				Log(tostring(loc_col + loc_col_inc));
+				--]]
 				empty_neighbors[#empty_neighbors+1] = {row =row_index, col = col_index, n_visited = grid[row_index][col_index].n_visited, direction = value};
 
 				--Log(tostring(#empty_neighbors));
@@ -215,6 +229,85 @@ function Mouse_ND:getUnoccupiedNeighbors(loc_row, loc_col)
 
 	return empty_neighbors;
 
+end
+
+function Mouse_ND:getOccupiedNeighbors(loc_row, loc_col)
+
+	local grid = self.Maze_Properties.grid
+	local neighbor_blocks = {};
+
+	for key,value in pairs(self.directions) do
+		local row_index = value.row_inc + loc_row
+		local col_index = value.col_inc + loc_col
+
+		if row_index > 0 and col_index > 0 and row_index <= #grid and col_index <= #grid[1] then 
+			--Log("row_index = %d, col_index = %d", row_index, col_index)
+			if grid[row_index][col_index].occupied == true then
+				local cur_nslot = self.Maze_Properties.ID:rowcol_to_nslot(row_index, col_index);
+                local cur_wall = self.Maze_Properties.ID.myWalls[cur_nslot];
+
+                if cur_wall ~= nil then
+					neighbor_blocks[#neighbor_blocks+1] = cur_wall;
+				end
+			end
+		end
+	end
+
+	return neighbor_blocks;
+
+end
+
+function Mouse_ND:tractorBeam(frameTime)
+
+	--Log(tostring(self.toggle));
+	--Log("In tractor beam");
+	if self.toggle == 0 then
+		self.toggle = 1;
+	else
+		self.toggle = 0;
+	end
+
+	self:move_xy(self.pos);
+
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
+	--Lumberyard
+	--local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+
+	local row = rowcol.row;
+	local col = rowcol.col;
+
+	local neighbor_blocks = self:getOccupiedNeighbors(row, col);
+
+	--Log("Num neighbor blocks: " .. tostring(#neighbor_blocks));
+
+	local num_beams = 5;
+	local spacing = 1/num_beams;
+
+	for key,value in pairs(neighbor_blocks) do
+		local center_pos = value:GetPos();
+		center_pos.z = center_pos.z + 1;
+		for i = -num_beams,num_beams do
+			for j = -num_beams,num_beams do
+				for k = -num_beams,num_beams do
+					local endpos = {x = center_pos.x + spacing*i, 
+									y = center_pos.y + spacing*j,
+									z = center_pos.z + spacing*k};
+					System.DrawLine(self.pos, endpos, 0, 1, 1, 0.3 + 0.05*self.toggle);
+				end
+			end
+		end
+
+		up_pos = value:GetPos();
+		up_pos.z = up_pos.z + 0.1;
+		
+		if up_pos.z - self.pos.z < 1 then
+			value:SetPos(up_pos);
+		end
+	
+		return;
+		--System.DrawLine(self.pos, center_pos.z, 0, 0, 1, 1);
+	end
+	
 end
 
 --Most efficient algorithm for exploring maze
@@ -291,22 +384,6 @@ function Mouse_ND:depthFirstSearch(frameTime)
 	--self:PrintTable(empty_neighbors);
 	--self:PrintTable(self.movement_stack);
 	--]]
-end
-
-function Mouse_ND:getLeftRight()
-	local dir = self.direction;
-	local dirs = self.directions;
-	if dir.name == "up" then
-		return dirs.left, dirs.right;
-	elseif dir.name == "down" then
-		return dirs.right, dirs.left;
-	elseif dir.name == "left" then 
-		return dirs.up, dirs.down;
-	elseif dir.name == "right" then
-		return dirs.down, dirs.up;
-	else
-		return nil;
-	end
 end
 
 function Mouse_ND:runFrom(target, frameTime)
@@ -755,7 +832,9 @@ function Mouse_ND:OnUpdate(frameTime)
 	
 	--self:exploratoryWalk(frameTime);
 
-	self:depthFirstSearch(frameTime);
+	--self:depthFirstSearch(frameTime);
+
+	self:tractorBeam(frameTime);
 end
 
 function Mouse_ND:Move_to_Pos(frameTime, pos) 

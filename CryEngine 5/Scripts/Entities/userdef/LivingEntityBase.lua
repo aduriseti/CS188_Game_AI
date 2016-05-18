@@ -71,9 +71,11 @@ LivingEntityBase = {
 	direction = {row_inc = 0, col_inc = 0},
 	Previous_Loc={},
 	
-	movement_stack = {};
+	movement_stack = {}, 
+
+	backtrack_stack = {},
 	
-	movement_queue = {};
+	movement_queue = {},
 
 	target = "",
 
@@ -340,25 +342,6 @@ end
 -------------------------              Movement Algorithms                             ---------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
 
-function LivingEntityBase:turnLeftAlways()
-	--STATUS: Not finished for maze2
-
-	local rowcol = LivingEntityBase.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
-	local row = rowcol.row;
-	local col = rowcol.col;
-
-end
-
-function LivingEntityBase:randomWalk() 
-
-	--STATUS: Cryengine only - will push when works with lumberyard
-
-	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
-	local row = rowcol.row;
-	local col = rowcol.col;
-
-end
-
 function LivingEntityBase:getUnoccupiedNeighbors(loc_row, loc_col)
 
 	local grid = self.Maze_Properties.grid
@@ -387,8 +370,9 @@ function LivingEntityBase:getUnoccupiedNeighbors(loc_row, loc_col)
 
 end
 
-function LivingEntityBase:depthFirstSearch()
-	--[[
+--Most efficient algorithm for exploring maze
+function LivingEntityBase:depthFirstSearch(frameTime)
+	
 	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
 	--Lumberyard
 	--local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
@@ -396,57 +380,54 @@ function LivingEntityBase:depthFirstSearch()
 	local row = rowcol.row;
 	local col = rowcol.col;
 
-	local loc_row_inc = self.direction.row_inc;
-	local loc_col_inc = self.direction.col_inc;
+	--if there are still grid spaces in our movement stack
+	if #self.movement_stack ~= 0 then
+		local target_square = self.movement_stack[#self.movement_stack];
+		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(target_square.row, target_square.col);
 
-	local prev_pos = self.Previous_Loc
-	--if we haven't moved out of a grid space yet, continue as before
-	if row == prev_pos.row and col == prev_pos.col and (loc_row_inc ~= 0 or loc_col_inc) ~= 0 then
-		--Log("STAY ON COURSE");
-		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
-		--target_pos.z = 32;
-		self:Move_to_Pos(frameTime, target_pos);
-		return;
-	end
+		System.DrawLine(self.pos, {target_pos.x, target_pos.y, self.pos.z}, 0, 1, 0, 1);
+		--if the target square is not a neighbor or the current square do nothing for now
+		if (target_square.row - row)^2 + (target_square.col - col)^2 > 1 then
+			--Follow backtrack path back to target square
+			local backtrack_square = self.backtrack_stack[#self.backtrack_stack];
+			if row ~= backtrack_square.row or col ~= backtrack_square.col then
+				backtrack_pos = self.Maze_Properties.ID:rowcol_to_pos(backtrack_square.row, backtrack_square.col);
+				self:Move_to_Pos(frameTime, backtrack_pos);
+			else
+				self.backtrack_stack[#self.backtrack_stack] = nil;
+			end
+			return;
+		--if we haven't reached the top square in the movement stack
+		elseif row ~= target_square.row or col ~= target_square.col then
+			self:Move_to_Pos(frameTime, target_pos);
+			return;
+		--else if the top square has been reached
+		else
+			--increment visit counter of current grid space
+			self.Maze_Properties.grid[row][col].n_visited = self.Maze_Properties.grid[row][col].n_visited + 1;
 
-	--else change our behavior
-	self.Previous_Loc.col = col;
-	self.Previous_Loc.row = row;
+			--TODO: make this happen for all movement so DFS isn't broken by state transition
+			--add top square of movement stack to backtrack stack so mouse can get out of dead ends
+			self.backtrack_stack[#self.backtrack_stack + 1] = self.movement_stack[#self.movement_stack];
 
-	--increment visit counter of current grid space
-	--Log(tostring(self.Maze_Properties.grid[row][col].n_visited));
-	self.Maze_Properties.grid[row][col].n_visited = self.Maze_Properties.grid[row][col].n_visited + 1;
-	--Log(tostring(self.Maze_Properties.grid[row][col].n_visited));
+			--remove top square of movement stack
+			self.movement_stack[#self.movement_stack] = nil;
 
-	
-	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
-
-	for key,value in pairs(empty_neighbors) do
-		if value.n_visited == 0 then
-			self.movement_stack[#movement_stack + 1] = value;
+			--now exit out of if statement to add unvisited neighbors to movement stack
 		end
 	end
-
-	Log("movement stack length: " .. tostring(#movement_stack + 1));
-
-	Log
-
-	--]]
-end
-
-function LivingEntityBase:getLeftRight()
-	local dir = self.direction;
-	local dirs = self.directions;
-	if dir.name == "up" then
-		return dirs.left, dirs.right;
-	elseif dir.name == "down" then
-		return dirs.right, dirs.left;
-	elseif dir.name == "left" then 
-		return dirs.up, dirs.down;
-	elseif dir.name == "right" then
-		return dirs.down, dirs.up;
-	else
-		return nil;
+	
+	--populate movement stack with unvisited neighbors
+	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
+	for key,value in pairs(empty_neighbors) do
+		if value.n_visited == 0 then
+			self.movement_stack[#self.movement_stack + 1] = value;
+		end
+	end
+	
+	--entire maze explored - additionally backtrackstack will hold path back to origin
+	if #self.movement_stack == 0 then
+		Log("Explored entire maze");
 	end
 end
 
@@ -583,6 +564,8 @@ function LivingEntityBase:exploratoryWalk(frameTime)
 		self:Move_to_Pos(frameTime, target_pos);
 		return;
 	end
+
+	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
 
 	--else change our behavior
 	self.Previous_Loc.col = col;
