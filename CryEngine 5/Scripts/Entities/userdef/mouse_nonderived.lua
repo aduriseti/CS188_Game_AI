@@ -5,7 +5,7 @@ Mouse_ND = {
         --object_Model = "objects/characters/animals/rat/rat.cdf",
 		object_Model = "objects/default/primitive_cube_small.cgf",
         fRotSpeed = 3, --[0.1, 20, 0.1, "Speed of rotation"]
-		m_speed = 0.15;
+		m_speed = 0.5;
         --maze_ent_name = "Maze1",
 		maze_ent_name = "",
         bActive = 0,
@@ -53,10 +53,16 @@ Mouse_ND = {
 			up = {row_inc = 1, col_inc = 0},
 			down = {row_inc = -1, col_inc = 0},
 			right = {row_inc = 0, col_inc = 1},
-			left = {row_inc = 0, col_inc = -1}
+			left = {row_inc = 0, col_inc = -1},
 		},
 		
 	direction = {row_inc = 0, col_inc = 0},
+
+	movement_stack = {},
+
+	backtrack_stack = {},
+
+	movement_queue = {},
 	
 	state = "",
 };
@@ -117,7 +123,9 @@ function Mouse_ND:OnReset()
 		
 		self:SetupMaze();
 		
-		self.direction = self.directions.none;
+		--self.direction = self.directions.none;
+
+		self.movement_stack = {};
 		
 		self:Activate(self.Properties.bActive); --set OnUpdate() on/off
 
@@ -188,9 +196,9 @@ function Mouse_ND:getUnoccupiedNeighbors(loc_row, loc_col)
 			--Log("row_index = %d, col_index = %d", row_index, col_index)
 			if grid[row_index][col_index].occupied == false then
 			
-				try_pos = self.Maze_Properties.ID:rowcol_to_pos(row_index, col_index);
+			--	try_pos = self.Maze_Properties.ID:rowcol_to_pos(row_index, col_index);
 			
-				System.DrawLine(self.pos, {try_pos.x, try_pos.y, self.pos.z}, 0, 1, 0, 1);
+				--System.DrawLine(self.pos, {try_pos.x, try_pos.y, self.pos.z}, 0, 1, 0, 1);
 
 				--Log("continue moving in same direction");
 
@@ -207,6 +215,82 @@ function Mouse_ND:getUnoccupiedNeighbors(loc_row, loc_col)
 
 	return empty_neighbors;
 
+end
+
+--Most efficient algorithm for exploring maze
+function Mouse_ND:depthFirstSearch(frameTime)
+	
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
+	--Lumberyard
+	--local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+
+	local row = rowcol.row;
+	local col = rowcol.col;
+
+	Log("Backtrack length: " .. tostring(#self.backtrack_stack));
+
+	--if there are still grid spaces in our movement stack
+	if #self.movement_stack ~= 0 then
+		local target_square = self.movement_stack[#self.movement_stack];
+		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(target_square.row, target_square.col);
+
+		System.DrawLine(self.pos, {target_pos.x, target_pos.y, self.pos.z}, 0, 1, 0, 1);
+		--if the target square is not a neighbor or the current square do nothing for now
+		if (target_square.row - row)^2 + (target_square.col - col)^2 > 1 then
+			--TODO: implement create movement queue using BFS/A*	
+			--Log("Need to follow movement queue back to target square");
+			local backtrack_square = self.backtrack_stack[#self.backtrack_stack];
+			if row ~= backtrack_square.row or col ~= backtrack_square.col then
+				backtrack_pos = self.Maze_Properties.ID:rowcol_to_pos(backtrack_square.row, backtrack_square.col);
+				self:Move_to_Pos(frameTime, backtrack_pos);
+			else
+				self.backtrack_stack[#self.backtrack_stack] = nil;
+			end
+			--self:Move_to_Pos(frameTime, target_pos);
+			return;
+		--if we haven't reached the top square in the movement stack
+		elseif row ~= target_square.row or col ~= target_square.col then
+			--Log("STAY ON COURSE");
+			--local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
+			--local target_pos = self.Maze_Properties.ID:rowcol_to_pos(target_square.row, target_square.col);
+			--target_pos.z = 32;
+			self:Move_to_Pos(frameTime, target_pos);
+			return;
+		--else if the top square has been reached
+		else
+			--increment visit counter of current grid space
+			--Log(tostring(self.Maze_Properties.grid[row][col].n_visited));
+			self.Maze_Properties.grid[row][col].n_visited = self.Maze_Properties.grid[row][col].n_visited + 1;
+			--Log(tostring(self.Maze_Properties.grid[row][col].n_visited));
+
+			--add top square of movement stack to backtrack stack so mouse can get out of dead ends
+			self.backtrack_stack[#self.backtrack_stack + 1] = self.movement_stack[#self.movement_stack];
+
+			--remove top square of movement stack
+			--Log("movement stack length: " .. tostring(#self.movement_stack));
+			self.movement_stack[#self.movement_stack] = nil;
+			--Log("movement stack length: " .. tostring(#self.movement_stack));
+
+			--now exit out of if statement to add unvisited neighbors to movement stack
+		end
+	end
+
+	
+	--populate movement stack with unvisited neighbors
+	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
+	for key,value in pairs(empty_neighbors) do
+		if value.n_visited == 0 then
+			self.movement_stack[#self.movement_stack + 1] = value;
+		end
+	end
+	
+	--entire maze explored - additionally backtrackstack will hold path back to origin
+	if #self.movement_stack == 0 then
+		Log("Explored entire maze");
+	end
+	--self:PrintTable(empty_neighbors);
+	--self:PrintTable(self.movement_stack);
+	--]]
 end
 
 function Mouse_ND:getLeftRight()
@@ -669,7 +753,9 @@ function Mouse_ND:OnUpdate(frameTime)
 	
 	--self:randomDirectionalWalk(frameTime);
 	
-	self:exploratoryWalk(frameTime);
+	--self:exploratoryWalk(frameTime);
+
+	self:depthFirstSearch(frameTime);
 end
 
 function Mouse_ND:Move_to_Pos(frameTime, pos) 
