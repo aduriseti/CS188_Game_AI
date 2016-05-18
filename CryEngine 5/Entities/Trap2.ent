@@ -1,0 +1,4 @@
+<Entity
+ Name="Trap2" 
+ Script="Scripts/Entities/userdef/Trap2.lua"
+/>
