@@ -9,12 +9,17 @@
            <FoodType value="Berry"/>
            <FoodType value="Potato"/>
            <FoodType value="Cheese"/>
+           <FoodType value="Grains"/>
         </ToEat>
         <FoodLocations>
            <Food FoodType="Berry" LocationGeneral="North-East"/>
+           <Food FoodType="Potato" LocationGeneral="South-East"/>
+           <Food FoodType="Cheese" LocationGeneral="South-West"/>
+           <Food FoodType="Grains" LocationGeneral="North-West"/>
         </FoodLocations>
         <KnownDangerEnts>
            <Killer value="Snake"/>
+           <Killer value="Trap"/>
         </KnownDangerEnts>
         <Allies>
            <Mouse value="Mouse_2"/>
