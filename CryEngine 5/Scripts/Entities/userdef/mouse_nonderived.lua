@@ -2,10 +2,10 @@ Mouse_ND = {
 	type = "Mouse_ND",
 	
     Properties = {
-        --object_Model = "objects/characters/animals/rat/rat.cdf",
-		object_Model = "objects/default/primitive_cube_small.cgf",
+        object_Model = "objects/characters/animals/rat/rat.cdf",
+		--object_Model = "objects/default/primitive_cube_small.cgf",
         fRotSpeed = 3, --[0.1, 20, 0.1, "Speed of rotation"]
-		m_speed = 0.5;
+		m_speed = 0.15;
         --maze_ent_name = "Maze1",
 		maze_ent_name = "",
         bActive = 0,
@@ -832,9 +832,9 @@ function Mouse_ND:OnUpdate(frameTime)
 	
 	--self:exploratoryWalk(frameTime);
 
-	--self:depthFirstSearch(frameTime);
-
-	self:tractorBeam(frameTime);
+	self:depthFirstSearch(frameTime);
+	self:SetScale(5);
+	--self:tractorBeam(frameTime);
 end
 
 function Mouse_ND:Move_to_Pos(frameTime, pos) 
