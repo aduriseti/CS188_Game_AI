@@ -31,14 +31,14 @@ Snake = {
         initial_direction = "up",
 		
 		--Copied from BasicEntity.lua
-        Physics = {
-            bPhysicalize = 1, -- True if object should be physicalized at all.
-            bRigidBody = 1, -- True if rigid body, False if static.
-            bPushableByPlayers = 1,
+        --Physics = {
+        --    bPhysicalize = 1, -- True if object should be physicalized at all.
+         --   bRigidBody = 1, -- True if rigid body, False if static.
+         --   bPushableByPlayers = 1,
         
-            Density = -1,
-            Mass = -1,
-        },
+         --   Density = -1,
+         --   Mass = -1,
+       -- },
     },
 	
 	Food_Properties = {
