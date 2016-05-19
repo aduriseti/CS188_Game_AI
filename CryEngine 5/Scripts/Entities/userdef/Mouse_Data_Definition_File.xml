@@ -11,7 +11,10 @@
         <Property name="WinCounter" type="int" />
         
         <!--In Future have ToEat become table with number of each item" -->
-        <Array name="ToEat" type="string" elementName="FoodType"/>
+        <Array name="ToEat" elementName="FoodNeed">
+            <Property name="FoodType" type="string"/>
+            <Property name="NumToEat" type="int"/>
+        </Array>
         <Array name="FoodLocations" elementName="Food">
            <Property name="FoodType" type="string" />
            <Property name="LocationGeneral" type="string"/>
