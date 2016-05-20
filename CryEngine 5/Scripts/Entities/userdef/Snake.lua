@@ -141,6 +141,7 @@ Snake.Destroyed =
 ---------------------------------------------------------------------------------------------------------------------------------
 function Snake:THEFUCK()
 	Log("Snake: Thefuck")
+		self:GotoState("Patrol");
 end 
 --sets the Snake's properties
 function Snake:abstractReset()

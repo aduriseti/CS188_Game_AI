@@ -23,6 +23,8 @@ Mouse = {
 	type = "Mouse",
 	
 	States = {
+		"Test",
+		"Move",
 		"Search",
 		"Avoid",
 		"Eat",
@@ -71,6 +73,13 @@ Mouse = {
     Editor = { 
 		Icon = "Checkpoint.bmp", 
 	},	
+	
+	Move = {
+		prev_state = "",
+		jump = 0,
+		impulseMag = 50,
+		impulseDir = {x=0,y=0,z=0},
+	}
 
 };
 
@@ -79,6 +88,54 @@ MakeDerivedEntityOverride(Mouse, LivingEntityBase);
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    Mouse States                 --------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
+Mouse.Test = 
+{
+	OnBeginState = function(self)
+		Log("Mouse: Test state")
+		
+  	end,
+	
+	OnUpdate = function(self, time)
+		  
+		  self.Move.prev_state = "Test"
+		  self.Move.impulseDir = self:GetDirectionVector()
+		  self.Move.impulseMag = 50
+		  --Log(self.Move.impulseMag)
+		 -- LogVec("ImpulseDir", self.Move.impulseDir)
+		  self:GotoState("Move")
+
+	end,
+	
+	OnEndState = function(self)
+		Log("Mouse: Exiting Test State")
+	end,
+}
+
+Mouse.Move = 
+{
+	OnBeginState = function(self)
+		Log("Mouse: Move state")
+		
+  	end,
+	
+	OnUpdate = function(self, time)
+		  --Log("Impulse added")
+		   if(jump == 1) then self.Move.impulseDir.z = 1 end
+		   --self:PrintTable(self.Move.impulseDir)
+		   Log(self.Move.impulseMag)
+		  self:AddImpulse(-1, self:GetCenterOfMassPos(), self.Move.impulseDir, self.Move.impulseMag, 1)
+		  self:GotoState(self.Move.prev_state)
+
+	end,
+	
+	OnEndState = function(self)
+		Log("Mouse: Exiting Move State")
+		self.Move.impulseDir = {}
+		self.Move.prev_state = "Move"
+	end,
+}
+
+
 Mouse.Search =
  {
 
@@ -180,7 +237,7 @@ Mouse.Cautious =
 
 	OnBeginState = function(self)
 		Log("Mouse: Entering Cautious State")
-
+		
   	end,
 
  	OnUpdate = function(self,time)
@@ -302,15 +359,20 @@ function Mouse:OnEat()
 	self:GotoState("Dead")
 end
 
+
 function Mouse:THEFUCK()
 	Log("Mouse: :In THEFUCK")
 	--self:GotoState("Search")
 	--self:SetScale(3)
 	self.mouseDataTable = self:LoadXMLData()
-	self:PrintTable(self.mouseDataTable);
+	--self:PrintTable(self.mouseDataTable);
+	  
+	  --self:GotoState("Test")
+
 	self:GotoState("Search")
-	Log("WTF")
+	--Log("WTF")
 end 
+
 
 --sets the Mouse's properties
 function Mouse:abstractReset()
@@ -323,7 +385,7 @@ function Mouse:abstractReset()
 	
 	--self:PrintTable(self.mouseDataTable)
 
-	self:GotoState("Search");
+	--self:GotoState("Search");
 
 end
 

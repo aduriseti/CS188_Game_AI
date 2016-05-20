@@ -52,10 +52,12 @@ LivingEntityBase = {
 				--max_jump_angle = , -- player cannot jump towards ground if this angle is exceeded
 				min_fall_angle = 70, -- player starts falling when slope is steeper than this, in radians
 				max_vel_ground = 100, -- player cannot stand on surfaces that are moving faster than this
+				--colliderMat = "mat_player_collider",
+
 			},
         },
     },  
-
+	
   -- optional editor information taken from BasicEntity.lua
   Editor = {
 	 	Icon = "Checkpoint.bmp",
@@ -121,14 +123,13 @@ end
 function LivingEntityBase:OnReset()
 	--OK wtf is it really not possible to reload this script from maze2?
 	--Log("test reload from maze");
-	Log("LivingEntityBase: OnReset()")
---self:Activate(1);
+	--Log("LivingEntityBase: OnReset()")
     self:SetFromProperties()  
 
-	Log("About to call abstractReset")
+	--Log("About to call abstractReset")
     self:abstractReset()
 	self:THEFUCK()
-	Log("Should have called abstractReset")
+	--Log("Should have called abstractReset")
 end
 
 -- This abstract reset is empty in Base, it purely exists if you want extra functionality from reset in subclass
@@ -150,10 +151,10 @@ function LivingEntityBase:SetupModel()
 
 		local v1, v2 = self:GetLocalBBox()
 		local v = {x=0,y=0,z=0}
-		LogVec("v2", v2)
-		LogVec("v1", v1)
+		--LogVec("v2", v2)
+		--LogVec("v1", v1)
 		SubVectors(v, v2, v1)
-		LogVec("v", v)
+		--LogVec("v", v)
 		self.dimensions.Model_Width = v.x
 		self.dimensions.Model_Height = v.y;
 		self.Properties.Physics.Living.height = v.z;
@@ -173,7 +174,6 @@ end
 function LivingEntityBase:PhysicalizeThis() -- Helper function to physicalize, Copied from BasicEntity.lua
    
    self:Physicalize(0, PE_LIVING, self.Properties.Physics);
-  -- self:SetPhysicParams()
    self:AwakePhysics(1)
    
 end
@@ -206,12 +206,13 @@ function LivingEntityBase:SetFromProperties()
         end
     end
 
-    if (self.Maze_Properties.ID == "") then
-        Log("Error: LivingEntityBase unable to locate maze");
-        return;
-    end
+    if (self.Maze_Properties.ID ~= "") then
+		self:SetupMaze()
+    else 
+	     Log("Error: LivingEntityBase unable to locate maze");
+        --return;
+	end
 	
-    self:SetupMaze()
 
     if(self.Player_Properties.ID == "") then
         for key, value in pairs( nearby_entities ) do
