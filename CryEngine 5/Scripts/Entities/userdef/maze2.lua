@@ -271,14 +271,9 @@ end
 function Maze2:RemoveTraps()
     for k,v in pairs(self.myTraps) do
 
-        --local EntID=System.GetEntityByName(v);
-        --local EntID = System.GetEntityByName("WALLS");
-
-        --System.RemoveEntity(EntID)
         System.RemoveEntity(v.id)
         self.myTraps[k] = nil
-        --v:DeleteThis()
-        --v:TestDelete()
+
     end
 end 
 
@@ -605,10 +600,10 @@ function Maze2:New()
        -- obj:PhysicalizeWallSlots(); -- The Maze2 has been complete, make the walls of the Maze2 actually physical (i.e. cant go walk them)
    end
    
-   --self:SpawnMice()
-   --self:SpawnSnakes(5)
-   --self:SpawnFood()
-   --self:SpawnTraps(5)
+   self:SpawnMice()
+   self:SpawnSnakes(5)
+   self:SpawnFood()
+   self:SpawnTraps(5)
   
 end
 
@@ -1045,7 +1040,7 @@ function Maze2:SpawnMice()
         local sy = objY*(h-1) + yOffset
 
         --Log("Spawning at (%d, %d)", sx, sy);
-        local spawnPos = {x=sx,y=sy,z=32}
+        local spawnPos = {x=sx,y=sy,z=33}
         local dVec = self:GetDirectionVector()
         --LogVec("Maze orientation: ", dVec)
         local params = {
@@ -1056,13 +1051,12 @@ function Maze2:SpawnMice()
            -- scale = 3;
             properties = {
                 bActive = 1;
-				--grid = {};
               --  object_Model = self.Model;
             };
         };
         
         local mouse = System.SpawnEntity(params);
-        mouse:SetScale(3)
+       -- mouse:SetScale(3)
           self.myMice[#self.myMice+1] = mouse;
 
 end
@@ -1260,10 +1254,23 @@ function Maze2:SpawnTraps(num)
         end 
         local xOffset = self.Origin.x;
         local yOffset = self.Origin.y;
+        
         local i = 0;
         while i < num do
+        
+            local tClass = "Trap1"
+            local tName = "Spring"
+            local tModel = "objects/default/primitive_box.cgf"
+            
+            local trapType = random(2)
+            if(trapType > 1) then 
+                tClass = "Trap2"
+                tName = "Thwomp"
+                tModel = "objects/default/primitive_cube.cgf"
+            end
+            
             i = i +1
-            local w = random(2, self:width()*2+1)-- end
+            local w = random(2, self:width()*2+1) 
             if w%2 ~= 0  then w = w-1 end
             local h = random(2, self:height()*2+1)
             if h%2 ~= 0  then h = h-1 end
@@ -1276,13 +1283,13 @@ function Maze2:SpawnTraps(num)
             local dVec = self:GetDirectionVector()
             --LogVec("Maze orientation: ", dVec)
             local params = {
-                class = "Trap1";
-                name = "T";
+                class = tClass;
+                name = tName;
                 position = spawnPos;
                 --orientation = dVec;
                 properties = {
                     bActive = 1;
-                    object_Model = "objects/default/primitive_box.cgf";
+                    object_Model = tModel;
                 --  object_Model = self.Model;
                 };
             };
@@ -1290,7 +1297,7 @@ function Maze2:SpawnTraps(num)
             local Trap = System.SpawnEntity(params);
             
             self.myTraps[#self.myTraps+1] = Trap;
-       end
+        end    
 end
 
 function Maze2:PrintTable(t)

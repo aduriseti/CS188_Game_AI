@@ -91,7 +91,7 @@ MakeDerivedEntityOverride(Mouse, LivingEntityBase);
 Mouse.Test = 
 {
 	OnBeginState = function(self)
-		Log("Mouse: Test state")
+		--Log("Mouse: Test state")
 		
   	end,
 	
@@ -99,7 +99,7 @@ Mouse.Test =
 		  
 		  self.Move.prev_state = "Test"
 		  self.Move.impulseDir = self:GetDirectionVector()
-		  self.Move.impulseMag = 50
+		  self.Move.impulseMag = 30
 		  --Log(self.Move.impulseMag)
 		 -- LogVec("ImpulseDir", self.Move.impulseDir)
 		  self:GotoState("Move")
@@ -107,14 +107,14 @@ Mouse.Test =
 	end,
 	
 	OnEndState = function(self)
-		Log("Mouse: Exiting Test State")
+		--Log("Mouse: Exiting Test State")
 	end,
 }
 
 Mouse.Move = 
 {
 	OnBeginState = function(self)
-		Log("Mouse: Move state")
+		--Log("Mouse: Move state")
 		
   	end,
 	
@@ -122,14 +122,14 @@ Mouse.Move =
 		  --Log("Impulse added")
 		   if(jump == 1) then self.Move.impulseDir.z = 1 end
 		   --self:PrintTable(self.Move.impulseDir)
-		   Log(self.Move.impulseMag)
+		   --Log(self.Move.impulseMag)
 		  self:AddImpulse(-1, self:GetCenterOfMassPos(), self.Move.impulseDir, self.Move.impulseMag, 1)
-		  self:GotoState(self.Move.prev_state)
-
+		  --self:GotoState(self.Move.prev_state)
+		  self:GotoState("Sleep")
 	end,
 	
 	OnEndState = function(self)
-		Log("Mouse: Exiting Move State")
+		--Log("Mouse: Exiting Move State")
 		self.Move.impulseDir = {}
 		self.Move.prev_state = "Move"
 	end,
@@ -364,9 +364,8 @@ function Mouse:THEFUCK()
 	Log("Mouse: :In THEFUCK")
 	--self:GotoState("Search")
 	--self:SetScale(3)
-	self.mouseDataTable = self:LoadXMLData()
+	--self.mouseDataTable = self:LoadXMLData()
 	--self:PrintTable(self.mouseDataTable);
-	  
 	  --self:GotoState("Test")
 
 	self:GotoState("Search")

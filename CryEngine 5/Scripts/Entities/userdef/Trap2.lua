@@ -13,7 +13,7 @@ Trap2 =
   {
    object_Model = "objects/default/primitive_cube.cgf",
    bActive = 1,
-   m_speed = 0.05,
+   m_speed = 0.005,
    Physics = {
         bPhysicalize = 1, -- True if object should be physicalized at all.
         bRigidBody = 1, -- True if rigid body, False if static.
@@ -54,24 +54,26 @@ Trap2.Up =
 
     end,
     
-    OnEnterArea = function(self,entity,areaId)
+   --[[ OnEnterArea = function(self,entity,areaId)
         if (entity.type == "Mouse") then
             Log("Mouse Entered my Box")
             entity:OnEat(self,2)
             --self:GotoState("Sprung")
         end;
-     end,
+     end,]]
     
-    --[[
+    
     OnCollision = function(self, hitdata)
         Log("A COLLISION!")
-        local norm = hitdata.normal
-
-        local vel = hitdata.velocity
-
-        local ang = self:GetAngles ()
+        local target = hitdata.target
+        Log("Target.type is "..target.type)
+        if target.type == "Mouse" then
+               Log("Trap2: CRUSH LIL MOUSEY");
+               target:OnEat(self,2)
+               
+        end
     end,
-]]
+
   OnEndState = function(self)
   	Log("Trap2: Kill? Goin' up~ ")
     --self:Kill()
@@ -124,11 +126,11 @@ function Trap2:OnReset()
     self:GotoState("Up")
 end
 
---[[
+
 function Trap2:OnCollision(hitdata)
-    Log("In OnCollision")
+    Log("In OnCollision Main")
 end 
-]]
+
 
 function Trap2:SetupModel()
         
@@ -139,9 +141,9 @@ function Trap2:SetupModel()
             
         --self:SetModelDimensions();
         
-        if (Properties.Physics.bPhysicalize == 1) then -- Physicalize it
+        --if (Properties.Physics.bPhysicalize == 1) then -- Physicalize it
             self:PhysicalizeThis();
-        end
+       --end
 
     end
     
@@ -153,9 +155,8 @@ function Trap2:PhysicalizeThis() -- Helper function to physicalize, Copied from 
 	local Physics = self.Properties.Physics;
 	EntityCommon.PhysicalizeRigid( self,0,Physics,self.bRigidBodyActive );
     ]]
-    self:Physicalize (1, PE_RIGID, {mass = 1})
-
-   self:EnablePhysics (1)
+    self:Physicalize (0, PE_RIGID, {mass = 0})
+   self:AwakePhysics(1)
 end
 
 function Trap2:SetFromProperties()

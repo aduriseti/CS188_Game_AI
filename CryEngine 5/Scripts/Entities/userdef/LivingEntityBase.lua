@@ -38,7 +38,8 @@ LivingEntityBase = {
 			--Living:
 			Living = {
 				height = 0, -- vertical offset of collision geometry center
-				size = {}, --collision cylinder dimensions, a vector
+				--size = {x=1,z=0.5}, --collision cylinder dimensions, a vector WTF WONT WORK U PIECE OF SHIT
+				size = {x=2.4,y=2.4,z=0.8},
 				--height_eye = , --vertical offset of the camera
 				--height_pivot = , -- offset from central ground position that is considered the entity center
 				--height_head = , -- vertical offset of the head
@@ -53,8 +54,27 @@ LivingEntityBase = {
 				min_fall_angle = 70, -- player starts falling when slope is steeper than this, in radians
 				max_vel_ground = 100, -- player cannot stand on surfaces that are moving faster than this
 				--colliderMat = "mat_player_collider",
-
+				--useCapsule=0,
 			},
+			
+			-- Area:
+			Area = {
+				type = AREA_BOX, -- type of the area, AREA_BOX, AREA_SPHERE, AREA_GEOMETRY, AREA_SHAPE, AREA_CYLINDER, AREA_SPLINE
+				--radius = , radius of the area sphere, required if the area type is AREA_SPHERE
+				box_min = {x=0,y=0,z=0}, --min vector of the bounding box, rquired if the area type is AREA_BOX
+				box_max = {x=0,y=0,z=0}, -- max vector of the bounding box, rquired if the area type is AREA_BOX
+				--points = {}, -- table containing collection of vectors in local entity space defining the 2D shape of the area, if the area type is AREA_SHAPE
+				--height = 0, -- height of the 2D area, relative to the minimal Z in the points table, if the area type is AREA_SHAPE
+				--uniform = , -- same direction in every point or always point to the center
+				--falloff = , --ellipsoidal falloff dimensions, a vector. zero vector if no falloff
+				gravity = 9.81, --gravity vector inside the physical area
+			},
+			
+				PlayerDim = {
+					cyl_r = 1, --float - radius of collider cylinder default -
+
+					cyl_pos =0.5 , --float - vertical position of collider cylinder default -
+				},
         },
     },  
 	
@@ -100,6 +120,8 @@ LivingEntityBase = {
 	enemy = "",
 
 	timer  = 0,
+	
+
 
 };
 
@@ -150,18 +172,23 @@ function LivingEntityBase:SetupModel()
         self:LoadObject(0,Properties.object_Model)  -- Load model into main entity
 
 		local v1, v2 = self:GetLocalBBox()
-		local v = {x=0,y=0,z=0}
+		--local v = {x=0,y=0,z=0}
 		--LogVec("v2", v2)
 		--LogVec("v1", v1)
-		SubVectors(v, v2, v1)
+		--SubVectors(v, v2, v1)
 		--LogVec("v", v)
-		self.dimensions.Model_Width = v.x
-		self.dimensions.Model_Height = v.y;
-		self.Properties.Physics.Living.height = v.z;
-		self.Properties.Physics.Living.size = v;
+		--self.dimensions.Model_Width = v.x
+		--self.dimensions.Model_Height = v.y;
+		--self.Properties.Physics.Living.height = 0;
+		--self.Properties.Physics.Living.size = v;
 
         --if (Properties.Physics.bPhysicalize == 1) then -- Physicalize it
-            self:PhysicalizeThis();
+		self.Properties.Physics.Area.box_min = v1
+		self.Properties.Physics.Area.box_max = v2
+		--LogVec("Max", self.Properties.Physics.Area.box_max)
+		self.Properties.Physics.PlayerDim.cyl_r = v2.x
+		self.Properties.Physics.PlayerDim.cyl_pos = v2.y 
+        self:PhysicalizeThis();
         --end
     end
 	
@@ -173,7 +200,11 @@ end
 
 function LivingEntityBase:PhysicalizeThis() -- Helper function to physicalize, Copied from BasicEntity.lua
    
+   --self:Physicalize(0, PE_AREA, self.Properties.Physics);
+   --Log(self.Properties.Physics.PlayerDim.cyl_r)
+   
    self:Physicalize(0, PE_LIVING, self.Properties.Physics);
+   self:SetPhysicParams(PHYSICPARAM_PLAYERDIM, self.Properties.Physics.PlayerDim)
    self:AwakePhysics(1)
    
 end
