@@ -81,3 +81,5 @@ Could be mouse traps loaded with cheese, maybe some already sprung (could learn 
  - [ ] Player MadScientist/Mouse Management System
  - [x] User Interface (Start Screen, etc...)
  - [ ] Further Game Logic
+ - [ ] Change camera view
+ - [ ] Camera for each mouse
