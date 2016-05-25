@@ -15,7 +15,7 @@ LivingEntityBase = {
    Properties = {
 
         bUsable = 0,
-        object_Model = "objects/default/primitive_cube_small.cgf",
+        --object_Model = "objects/default/primitive_cube_small.cgf",
 		fRotSpeed = 3, --[0.1, 20, 0.1, "Speed of rotation"]
 		m_speed = 0.1;       
 
@@ -272,8 +272,10 @@ function LivingEntityBase:SetupMaze()
     self.Maze_Properties.model_width = self.Maze_Properties.ID.Model_Width;
     self.Maze_Properties.corridor_width = self.Maze_Properties.ID.corridorSize;       
 
+	self.Maze_Properties.grid = {};
+	
     if #self.Maze_Properties.grid ~= self.Maze_Properties.height then
-        self.Maze_Properties.grid = {};
+        --self.Maze_Properties.grid = {};
         for row = 1, self.Maze_Properties.height do
             self.Maze_Properties.grid[row] = {};
             for col = 1, self.Maze_Properties.width do
@@ -323,34 +325,18 @@ function LivingEntityBase:Move_to_Pos(frameTime, pos)
 
 end
 
-function LivingEntityBase:FaceAt(pos, frameTime)
-   local a = self:GetPos();
-   local b = pos;
-   --local C = math.sqrt((b.y-a.y)^2 + (b.x-a.x)^2);
-   
-   -- Calculate Rotation on Z-axis
-   --local newAngleZ = math.atan2 (b.y-a.y, b.x-a.x);
-  -- local differenceZ =((((newAngleZ - self.angles.z) % (2 * math.pi)) + (3 * math.pi)) % (2 * math.pi)) - math.pi;
-   --newAngleZ = (self.angles.z + differenceZ);
-   
-   -- Calculate Rotation on Y-axis
-   --local newAngleY = math.atan2 (b.z-a.z, C); 
-   --local differenceY =((((newAngleY - self.angles.y) % (2 * math.pi)) + (3 * math.pi)) % (2 * math.pi)) - math.pi;
-  -- newAngleY = (self.angles.y + differenceY)*-1;
-   
-   -- Set rotation
-  -- self.angles.z = Lerp(self.angles.z, newAngleZ, (self.Properties.fRotSpeed*frameTime));   
-   --self.angles.y = Lerp(self.angles.y, newAngleY, (self.Properties.fRotSpeed*frameTime));
-   --self:SetAngles(self.angles);
-   
-     local vector=DifferenceVectors(b, a);  -- Vector from player to target
-
-     vector=NormalizeVector(vector);  -- Ensure vector is normalised (unit length)
-
-     self:SetDirectionVector(vector); -- Orient player to the vector
-
+function LivingEntityBase:FaceAt(pos, fT)
+	--Log("In FaceAt");
+    local a = self.pos;
+    local b = pos;
+    local newAngle = math.atan2 (b.y-a.y, b.x-a.x);    
+    
+    local difference =((((newAngle - self.angles.z) % (2 * math.pi)) + (3 * math.pi)) % (2 * math.pi)) - math.pi;
+    newAngle = (self.angles.z + difference);
+    
+    self.angles.z = Lerp(self.angles.z, newAngle, (self.Properties.fRotSpeed*fT));  
+    self:SetAngles(self.angles);
 end
-
 
 
 function LivingEntityBase:FollowPlayer(frameTime)

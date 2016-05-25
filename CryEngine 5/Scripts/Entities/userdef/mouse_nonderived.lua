@@ -4,7 +4,7 @@ Mouse_ND = {
     Properties = {
         object_Model = "objects/characters/animals/rat/rat.cdf",
 		--object_Model = "objects/default/primitive_cube_small.cgf",
-        fRotSpeed = 3, --[0.1, 20, 0.1, "Speed of rotation"]
+        fRotSpeed = 10, --[0.1, 20, 0.1, "Speed of rotation"]
 		m_speed = 0.15;
         --maze_ent_name = "Maze1",
 		maze_ent_name = "",
@@ -834,7 +834,7 @@ function Mouse_ND:OnUpdate(frameTime)
 
 	self:depthFirstSearch(frameTime);
 	self:SetScale(5);
-	--self:tractorBeam(frameTime);
+	self:tractorBeam(frameTime);
 end
 
 function Mouse_ND:Move_to_Pos(frameTime, pos) 
@@ -876,7 +876,7 @@ function Mouse_ND:FaceAt(pos, fT)
     local newAngle = math.atan2 (b.y-a.y, b.x-a.x);    
     
     local difference =((((newAngle - self.angles.z) % (2 * math.pi)) + (3 * math.pi)) % (2 * math.pi)) - math.pi;
-    newAngle = (self.angles.z + difference);
+    newAngle = (self.angles.z + difference - 0.5 * math.pi);
     
     self.angles.z = Lerp(self.angles.z, newAngle, (self.Properties.fRotSpeed*fT));  
     self:SetAngles(self.angles);
