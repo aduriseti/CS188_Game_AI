@@ -74,10 +74,10 @@ Could be mouse traps loaded with cheese, maybe some already sprung (could learn 
  
 ##Misc (Erick, Everyone)
  - [ ] Design Trap Entities
- - [ ] Mouse assets
- - [ ] Snake assets
+ - [x] Mouse assets
+ - [x] Snake assets
  - [ ] Trap assets
  - [ ] Wall assets
  - [ ] Player MadScientist/Mouse Management System
- - [ ] User Interface (Start Screen, etc...)
+ - [x] User Interface (Start Screen, etc...)
  - [ ] Further Game Logic
