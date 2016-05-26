@@ -36,7 +36,6 @@ Mouse = {
 	mouseDataTable = {},
 	
     Properties = {
-    	entType = "Mouse",
 		bUsable = 0,
         object_Model = "Objects/characters/animals/rat/rat.cdf",
 	    --object_Model = "objects/default/primitive_cube_small.cgf",
@@ -149,9 +148,6 @@ Mouse.Search =
   OnUpdate = function(self,time)
   	
   	  local trap;
-	  local enemy = self:ray_cast("Snake");
-	 -- local trap = self:ray_cast("Trap1");
-	  local target = self:ray_cast("Food");
 	  
 	  --local myTest = self:IntersectRay(0, self:GetPos(), self:GetDirectionVector(), 15)
 	  --self:PrintTable(myTest)
@@ -180,13 +176,23 @@ Mouse.Search =
 	  end 
 	  --Log(tostring(enemy));
 	  --Log(tostring(target));
+	  
+	for i = 1, #self.mouseDataTable.defaultTable.KnownDangerEnts do 
+		Log("Checking for dangerous entity " .. tostring(self.mouseDataTable.defaultTable.KnownDangerEnts[i]));
+		local enemy = self:ray_cast(self.mouseDataTable.defaultTable.KnownDangerEnts[i]);
+		if enemy ~= nil then 
+			self:GotoState("Avoid"); 
+		end
+	end
+	  
+	  --local enemy = self:ray_cast("Snake");
+	 -- local trap = self:ray_cast("Trap1");
+	  local target = self:ray_cast("Food");
 
-	  if enemy ~= nil then
-	  	self:GotoState("Avoid");
-	  elseif target ~= nil then
+	if target ~= nil then
 	  	--Log("Gonna Eat")
 	  	self:GotoState("Eat");
-	  else end;
+	else end;
 
 		--self:randomDirectionalWalk(time);
 
@@ -357,8 +363,19 @@ Mouse.Power =
 -------------------------                     State Functions                        --------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------
 
-function Mouse:OnEat()
+function Mouse:OnEat(userId, index)
 	Log("RIP Mouse")
+	--self.mouseDataTable = self:LoadXMLData(Mouse_Default_Data_File);
+	
+	for i = 1, #self.mouseDataTable.defaultTable.KnownDangerEnts do 
+		if self.mouseDataTable.defaultTable.KnownDangerEnts[i] == tostring(userId.type) then
+			Log(tostring(userID.type) .. " already in data table");
+			self:GotoState("Dead")
+		end
+	end
+	Log("Adding " .. tostring(userID.type) .. " to data table");
+	self.mouseDataTable.defaultTable.KnownDangerEnts[#self.mouseDataTable.defaultTable.KnownDangerEnts + 1] = userID.type;
+	self:SaveXMLData(self.mouseDataTable, Mouse_Default_Data_File);
 	self:GotoState("Dead")
 end
 
@@ -432,7 +449,7 @@ end
 
 function Mouse:Eating(foodType)
 
-	self.mouseDataTable = self:LoadXMLData(Mouse_Default_Data_File);
+	--self.mouseDataTable = self:LoadXMLData(Mouse_Default_Data_File);
 	local mid_x = self.Maze_Properties.ID.Width/2;
 	local mid_y = self.Maze_Properties.ID.Height/2;
 	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);

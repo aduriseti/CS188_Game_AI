@@ -9,6 +9,8 @@
         <Property name="Boldness" type="float"/>
         <Property name="DeathCounter" type="int"/>
         <Property name="WinCounter" type="int" />
+		
+		<Property name="ImpulseMagnitude" type = "float" />
         
         <!--In Future have ToEat become table with number of each item" -->
         <Table name="ToEat">
