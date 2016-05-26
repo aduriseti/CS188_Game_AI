@@ -79,8 +79,16 @@ Mouse = {
 		jump = 0,
 		impulseMag = 50,
 		impulseDir = {x=0,y=0,z=0},
-	}
-
+	},
+	
+	eatCount = {
+		Cheese = 0,
+		Berry = 0,
+		Potato = 0,
+		Grains = 0,
+	},
+	
+	ToEat = {},
 };
 
 MakeDerivedEntityOverride(Mouse, LivingEntityBase);
@@ -137,75 +145,108 @@ Mouse.Move =
 
 
 Mouse.Search =
- {
+{
+	OnBeginState = function(self)
+		Log("Mouse: Entering Search State")
+		self.mouseDataTable = self:LoadXMLData(Mouse_Default_Data_File)
+		--self:PrintTable(self.mouseDataTable)
+	end,
 
-  OnBeginState = function(self)
-  	Log("Mouse: Entering Search State")
-	self.mouseDataTable = self:LoadXMLData(Mouse_Default_Data_File)
-	--self:PrintTable(self.mouseDataTable)
-  end,
+	OnUpdate = function(self,time)
 
-  OnUpdate = function(self,time)
-  	
-  	  local trap;
-	  
-	  --local myTest = self:IntersectRay(0, self:GetPos(), self:GetDirectionVector(), 15)
-	  --self:PrintTable(myTest)
-	 
-	  local hitData = {};
-	  --local angles = self:GetAngles()
-	  --LogVec("angles", angles)
-	  local dir = self:GetDirectionVector();
-	  dir = vecScale(dir, 50);
-	  --LogVec("Direction", dir)
-	  local hits = Physics.RayWorldIntersection(self:GetPos(), dir, 1, ent_all, self.id, nil, hitData )
-	  --Log(hits)
-	  if(hits > 0) then 
-	  	--self:PrintTable(hitData)
-		  if(hitData[1].entity and hitData[1].entity.class == "Trap1") then 
-		  	  trap = hitData[1].entity
-		  end 
-	  end 
-	  
-	  
-	  if(trap ~=nil) then 
-	       Log("Mouse: Sees trap")
+		local trap;
+
+		--local myTest = self:IntersectRay(0, self:GetPos(), self:GetDirectionVector(), 15)
+		--self:PrintTable(myTest)
+
+		local hitData = {};
+		--local angles = self:GetAngles()
+		--LogVec("angles", angles)
+		local dir = self:GetDirectionVector();
+		dir = vecScale(dir, 50);
+		--LogVec("Direction", dir)
+		local hits = Physics.RayWorldIntersection(self:GetPos(), dir, 1, ent_all, self.id, nil, hitData )
+		--Log(hits)
+		if(hits > 0) then 
+			--self:PrintTable(hitData)
+			if(hitData[1].entity and hitData[1].entity.class == "Trap1") then 
+				trap = hitData[1].entity
+			end 
+		end 
+
+
+		if(trap ~=nil) then 
+		   Log("Mouse: Sees trap")
 		   local child = trap:GetChild(0)
 		   self:PrintTable(child)
 		   target = child;	
-	  end 
-	  --Log(tostring(enemy));
-	  --Log(tostring(target));
+		end 
+		--Log(tostring(enemy));
+		--Log(tostring(target));
 	  
-	for i = 1, #self.mouseDataTable.defaultTable.KnownDangerEnts do 
-		Log("Checking for dangerous entity " .. tostring(self.mouseDataTable.defaultTable.KnownDangerEnts[i]));
-		local enemy = self:ray_cast(self.mouseDataTable.defaultTable.KnownDangerEnts[i]);
-		if enemy ~= nil then 
-			self:GotoState("Avoid"); 
+		for i = 1, #self.mouseDataTable.defaultTable.KnownDangerEnts do 
+			--Log("Checking for dangerous entity " .. tostring(self.mouseDataTable.defaultTable.KnownDangerEnts[i]));
+			local enemy = self:ray_cast(self.mouseDataTable.defaultTable.KnownDangerEnts[i]);
+			if enemy ~= nil then 
+				self:GotoState("Avoid"); 
+			end
 		end
-	end
-	  
-	  --local enemy = self:ray_cast("Snake");
-	 -- local trap = self:ray_cast("Trap1");
-	  local target = self:ray_cast("Food");
+		  
+		  --local enemy = self:ray_cast("Snake");
+		 -- local trap = self:ray_cast("Trap1");
+		local target = self:ray_cast("Food");
 
-	if target ~= nil then
-	  	--Log("Gonna Eat")
-	  	self:GotoState("Eat");
-	else end;
+		if target ~= nil then
+			--Log("Gonna Eat")
+			self:GotoState("Eat");
+		else end;
+			--Log("exploratoryWalk");
+		
+		local max_toEat = 0;
+		local max_key = nil;
+		for key,value in pairs(self.eatCount) do
+			local toEat = self.mouseDataTable.defaultTable.ToEat[key] - value;
+			if toEat > max_toEat then
+				max_toEat = toEat;
+				max_key = key;
+			end
+		end
+		
+		if max_key ~= nil then
+			local max_counter = 0;
+			local location_key = nil;
+			for key,value in pairs(self.mouseDataTable.defaultTable.FoodLocations[max_key]) do
+				if value > max_counter then
+					max_counter = value;
+					location_key = key;
+				end
+			end
 
-		--self:randomDirectionalWalk(time);
+			if location_key ~= nil then
+				local walk_dir = nil;
+				if tostring(location_key) == "NorthEastCounter" then
+					walk_dir = {row_inc = 1, col_inc = 1};
+				elseif tostring(location_key) == "SouthEastCounter" then
+					walk_dir = {row_inc = -1, col_inc = 1};
+				elseif tostring(location_key) == "NorthWestCounter" then
+					walk_dir = {row_inc = 1, col_inc = -1};
+				elseif tostring(location_key) == "SouthWestCounter" then
+					walk_dir = {row_inc = -1, col_inc = -1};
+				end
+				
+				self:guidedExploratoryWalk(time, walk_dir);
+			else
+				self:exploratoryWalk(time);
+			end
+		end
+		
+		--self:exploratoryWalk(time);
+	end,
 
-		--Log("exploratoryWalk");
-		self:exploratoryWalk(time);
-
-  end,
-
-  OnEndState = function(self)
-  	Log("Mouse: Exiting Search State")
-  end,
-
- }
+	OnEndState = function(self)
+		Log("Mouse: Exiting Search State")
+	end,
+}
 
 Mouse.Avoid =
 {

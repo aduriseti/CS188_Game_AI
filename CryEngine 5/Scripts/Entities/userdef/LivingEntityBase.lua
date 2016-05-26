@@ -332,7 +332,7 @@ function LivingEntityBase:FaceAt(pos, fT)
     local newAngle = math.atan2 (b.y-a.y, b.x-a.x);    
     
     local difference =((((newAngle - self.angles.z) % (2 * math.pi)) + (3 * math.pi)) % (2 * math.pi)) - math.pi;
-    newAngle = (self.angles.z + difference);
+    newAngle = (self.angles.z + difference - 0.5 * math.pi);
     
     self.angles.z = Lerp(self.angles.z, newAngle, (self.Properties.fRotSpeed*fT));  
     self:SetAngles(self.angles);
@@ -358,31 +358,6 @@ end
 -------------------------              Movement Algorithms                             ---------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
 
-function LivingEntityBase:turnLeftAlways()
-	--STATUS: Not finished for maze2
-
-	local rowcol = LivingEntityBase.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
-	local row = rowcol.row;
-	local col = rowcol.col;
-
-end
-
-function LivingEntityBase:depthFirstSearch()
-
-	--STATUS: Not finished for any maze
-
-end
-
-function LivingEntityBase:randomWalk() 
-
-	--STATUS: Cryengine only - will push when works with lumberyard
-
-	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
-	local row = rowcol.row;
-	local col = rowcol.col;
-
-end
-
 function LivingEntityBase:getUnoccupiedNeighbors(loc_row, loc_col)
 
 	local grid = self.Maze_Properties.grid
@@ -400,7 +375,12 @@ function LivingEntityBase:getUnoccupiedNeighbors(loc_row, loc_col)
 			
 				System.DrawLine(self.pos, {try_pos.x, try_pos.y, self.pos.z}, 0, 1, 0, 1);
 
-				empty_neighbors[#empty_neighbors+1] = {row =row_index, col = col_index, n_visited = grid[row_index][col_index].n_visited, direction = value};
+				empty_neighbors[#empty_neighbors+1] = {
+					row =row_index, 
+					col = col_index, 
+					n_visited = grid[row_index][col_index].n_visited, 
+					direction = value
+				};
 
 				--Log(tostring(#empty_neighbors));
 			end
@@ -409,22 +389,6 @@ function LivingEntityBase:getUnoccupiedNeighbors(loc_row, loc_col)
 
 	return empty_neighbors;
 
-end
-
-function LivingEntityBase:getLeftRight()
-	local dir = self.direction;
-	local dirs = self.directions;
-	if dir.name == "up" then
-		return dirs.left, dirs.right;
-	elseif dir.name == "down" then
-		return dirs.right, dirs.left;
-	elseif dir.name == "left" then 
-		return dirs.up, dirs.down;
-	elseif dir.name == "right" then
-		return dirs.down, dirs.up;
-	else
-		return nil;
-	end
 end
 
 function LivingEntityBase:runFrom(target, frameTime)
@@ -588,9 +552,15 @@ function LivingEntityBase:guidedExploratoryWalk(frameTime, walk_dir)
 	local min_val = 10000;
 	local min_key = 0
 
+	--preferentially move in walk_dir but if not possible move in least visited direction
 	for key, value in pairs(empty_neighbors) do
-		--Log(tostring(value.n_visited));
-		if value.n_visited < min_val then
+		--if the direction of this neighbor is in vertical or horizontal alignment with walkdir
+		if value.direction.row_inc == walk_dir.row_inc or
+				value.direction.col_inc == walk_dir.col_inc then
+			self.direction = value.direction;
+			return;
+		--otherwise find the least visited neighboring square
+		else if value.n_visited < min_val then
 			min_val = value.n_visited;
 			min_key = key;
 		end
