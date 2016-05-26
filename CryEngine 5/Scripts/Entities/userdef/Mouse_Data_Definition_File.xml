@@ -2,7 +2,7 @@
  
     <Property name="version" type="string"/>
  
-    <Table name="mouseDataTable">
+    <Table name="defaultTable">
     
         <Property name="EnemyInMemory" type="bool"/>
         <Property name="LeftTurnTendency" type="float" />

@@ -142,7 +142,7 @@ Mouse.Search =
   OnBeginState = function(self)
   	Log("Mouse: Entering Search State")
 	self.mouseDataTable = self:LoadXMLData(Mouse_Default_Data_File)
-	self:PrintTable(self.mouseDataTable)
+	--self:PrintTable(self.mouseDataTable)
   end,
 
   OnUpdate = function(self,time)
@@ -281,7 +281,7 @@ Mouse.Eat =
 
   	OnEndState = function(self)
 		Log("Mouse: Exiting Eat State")
-		--self:SaveXMLData(self.mouseDataTable, Mouse_Default_Data_File)
+		self:SaveXMLData(self.mouseDataTable, Mouse_Default_Data_File)
 		-- Record Food Locs knowledge
   	end,
 	
@@ -451,60 +451,60 @@ function Mouse:Eating(foodType)
 	if foodType == "Cheese" then     -- Cheese
         Log("Mouse:OnEat = I am eating Cheese")
 		-- Update food table
-		self.mouseDataTable.ToEat.Cheese = self.mouseDataTable.ToEat.Cheese - 1;
+		--self.mouseDataTable.defaultTable.ToEat.Cheese = self.mouseDataTable.defaultTable.ToEat.Cheese - 1;
 
 		-- Update location table
 		if quadrant == "North-East" then
-			self.mouseDataTable.FoodLocations.Cheese.NorthEastCounter = self.mouseDataTable.FoodLocations.Cheese.NorthEastCounter + 1;
+			self.mouseDataTable.defaultTable.FoodLocations.Cheese.NorthEastCounter = self.mouseDataTable.defaultTable.FoodLocations.Cheese.NorthEastCounter + 1;
 		elseif quadrant == "South-East" then
-			self.mouseDataTable.FoodLocations.Cheese.SouthEastCounter = self.mouseDataTable.FoodLocations.Cheese.SouthEastCounter + 1;
+			self.mouseDataTable.defaultTable.FoodLocations.Cheese.SouthEastCounter = self.mouseDataTable.defaultTable.FoodLocations.Cheese.SouthEastCounter + 1;
 		elseif quadrant == "South-West" then
-			self.mouseDataTable.FoodLocations.Cheese.SouthWestCounter = self.mouseDataTable.FoodLocations.Cheese.SouthWestCounter + 1;
+			self.mouseDataTable.defaultTable.FoodLocations.Cheese.SouthWestCounter = self.mouseDataTable.defaultTable.FoodLocations.Cheese.SouthWestCounter + 1;
 		else
-			self.mouseDataTable.FoodLocations.Cheese.NorthWestCounter = self.mouseDataTable.FoodLocations.Cheese.NorthWestCounter + 1;
+			self.mouseDataTable.defaultTable.FoodLocations.Cheese.NorthWestCounter = self.mouseDataTable.defaultTable.FoodLocations.Cheese.NorthWestCounter + 1;
 		end
     elseif foodType == "Berry" then -- Berry
         Log("Mouse:OnEat = I am eating Berry")
-		self.mouseDataTable.ToEat.Berry = self.mouseDataTable.ToEat.Berry - 1;
+		--self.mouseDataTable.defaultTable.ToEat.Berry = self.mouseDataTable.defaultTable.ToEat.Berry - 1;
 
 		-- Update location table
 		if quadrant == "North-East" then
-			self.mouseDataTable.FoodLocations.Berry.NorthEastCounter = self.mouseDataTable.FoodLocations.Berry.NorthEastCounter + 1;
+			self.mouseDataTable.defaultTable.FoodLocations.Berry.NorthEastCounter = self.mouseDataTable.defaultTable.FoodLocations.Berry.NorthEastCounter + 1;
 		elseif quadrant == "South-East" then
-			self.mouseDataTable.FoodLocations.Berry.SouthEastCounter = self.mouseDataTable.FoodLocations.Berry.SouthEastCounter + 1;
+			self.mouseDataTable.defaultTable.FoodLocations.Berry.SouthEastCounter = self.mouseDataTable.defaultTable.FoodLocations.Berry.SouthEastCounter + 1;
 		elseif quadrant == "South-West" then
-			self.mouseDataTable.FoodLocations.Berry.SouthWestCounter = self.mouseDataTable.FoodLocations.Berry.SouthWestCounter + 1;
+			self.mouseDataTable.defaultTable.FoodLocations.Berry.SouthWestCounter = self.mouseDataTable.defaultTable.FoodLocations.Berry.SouthWestCounter + 1;
 		else
-			self.mouseDataTable.FoodLocations.Berry.NorthWestCounter = self.mouseDataTable.FoodLocations.Berry.NorthWestCounter + 1;
+			self.mouseDataTable.defaultTable.FoodLocations.Berry.NorthWestCounter = self.mouseDataTable.defaultTable.FoodLocations.Berry.NorthWestCounter + 1;
 		end
     elseif foodType == "Potato" then -- Potato
         Log("Mouse:OnEat = I am eating Potato")
-		self.mouseDataTable.ToEat.Berry = self.mouseDataTable.ToEat.Berry - 1;
+		--self.mouseDataTable.defaultTable.ToEat.Berry = self.mouseDataTable.defaultTable.ToEat.Berry - 1;
 
 		-- Update location table
 		if quadrant == "North-East" then
-			self.mouseDataTable.FoodLocations.Potato.NorthEastCounter = self.mouseDataTable.FoodLocations.Potato.NorthEastCounter + 1;
+			self.mouseDataTable.defaultTable.FoodLocations.Potato.NorthEastCounter = self.mouseDataTable.defaultTable.FoodLocations.Potato.NorthEastCounter + 1;
 		elseif quadrant == "South-East" then
-			self.mouseDataTable.FoodLocations.Potato.SouthEastCounter = self.mouseDataTable.FoodLocations.Potato.SouthEastCounter + 1;
+			self.mouseDataTable.defaultTable.FoodLocations.Potato.SouthEastCounter = self.mouseDataTable.defaultTable.FoodLocations.Potato.SouthEastCounter + 1;
 		elseif quadrant == "South-West" then
-			self.mouseDataTable.FoodLocations.Potato.SouthWestCounter = self.mouseDataTable.FoodLocations.Potato.SouthWestCounter + 1;
+			self.mouseDataTable.defaultTable.FoodLocations.Potato.SouthWestCounter = self.mouseDataTable.defaultTable.FoodLocations.Potato.SouthWestCounter + 1;
 		else
-			self.mouseDataTable.FoodLocations.Potato.NorthWestCounter = self.mouseDataTable.FoodLocations.Potato.NorthWestCounter + 1;
+			self.mouseDataTable.defaultTable.FoodLocations.Potato.NorthWestCounter = self.mouseDataTable.defaultTable.FoodLocations.Potato.NorthWestCounter + 1;
 		end
     elseif foodType == "Grains" then -- Grains
         Log("Mouse:OnEat = I am eating Grains")
-		self:PrintTable(self.mouseDataTable);
-		self.mouseDataTable.ToEat.Grains = self.mouseDataTable.ToEat.Grains - 1;
+		--self:PrintTable(self.mouseDataTable);
+		--self.mouseDataTable.defaultTable.ToEat.Grains = self.mouseDataTable.defaultTable.ToEat.Grains - 1;
 
 		-- Update location table
 		if quadrant == "North-East" then
-			self.mouseDataTable.FoodLocations.Grains.NorthEastCounter = self.mouseDataTable.FoodLocations.Grains.NorthEastCounter + 1;
+			self.mouseDataTable.defaultTable.FoodLocations.Grains.NorthEastCounter = self.mouseDataTable.defaultTable.FoodLocations.Grains.NorthEastCounter + 1;
 		elseif quadrant == "South-East" then
-			self.mouseDataTable.FoodLocations.Grains.SouthEastCounter = self.mouseDataTable.FoodLocations.Grains.SouthEastCounter + 1;
+			self.mouseDataTable.defaultTable.FoodLocations.Grains.SouthEastCounter = self.mouseDataTable.defaultTable.FoodLocations.Grains.SouthEastCounter + 1;
 		elseif quadrant == "South-West" then
-			self.mouseDataTable.FoodLocations.Grains.SouthWestCounter = self.mouseDataTable.FoodLocations.Grains.SouthWestCounter + 1;
+			self.mouseDataTable.defaultTable.FoodLocations.Grains.SouthWestCounter = self.mouseDataTable.defaultTable.FoodLocations.Grains.SouthWestCounter + 1;
 		else
-			self.mouseDataTable.FoodLocations.Grains.NorthWestCounter = self.mouseDataTable.FoodLocations.Grains.NorthWestCounter + 1;
+			self.mouseDataTable.defaultTable.FoodLocations.Grains.NorthWestCounter = self.mouseDataTable.defaultTable.FoodLocations.Grains.NorthWestCounter + 1;
 		end
     elseif foodType == "PowerBall" then -- PowerBall
         Log("Mouse:OnEat = I am eating PowerBall")

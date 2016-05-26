@@ -564,10 +564,13 @@ function LivingEntityBase:exploratoryWalk(frameTime)
 	--else change our behavior
 	self.Previous_Loc.col = col;
 	self.Previous_Loc.row = row;
+	
+	--Log(tostring(self.Maze_Properties.grid));
 
 	--increment visit counter of current grid space
 	self.Maze_Properties.grid[row][col].n_visited = self.Maze_Properties.grid[row][col].n_visited + 1;
-
+	
+	
 	-- if there are more options than backwards
 	if #empty_neighbors >=2 then
 		--remove backtracking as an option
