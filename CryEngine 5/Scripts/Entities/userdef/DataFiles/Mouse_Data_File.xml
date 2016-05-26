@@ -5,17 +5,12 @@
         Boldness="0.1"
         DeathCounter="0"
         WinCounter="0">
-        <ToEat>
-           <FoodNeed FoodType="Berry" NumToEat="3"/>
-           <FoodNeed FoodType="Potato" NumToEat="2"/>
-           <FoodNeed FoodType="Cheese" NumToEat="3"/>
-           <FoodNeed FoodType="Grains" NumToEat="1"/>
-        </ToEat>
-        <FoodLocations>
-           <Food FoodType="Berry" LocationGeneral="North-East"/>
-           <Food FoodType="Potato" LocationGeneral="South-East"/>
-           <Food FoodType="Cheese" LocationGeneral="South-West"/>
-           <Food FoodType="Grains" LocationGeneral="North-West"/>
+        <ToEat Cheese="3" Berry="2" Potato="3" Grains="4"/>
+        <FoodLocations
+           <Cheese NorthEastCounter="0" SouthEastCounter="0" SouthWestCounter="0" NorthWestCounter="0"/>
+           <Berry NorthEastCounter="0" SouthEastCounter="0" SouthWestCounter="0" NorthWestCounter="0"/>
+           <Potato NorthEastCounter="0" SouthEastCounter="0" SouthWestCounter="0" NorthWestCounter="0"/>
+           <Grains NorthEastCounter="0" SouthEastCounter="0" SouthWestCounter="0" NorthWestCounter="0"/>
         </FoodLocations>
         <KnownDangerEnts>
            <Killer value="Snake"/>
