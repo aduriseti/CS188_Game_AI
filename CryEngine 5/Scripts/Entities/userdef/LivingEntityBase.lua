@@ -757,6 +757,7 @@ function LivingEntityBase:ray_cast(target_class)
 
  	Physics.RayWorldIntersection(self.pos, diff, 1, ent_all, self.id, target.id, fucker);--, self:GetRawId(), target_mouse:GetRawId());
 
+	
 	local n_hits = 0;
 
 	for key, value in pairs(fucker) do
@@ -767,7 +768,8 @@ function LivingEntityBase:ray_cast(target_class)
 		--Log("Raycast intersect");
 		return nil;
 	end
-
+	
+	
 	return target;
 end
 
