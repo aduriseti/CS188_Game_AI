@@ -281,7 +281,7 @@ Mouse.Eat =
 
   	OnEndState = function(self)
 		Log("Mouse: Exiting Eat State")
-		self:SaveXMLData(self.mouseDataTable, Mouse_Default_Data_File)
+		--self:SaveXMLData(self.mouseDataTable, Mouse_Default_Data_File)
 		-- Record Food Locs knowledge
   	end,
 	
@@ -382,9 +382,9 @@ function Mouse:abstractReset()
 	--self.direction = self.directions.up;
 	--Log(tostring(self.direction.row_inc));
 	-- Load Knowledge Base in
-	--self.mouseDataTable = self:LoadXMLData() -- Optional Parameter to SPecify what file to read
+	self.mouseDataTable = self:LoadXMLData() -- Optional Parameter to SPecify what file to read
 	
-	--self:PrintTable(self.mouseDataTable)
+	self:PrintTable(self.mouseDataTable)
 
 	--self:GotoState("Search");
 
@@ -429,22 +429,6 @@ end
 -------------------------                      Functions                             ---------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
 
-
-
-
-function Mouse:breathing_animation(frameTime)
-
-	local cycle_time = 50;
-	local new_scale = 0.9+(0.2 * cycle_time % frameTime );
-	--Log("New scale " .. tostring(new_scale));
-	--self.SetScale(new_scale);
-
-	Log("cycle" .. tostring(frameTime));
-	Log("New height" .. tostring(32 + 0.9+(0.2 * frameTime % cycle_time)));
-	self:SetPos({self.pos.x, self.pos.y, 32 + 0.9+(0.2/50 * frameTime % cycle_time)});
-end
-
-
 function Mouse:Eating(foodType)
 
 	self.mouseDataTable = self:LoadXMLData(Mouse_Default_Data_File);
@@ -467,60 +451,60 @@ function Mouse:Eating(foodType)
 	if foodType == "Cheese" then     -- Cheese
         Log("Mouse:OnEat = I am eating Cheese")
 		-- Update food table
-		mouseDataTable.ToEat.Cheese = mouseDataTable.ToEat.Cheese - 1;
+		self.mouseDataTable.ToEat.Cheese = self.mouseDataTable.ToEat.Cheese - 1;
 
 		-- Update location table
 		if quadrant == "North-East" then
-			mouseDataTable.FoodLocations.Cheese.NorthEastCounter = mouseDataTable.FoodLocations.Cheese.NorthEastCounter + 1;
+			self.mouseDataTable.FoodLocations.Cheese.NorthEastCounter = self.mouseDataTable.FoodLocations.Cheese.NorthEastCounter + 1;
 		elseif quadrant == "South-East" then
-			mouseDataTable.FoodLocations.Cheese.SouthEastCounter = mouseDataTable.FoodLocations.Cheese.SouthEastCounter + 1;
+			self.mouseDataTable.FoodLocations.Cheese.SouthEastCounter = self.mouseDataTable.FoodLocations.Cheese.SouthEastCounter + 1;
 		elseif quadrant == "South-West" then
-			mouseDataTable.FoodLocations.Cheese.SouthWestCounter = mouseDataTable.FoodLocations.Cheese.SouthWestCounter + 1;
+			self.mouseDataTable.FoodLocations.Cheese.SouthWestCounter = self.mouseDataTable.FoodLocations.Cheese.SouthWestCounter + 1;
 		else
-			mouseDataTable.FoodLocations.Cheese.NorthWestCounter = mouseDataTable.FoodLocations.Cheese.NorthWestCounter + 1;
+			self.mouseDataTable.FoodLocations.Cheese.NorthWestCounter = self.mouseDataTable.FoodLocations.Cheese.NorthWestCounter + 1;
 		end
     elseif foodType == "Berry" then -- Berry
         Log("Mouse:OnEat = I am eating Berry")
-		mouseDataTable.ToEat.Berry = mouseDataTable.ToEat.Berry - 1;
+		self.mouseDataTable.ToEat.Berry = self.mouseDataTable.ToEat.Berry - 1;
 
 		-- Update location table
 		if quadrant == "North-East" then
-			mouseDataTable.FoodLocations.Berry.NorthEastCounter = mouseDataTable.FoodLocations.Berry.NorthEastCounter + 1;
+			self.mouseDataTable.FoodLocations.Berry.NorthEastCounter = self.mouseDataTable.FoodLocations.Berry.NorthEastCounter + 1;
 		elseif quadrant == "South-East" then
-			mouseDataTable.FoodLocations.Berry.SouthEastCounter = mouseDataTable.FoodLocations.Berry.SouthEastCounter + 1;
+			self.mouseDataTable.FoodLocations.Berry.SouthEastCounter = self.mouseDataTable.FoodLocations.Berry.SouthEastCounter + 1;
 		elseif quadrant == "South-West" then
-			mouseDataTable.FoodLocations.Berry.SouthWestCounter = mouseDataTable.FoodLocations.Berry.SouthWestCounter + 1;
+			self.mouseDataTable.FoodLocations.Berry.SouthWestCounter = self.mouseDataTable.FoodLocations.Berry.SouthWestCounter + 1;
 		else
-			mouseDataTable.FoodLocations.Berry.NorthWestCounter = mouseDataTable.FoodLocations.Berry.NorthWestCounter + 1;
+			self.mouseDataTable.FoodLocations.Berry.NorthWestCounter = self.mouseDataTable.FoodLocations.Berry.NorthWestCounter + 1;
 		end
     elseif foodType == "Potato" then -- Potato
         Log("Mouse:OnEat = I am eating Potato")
-		mouseDataTable.ToEat.Berry = mouseDataTable.ToEat.Berry - 1;
+		self.mouseDataTable.ToEat.Berry = self.mouseDataTable.ToEat.Berry - 1;
 
 		-- Update location table
 		if quadrant == "North-East" then
-			mouseDataTable.FoodLocations.Potato.NorthEastCounter = mouseDataTable.FoodLocations.Potato.NorthEastCounter + 1;
+			self.mouseDataTable.FoodLocations.Potato.NorthEastCounter = self.mouseDataTable.FoodLocations.Potato.NorthEastCounter + 1;
 		elseif quadrant == "South-East" then
-			mouseDataTable.FoodLocations.Potato.SouthEastCounter = mouseDataTable.FoodLocations.Potato.SouthEastCounter + 1;
+			self.mouseDataTable.FoodLocations.Potato.SouthEastCounter = self.mouseDataTable.FoodLocations.Potato.SouthEastCounter + 1;
 		elseif quadrant == "South-West" then
-			mouseDataTable.FoodLocations.Potato.SouthWestCounter = mouseDataTable.FoodLocations.Potato.SouthWestCounter + 1;
+			self.mouseDataTable.FoodLocations.Potato.SouthWestCounter = self.mouseDataTable.FoodLocations.Potato.SouthWestCounter + 1;
 		else
-			mouseDataTable.FoodLocations.Potato.NorthWestCounter = mouseDataTable.FoodLocations.Potato.NorthWestCounter + 1;
+			self.mouseDataTable.FoodLocations.Potato.NorthWestCounter = self.mouseDataTable.FoodLocations.Potato.NorthWestCounter + 1;
 		end
     elseif foodType == "Grains" then -- Grains
         Log("Mouse:OnEat = I am eating Grains")
-		self:PrintTable(mouseDataTable);
-		mouseDataTable.ToEat.Grains = mouseDataTable.ToEat.Grains - 1;
+		self:PrintTable(self.mouseDataTable);
+		self.mouseDataTable.ToEat.Grains = self.mouseDataTable.ToEat.Grains - 1;
 
 		-- Update location table
 		if quadrant == "North-East" then
-			mouseDataTable.FoodLocations.Grains.NorthEastCounter = mouseDataTable.FoodLocations.Grains.NorthEastCounter + 1;
+			self.mouseDataTable.FoodLocations.Grains.NorthEastCounter = self.mouseDataTable.FoodLocations.Grains.NorthEastCounter + 1;
 		elseif quadrant == "South-East" then
-			mouseDataTable.FoodLocations.Grains.SouthEastCounter = mouseDataTable.FoodLocations.Grains.SouthEastCounter + 1;
+			self.mouseDataTable.FoodLocations.Grains.SouthEastCounter = self.mouseDataTable.FoodLocations.Grains.SouthEastCounter + 1;
 		elseif quadrant == "South-West" then
-			mouseDataTable.FoodLocations.Grains.SouthWestCounter = mouseDataTable.FoodLocations.Grains.SouthWestCounter + 1;
+			self.mouseDataTable.FoodLocations.Grains.SouthWestCounter = self.mouseDataTable.FoodLocations.Grains.SouthWestCounter + 1;
 		else
-			mouseDataTable.FoodLocations.Grains.NorthWestCounter = mouseDataTable.FoodLocations.Grains.NorthWestCounter + 1;
+			self.mouseDataTable.FoodLocations.Grains.NorthWestCounter = self.mouseDataTable.FoodLocations.Grains.NorthWestCounter + 1;
 		end
     elseif foodType == "PowerBall" then -- PowerBall
         Log("Mouse:OnEat = I am eating PowerBall")
@@ -540,71 +524,5 @@ function Mouse:Eating(foodType)
 end
 
 function Mouse:PowerMode()
-
-end
-
-function Mouse:PrintTable(t)
-
-    local print_r_cache={}
-
-    local function sub_print_r(t,indent)
-
-        if (print_r_cache[tostring(t)]) then
-
-            Log(indent.."*"..tostring(t))
-
-        else
-
-            print_r_cache[tostring(t)]=true
-
-            if (type(t)=="table") then
-
-                for pos,val in pairs(t) do
-
-                    if (type(val)=="table") then
-
-                        Log(indent.."["..pos.."] => "..tostring(t).." {")
-
-                        sub_print_r(val,indent..string.rep(" ",string.len(pos)+8))
-
-                        Log(indent..string.rep(" ",string.len(pos)+6).."}")
-
-                    elseif (type(val)=="string") then
-
-                        Log(indent.."["..pos..'] => "'..val..'"')
-
-                    else
-
-                        Log(indent.."["..pos.."] => "..tostring(val))
-
-                    end
-
-                end
-
-            else
-
-                Log(indent..tostring(t))
-
-            end
-
-        end
-
-    end
-
-    if (type(t)=="table") then
-
-        Log(tostring(t).." {")
-
-        sub_print_r(t,"  ")
-
-        Log("}")
-
-    else
-
-        sub_print_r(t,"  ")
-
-    end
-
-    --Log()
 
 end
