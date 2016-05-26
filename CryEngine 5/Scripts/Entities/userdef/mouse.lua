@@ -36,6 +36,7 @@ Mouse = {
 	mouseDataTable = {},
 	
     Properties = {
+    	entType = "Mouse",
 		bUsable = 0,
         object_Model = "Objects/characters/animals/rat/rat.cdf",
 	    --object_Model = "objects/default/primitive_cube_small.cgf",
