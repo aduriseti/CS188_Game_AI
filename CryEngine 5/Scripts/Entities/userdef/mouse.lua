@@ -47,6 +47,7 @@ Mouse = {
 
         bActive = 1,
 
+        mouseDataTable = {},
         
 		
 		--Physics = {
@@ -80,8 +81,16 @@ Mouse = {
 		jump = 0,
 		impulseMag = 50,
 		impulseDir = {x=0,y=0,z=0},
-	}
-
+	},
+	
+	eatCount = {
+		Cheese = 0,
+		Berry = 0,
+		Potato = 0,
+		Grains = 0,
+	},
+	
+	ToEat = {},
 };
 
 MakeDerivedEntityOverride(Mouse, LivingEntityBase);
@@ -138,68 +147,111 @@ Mouse.Move =
 
 
 Mouse.Search =
- {
+{
+	OnBeginState = function(self)
+		Log("Mouse: Entering Search State")
+		self.Properties.mouseDataTable = self:LoadXMLData(Mouse_Default_Data_File)
+		--self:PrintTable(self.Properties.mouseDataTable)
+	end,
 
-  OnBeginState = function(self)
-  	Log("Mouse: Entering Search State")
-	self.mouseDataTable = self:LoadXMLData(Mouse_Default_Data_File)
-	--self:PrintTable(self.mouseDataTable)
-  end,
+	OnUpdate = function(self,time)
 
-  OnUpdate = function(self,time)
-  	
-  	  local trap;
-	  local enemy = self:ray_cast("Snake");
-	 -- local trap = self:ray_cast("Trap1");
-	  local target = self:ray_cast("Food");
-	  
-	  --local myTest = self:IntersectRay(0, self:GetPos(), self:GetDirectionVector(), 15)
-	  --self:PrintTable(myTest)
-	 
-	  local hitData = {};
-	  --local angles = self:GetAngles()
-	  --LogVec("angles", angles)
-	  local dir = self:GetDirectionVector();
-	  dir = vecScale(dir, 50);
-	  --LogVec("Direction", dir)
-	  local hits = Physics.RayWorldIntersection(self:GetPos(), dir, 1, ent_all, self.id, nil, hitData )
-	  --Log(hits)
-	  if(hits > 0) then 
-	  	--self:PrintTable(hitData)
-		  if(hitData[1].entity and hitData[1].entity.class == "Trap1") then 
-		  	  trap = hitData[1].entity
-		  end 
-	  end 
-	  
-	  
-	  if(trap ~=nil) then 
-	       Log("Mouse: Sees trap")
+		local trap;
+
+		--local myTest = self:IntersectRay(0, self:GetPos(), self:GetDirectionVector(), 15)
+		--self:PrintTable(myTest)
+
+		local hitData = {};
+		--local angles = self:GetAngles()
+		--LogVec("angles", angles)
+		local dir = self:GetDirectionVector();
+		dir = vecScale(dir, 50);
+		--LogVec("Direction", dir)
+		local hits = Physics.RayWorldIntersection(self:GetPos(), dir, 1, ent_all, self.id, nil, hitData )
+		--Log(hits)
+		if(hits > 0) then 
+			--self:PrintTable(hitData)
+			if(hitData[1].entity and hitData[1].entity.class == "Trap1") then 
+				trap = hitData[1].entity
+			end 
+		end 
+
+
+		if(trap ~=nil) then 
+		   Log("Mouse: Sees trap")
 		   local child = trap:GetChild(0)
 		   self:PrintTable(child)
 		   target = child;	
-	  end 
-	  --Log(tostring(enemy));
-	  --Log(tostring(target));
+		end 
+		--Log(tostring(enemy));
+		--Log(tostring(target));
+	  
+		for i = 1, #self.Properties.mouseDataTable.defaultTable.KnownDangerEnts do 
+			--Log("Checking for dangerous entity " .. tostring(self.Properties.mouseDataTable.defaultTable.KnownDangerEnts[i]));
+			local enemy = self:ray_cast(self.Properties.mouseDataTable.defaultTable.KnownDangerEnts[i]);
+			if enemy ~= nil then 
+				self:GotoState("Avoid"); 
+			end
+		end
+		  
+		  --local enemy = self:ray_cast("Snake");
+		 -- local trap = self:ray_cast("Trap1");
+		local target = self:ray_cast("Food");
 
-	  if enemy ~= nil then
-	  	self:GotoState("Avoid");
-	  elseif target ~= nil then
-	  	--Log("Gonna Eat")
-	  	self:GotoState("Eat");
-	  else end;
+		if target ~= nil then
+			--Log("Gonna Eat")
+			self:GotoState("Eat");
+		else end;
+			--Log("exploratoryWalk");
+		
+		local max_toEat = 0;
+		local max_key = nil;
+		for key,value in pairs(self.eatCount) do
+			local toEat = self.Properties.mouseDataTable.defaultTable.ToEat[key] - value;
+			if toEat > max_toEat then
+				max_toEat = toEat;
+				max_key = key;
+			end
+		end
+		
+		if max_key ~= nil then
+			local max_counter = 0;
+			local location_key = nil;
+			for key,value in pairs(self.Properties.mouseDataTable.defaultTable.FoodLocations[max_key]) do
+				if value > max_counter then
+					max_counter = value;
+					location_key = key;
+				end
+			end
 
-		--self:randomDirectionalWalk(time);
-
-		--Log("exploratoryWalk");
+			if location_key ~= nil then
+				local walk_dir = nil;
+				if tostring(location_key) == "NorthEastCounter" then
+					walk_dir = {row_inc = 1, col_inc = 1};
+				elseif tostring(location_key) == "SouthEastCounter" then
+					walk_dir = {row_inc = -1, col_inc = 1};
+				elseif tostring(location_key) == "NorthWestCounter" then
+					walk_dir = {row_inc = 1, col_inc = -1};
+				elseif tostring(location_key) == "SouthWestCounter" then
+					walk_dir = {row_inc = -1, col_inc = -1};
+				end
+				
+				self:guidedExploratoryWalk(time, walk_dir);
+				return;
+			else
+				--self:exploratoryWalk(time);
+			end
+		else
+			--self:exploratoryWalk(time);
+		end
+		
 		self:exploratoryWalk(time);
+	end,
 
-  end,
-
-  OnEndState = function(self)
-  	Log("Mouse: Exiting Search State")
-  end,
-
- }
+	OnEndState = function(self)
+		Log("Mouse: Exiting Search State")
+	end,
+}
 
 Mouse.Avoid =
 {
@@ -282,7 +334,7 @@ Mouse.Eat =
 
   	OnEndState = function(self)
 		Log("Mouse: Exiting Eat State")
-		self:SaveXMLData(self.mouseDataTable, Mouse_Default_Data_File)
+		self:SaveXMLData(self.Properties.mouseDataTable, Mouse_Default_Data_File)
 		-- Record Food Locs knowledge
   	end,
 	
@@ -357,8 +409,19 @@ Mouse.Power =
 -------------------------                     State Functions                        --------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------------------
 
-function Mouse:OnEat()
+function Mouse:OnEat(userId, index)
 	Log("RIP Mouse")
+	--self.Properties.mouseDataTable = self:LoadXMLData(Mouse_Default_Data_File);
+	
+	for i = 1, #self.Properties.mouseDataTable.defaultTable.KnownDangerEnts do 
+		if self.Properties.mouseDataTable.defaultTable.KnownDangerEnts[i] == tostring(userId.type) then
+			Log(tostring(userID.type) .. " already in data table");
+			self:GotoState("Dead")
+		end
+	end
+	Log("Adding " .. tostring(userID.type) .. " to data table");
+	self.Properties.mouseDataTable.defaultTable.KnownDangerEnts[#self.Properties.mouseDataTable.defaultTable.KnownDangerEnts + 1] = userID.type;
+	self:SaveXMLData(self.Properties.mouseDataTable, Mouse_Default_Data_File);
 	self:GotoState("Dead")
 end
 
@@ -367,8 +430,8 @@ function Mouse:THEFUCK()
 	Log("Mouse: :In THEFUCK")
 	--self:GotoState("Search")
 	--self:SetScale(3)
-	--self.mouseDataTable = self:LoadXMLData()
-	--self:PrintTable(self.mouseDataTable);
+	--self.Properties.mouseDataTable = self:LoadXMLData()
+	--self:PrintTable(self.Properties.mouseDataTable);
 	  --self:GotoState("Test")
 
 	self:GotoState("Search")
@@ -383,9 +446,9 @@ function Mouse:abstractReset()
 	--self.direction = self.directions.up;
 	--Log(tostring(self.direction.row_inc));
 	-- Load Knowledge Base in
-	self.mouseDataTable = self:LoadXMLData() -- Optional Parameter to SPecify what file to read
+	self.Properties.mouseDataTable = self:LoadXMLData() -- Optional Parameter to SPecify what file to read
 	
-	self:PrintTable(self.mouseDataTable)
+	self:PrintTable(self.Properties.mouseDataTable)
 
 	--self:GotoState("Search");
 
@@ -400,7 +463,7 @@ end
 -- Saves XML data from dataTable to dataFile
 function Mouse:SaveXMLData(dataTable, dataFile)
 	dataFile = dataFile or Mouse_Default_Data_File
-	dataTable = dataTable or self.mouseDataTable
+	dataTable = dataTable or self.Properties.mouseDataTable
 	
 	CryAction.SaveXML(Mouse_Data_Definition_File, dataFile, dataTable);
 end
@@ -432,7 +495,7 @@ end
 
 function Mouse:Eating(foodType)
 
-	self.mouseDataTable = self:LoadXMLData(Mouse_Default_Data_File);
+	--self.Properties.mouseDataTable = self:LoadXMLData(Mouse_Default_Data_File);
 	local mid_x = self.Maze_Properties.ID.Width/2;
 	local mid_y = self.Maze_Properties.ID.Height/2;
 	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
@@ -452,60 +515,60 @@ function Mouse:Eating(foodType)
 	if foodType == "Cheese" then     -- Cheese
         Log("Mouse:OnEat = I am eating Cheese")
 		-- Update food table
-		--self.mouseDataTable.defaultTable.ToEat.Cheese = self.mouseDataTable.defaultTable.ToEat.Cheese - 1;
+		--self.Properties.mouseDataTable.defaultTable.ToEat.Cheese = self.Properties.mouseDataTable.defaultTable.ToEat.Cheese - 1;
 
 		-- Update location table
 		if quadrant == "North-East" then
-			self.mouseDataTable.defaultTable.FoodLocations.Cheese.NorthEastCounter = self.mouseDataTable.defaultTable.FoodLocations.Cheese.NorthEastCounter + 1;
+			self.Properties.mouseDataTable.defaultTable.FoodLocations.Cheese.NorthEastCounter = self.Properties.mouseDataTable.defaultTable.FoodLocations.Cheese.NorthEastCounter + 1;
 		elseif quadrant == "South-East" then
-			self.mouseDataTable.defaultTable.FoodLocations.Cheese.SouthEastCounter = self.mouseDataTable.defaultTable.FoodLocations.Cheese.SouthEastCounter + 1;
+			self.Properties.mouseDataTable.defaultTable.FoodLocations.Cheese.SouthEastCounter = self.Properties.mouseDataTable.defaultTable.FoodLocations.Cheese.SouthEastCounter + 1;
 		elseif quadrant == "South-West" then
-			self.mouseDataTable.defaultTable.FoodLocations.Cheese.SouthWestCounter = self.mouseDataTable.defaultTable.FoodLocations.Cheese.SouthWestCounter + 1;
+			self.Properties.mouseDataTable.defaultTable.FoodLocations.Cheese.SouthWestCounter = self.Properties.mouseDataTable.defaultTable.FoodLocations.Cheese.SouthWestCounter + 1;
 		else
-			self.mouseDataTable.defaultTable.FoodLocations.Cheese.NorthWestCounter = self.mouseDataTable.defaultTable.FoodLocations.Cheese.NorthWestCounter + 1;
+			self.Properties.mouseDataTable.defaultTable.FoodLocations.Cheese.NorthWestCounter = self.Properties.mouseDataTable.defaultTable.FoodLocations.Cheese.NorthWestCounter + 1;
 		end
     elseif foodType == "Berry" then -- Berry
         Log("Mouse:OnEat = I am eating Berry")
-		--self.mouseDataTable.defaultTable.ToEat.Berry = self.mouseDataTable.defaultTable.ToEat.Berry - 1;
+		--self.Properties.mouseDataTable.defaultTable.ToEat.Berry = self.Properties.mouseDataTable.defaultTable.ToEat.Berry - 1;
 
 		-- Update location table
 		if quadrant == "North-East" then
-			self.mouseDataTable.defaultTable.FoodLocations.Berry.NorthEastCounter = self.mouseDataTable.defaultTable.FoodLocations.Berry.NorthEastCounter + 1;
+			self.Properties.mouseDataTable.defaultTable.FoodLocations.Berry.NorthEastCounter = self.Properties.mouseDataTable.defaultTable.FoodLocations.Berry.NorthEastCounter + 1;
 		elseif quadrant == "South-East" then
-			self.mouseDataTable.defaultTable.FoodLocations.Berry.SouthEastCounter = self.mouseDataTable.defaultTable.FoodLocations.Berry.SouthEastCounter + 1;
+			self.Properties.mouseDataTable.defaultTable.FoodLocations.Berry.SouthEastCounter = self.Properties.mouseDataTable.defaultTable.FoodLocations.Berry.SouthEastCounter + 1;
 		elseif quadrant == "South-West" then
-			self.mouseDataTable.defaultTable.FoodLocations.Berry.SouthWestCounter = self.mouseDataTable.defaultTable.FoodLocations.Berry.SouthWestCounter + 1;
+			self.Properties.mouseDataTable.defaultTable.FoodLocations.Berry.SouthWestCounter = self.Properties.mouseDataTable.defaultTable.FoodLocations.Berry.SouthWestCounter + 1;
 		else
-			self.mouseDataTable.defaultTable.FoodLocations.Berry.NorthWestCounter = self.mouseDataTable.defaultTable.FoodLocations.Berry.NorthWestCounter + 1;
+			self.Properties.mouseDataTable.defaultTable.FoodLocations.Berry.NorthWestCounter = self.Properties.mouseDataTable.defaultTable.FoodLocations.Berry.NorthWestCounter + 1;
 		end
     elseif foodType == "Potato" then -- Potato
         Log("Mouse:OnEat = I am eating Potato")
-		--self.mouseDataTable.defaultTable.ToEat.Berry = self.mouseDataTable.defaultTable.ToEat.Berry - 1;
+		--self.Properties.mouseDataTable.defaultTable.ToEat.Berry = self.Properties.mouseDataTable.defaultTable.ToEat.Berry - 1;
 
 		-- Update location table
 		if quadrant == "North-East" then
-			self.mouseDataTable.defaultTable.FoodLocations.Potato.NorthEastCounter = self.mouseDataTable.defaultTable.FoodLocations.Potato.NorthEastCounter + 1;
+			self.Properties.mouseDataTable.defaultTable.FoodLocations.Potato.NorthEastCounter = self.Properties.mouseDataTable.defaultTable.FoodLocations.Potato.NorthEastCounter + 1;
 		elseif quadrant == "South-East" then
-			self.mouseDataTable.defaultTable.FoodLocations.Potato.SouthEastCounter = self.mouseDataTable.defaultTable.FoodLocations.Potato.SouthEastCounter + 1;
+			self.Properties.mouseDataTable.defaultTable.FoodLocations.Potato.SouthEastCounter = self.Properties.mouseDataTable.defaultTable.FoodLocations.Potato.SouthEastCounter + 1;
 		elseif quadrant == "South-West" then
-			self.mouseDataTable.defaultTable.FoodLocations.Potato.SouthWestCounter = self.mouseDataTable.defaultTable.FoodLocations.Potato.SouthWestCounter + 1;
+			self.Properties.mouseDataTable.defaultTable.FoodLocations.Potato.SouthWestCounter = self.Properties.mouseDataTable.defaultTable.FoodLocations.Potato.SouthWestCounter + 1;
 		else
-			self.mouseDataTable.defaultTable.FoodLocations.Potato.NorthWestCounter = self.mouseDataTable.defaultTable.FoodLocations.Potato.NorthWestCounter + 1;
+			self.Properties.mouseDataTable.defaultTable.FoodLocations.Potato.NorthWestCounter = self.Properties.mouseDataTable.defaultTable.FoodLocations.Potato.NorthWestCounter + 1;
 		end
     elseif foodType == "Grains" then -- Grains
         Log("Mouse:OnEat = I am eating Grains")
-		--self:PrintTable(self.mouseDataTable);
-		--self.mouseDataTable.defaultTable.ToEat.Grains = self.mouseDataTable.defaultTable.ToEat.Grains - 1;
+		--self:PrintTable(self.Properties.mouseDataTable);
+		--self.Properties.mouseDataTable.defaultTable.ToEat.Grains = self.Properties.mouseDataTable.defaultTable.ToEat.Grains - 1;
 
 		-- Update location table
 		if quadrant == "North-East" then
-			self.mouseDataTable.defaultTable.FoodLocations.Grains.NorthEastCounter = self.mouseDataTable.defaultTable.FoodLocations.Grains.NorthEastCounter + 1;
+			self.Properties.mouseDataTable.defaultTable.FoodLocations.Grains.NorthEastCounter = self.Properties.mouseDataTable.defaultTable.FoodLocations.Grains.NorthEastCounter + 1;
 		elseif quadrant == "South-East" then
-			self.mouseDataTable.defaultTable.FoodLocations.Grains.SouthEastCounter = self.mouseDataTable.defaultTable.FoodLocations.Grains.SouthEastCounter + 1;
+			self.Properties.mouseDataTable.defaultTable.FoodLocations.Grains.SouthEastCounter = self.Properties.mouseDataTable.defaultTable.FoodLocations.Grains.SouthEastCounter + 1;
 		elseif quadrant == "South-West" then
-			self.mouseDataTable.defaultTable.FoodLocations.Grains.SouthWestCounter = self.mouseDataTable.defaultTable.FoodLocations.Grains.SouthWestCounter + 1;
+			self.Properties.mouseDataTable.defaultTable.FoodLocations.Grains.SouthWestCounter = self.Properties.mouseDataTable.defaultTable.FoodLocations.Grains.SouthWestCounter + 1;
 		else
-			self.mouseDataTable.defaultTable.FoodLocations.Grains.NorthWestCounter = self.mouseDataTable.defaultTable.FoodLocations.Grains.NorthWestCounter + 1;
+			self.Properties.mouseDataTable.defaultTable.FoodLocations.Grains.NorthWestCounter = self.Properties.mouseDataTable.defaultTable.FoodLocations.Grains.NorthWestCounter + 1;
 		end
     elseif foodType == "PowerBall" then -- PowerBall
         Log("Mouse:OnEat = I am eating PowerBall")
@@ -527,3 +590,31 @@ end
 function Mouse:PowerMode()
 
 end
+
+
+
+function Mouse:GetData(self, entityid)
+	local mouse = System.GetEntity(entityid)
+	local mouseTable = mouse.Properties.mouseDataTable
+	self:ActivateOutput("ToEatBerry", mouseTable.ToEat.Berry)
+	self:ActivateOutput("ToEatGrains", mouseTable.ToEat.Grains)
+	self:ActivateOutput("ToEatPotato", mouseTable.ToEat.Potato)
+
+end 
+
+Mouse.FlowEvents = 
+{
+	Inputs = 
+	{	
+		ID = {Mouse.GetData, "entityid"},
+
+	},
+
+	Outputs = 
+	{
+		ToEatBerry = "int",
+		ToEatGrains = "int",
+		ToEatPotato = "int",
+	},
+
+}

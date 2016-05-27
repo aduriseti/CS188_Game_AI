@@ -708,7 +708,7 @@ function Mouse_LOS:FaceAt(pos, fT)
     local newAngle = math.atan2 (b.y-a.y, b.x-a.x);    
     
     local difference =((((newAngle - self.angles.z) % (2 * math.pi)) + (3 * math.pi)) % (2 * math.pi)) - math.pi;
-    newAngle = (self.angles.z + difference);
+    newAngle = (self.angles.z + difference - 0.5 * math.pi);
     
     self.angles.z = Lerp(self.angles.z, newAngle, (self.Properties.fRotSpeed*fT));  
     self:SetAngles(self.angles);
