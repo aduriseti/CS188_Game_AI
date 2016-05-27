@@ -151,7 +151,7 @@ Mouse.Search =
 	OnBeginState = function(self)
 		Log("Mouse: Entering Search State")
 		self.Properties.mouseDataTable = self:LoadXMLData(Mouse_Default_Data_File)
-		--self:PrintTable(self.mouseDataTable)
+		--self:PrintTable(self.Properties.mouseDataTable)
 	end,
 
 	OnUpdate = function(self,time)
@@ -187,7 +187,7 @@ Mouse.Search =
 		--Log(tostring(target));
 	  
 		for i = 1, #self.Properties.mouseDataTable.defaultTable.KnownDangerEnts do 
-			--Log("Checking for dangerous entity " .. tostring(self.mouseDataTable.defaultTable.KnownDangerEnts[i]));
+			--Log("Checking for dangerous entity " .. tostring(self.Properties.mouseDataTable.defaultTable.KnownDangerEnts[i]));
 			local enemy = self:ray_cast(self.Properties.mouseDataTable.defaultTable.KnownDangerEnts[i]);
 			if enemy ~= nil then 
 				self:GotoState("Avoid"); 
@@ -207,7 +207,7 @@ Mouse.Search =
 		local max_toEat = 0;
 		local max_key = nil;
 		for key,value in pairs(self.eatCount) do
-			local toEat = self.mouseDataTable.defaultTable.ToEat[key] - value;
+			local toEat = self.Properties.mouseDataTable.defaultTable.ToEat[key] - value;
 			if toEat > max_toEat then
 				max_toEat = toEat;
 				max_key = key;
@@ -237,12 +237,15 @@ Mouse.Search =
 				end
 				
 				self:guidedExploratoryWalk(time, walk_dir);
+				return;
 			else
-				self:exploratoryWalk(time);
+				--self:exploratoryWalk(time);
 			end
+		else
+			--self:exploratoryWalk(time);
 		end
 		
-		--self:exploratoryWalk(time);
+		self:exploratoryWalk(time);
 	end,
 
 	OnEndState = function(self)
@@ -587,3 +590,31 @@ end
 function Mouse:PowerMode()
 
 end
+
+
+
+function Mouse:GetData(self, entityid)
+	local mouse = System.GetEntity(entityid)
+	local mouseTable = mouse.Properties.mouseDataTable
+	self:ActivateOutput("ToEatBerry", mouseTable.ToEat.Berry)
+	self:ActivateOutput("ToEatGrains", mouseTable.ToEat.Grains)
+	self:ActivateOutput("ToEatPotato", mouseTable.ToEat.Potato)
+
+end 
+
+Mouse.FlowEvents = 
+{
+	Inputs = 
+	{	
+		ID = {Mouse.GetData, "entityid"},
+
+	},
+
+	Outputs = 
+	{
+		ToEatBerry = "int",
+		ToEatGrains = "int",
+		ToEatPotato = "int",
+	},
+
+}
