@@ -596,14 +596,43 @@ end
 function Mouse:GetData(self, entityid)
 	local mouse = System.GetEntity(entityid)
 	local mouseTable = mouse.Properties.mouseDataTable
+	
+	-- Wins
+	self:ActivateOutput("numWins", mouseTable.WinCounter)
+	--Deaths
+	self:ActivateOutput("DeathCounter", mouseTable.DeathCounter)
+	--Boldness
+	self:ActivateOutput("Boldness", mouseTable.Boldness)
+	-- LeftTurnTendency
+	self:ActivateOutput("LeftTurnTendency", mouseTable.LeftTurnTendency)
+	-- ToEats
 	self:ActivateOutput("ToEatBerry", mouseTable.ToEat.Berry)
 	self:ActivateOutput("ToEatGrains", mouseTable.ToEat.Grains)
 	self:ActivateOutput("ToEatPotato", mouseTable.ToEat.Potato)
+	self:ActivateOutput("ToEatPotato", mouseTable.ToEat.Cheese)
+	-- Known Danger
+	local killers = ""
+	for k, v in mouseTable.KnownDangerEnts do 
+		killers = killers..v.." "
+	end 
+	self:ActivateOutput("KnownDanger", killers)
+
 
 end 
 
 Mouse.FlowEvents = 
 {
+	
+	--[[
+		Value types supported for the inputs and outputs:
+			string
+			bool
+			entityid
+			int
+			float
+			vec3
+	]]
+	
 	Inputs = 
 	{	
 		ID = {Mouse.GetData, "entityid"},
@@ -612,9 +641,28 @@ Mouse.FlowEvents =
 
 	Outputs = 
 	{
+		-- Win Counter
+		numWins = "int",
+		
+		-- Death counter
+		DeathCounter = "int",
+		
+		-- Left Turn Tendency
+		LeftTurnTendency = "float",
+		
+		-- Boldness 
+		Boldness = "float",
+		
+		-- To Eats
 		ToEatBerry = "int",
 		ToEatGrains = "int",
 		ToEatPotato = "int",
+		ToEatCheese = "int",
+		
+		-- Known Danger
+		KnownDanger = "string",
+		
+		-- 
 	},
 
 }
