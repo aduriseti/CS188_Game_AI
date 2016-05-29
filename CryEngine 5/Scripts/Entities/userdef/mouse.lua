@@ -124,7 +124,7 @@ Mouse.Test =
 Mouse.Move = 
 {
 	OnBeginState = function(self)
-		--Log("Mouse: Move state")
+		Log("Mouse: Move state")
 		
   	end,
 	
@@ -134,8 +134,8 @@ Mouse.Move =
 		   --self:PrintTable(self.Move.impulseDir)
 		   --Log(self.Move.impulseMag)
 		  self:AddImpulse(-1, self:GetCenterOfMassPos(), self.Move.impulseDir, self.Move.impulseMag, 1)
-		  --self:GotoState(self.Move.prev_state)
-		  self:GotoState("Sleep")
+		  self:GotoState(self.Move.prev_state)
+		  --self:GotoState("Sleep")
 	end,
 	
 	OnEndState = function(self)
@@ -598,14 +598,24 @@ end
 
 --[[
 function Mouse:move_xy(impulseMag, jump)
+	
+	 self.Move.prev_state = self:GetState()
+	 self.Move.impulseDir = self:GetDirectionVector()
+	 self.Move.impulseMag = impulseMag
+		  --Log(self.Move.impulseMag)
+		 -- LogVec("ImpulseDir", self.Move.impulseDir)
+		
 	  
 	self.Move.impulseDir = {x=0,y=1,z=0} --self:GetDirectionVector()
 	self.Move.impulseMag = 30
 	if(jump == 1) then self.Move.impulseDir.z = 1 end
+	
 	Log("Mouse's move_xy, adding imp of %d", impulseMag)
 	LogVec("Mouse's ImpulseDirection is ", self.Move.impulseDir)
-	self:AddImpulse(-1, self:GetCenterOfMassPos(), self.Move.impulseDir, self.Move.impulseMag, 1)
+	--self:AddImpulse(-1, self:GetCenterOfMassPos(), self.Move.impulseDir, self.Move.impulseMag, 1)
 	
+	self:GotoState("Move")  
+
 	self.pos = self:GetPos()
 	
 end
@@ -627,8 +637,8 @@ function Mouse:Move_to_Pos(frameTime, pos)
 	self:move_xy(diff_mag*10, 0)
 
 end
-]]
 
+]]
 --------------------------------------------------------------------------------------------------------------------------------------------
 -------------------------                      FlowGraph Utilities                             ---------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------------
