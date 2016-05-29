@@ -34,10 +34,6 @@ Could be mouse traps loaded with cheese, maybe some already sprung (could learn 
  - [ ] make chase and run from functions update direction immediately on sight as opposed to on grid position change
 
 #####Player (Amal)
- - [ ] change camera view to switch between overseer and mouse mode
- - [ ] get kepresses and use to control camera position
- - [ ] get user view direction and use to control camera position
- - [ ] get mouse clicks and location of clicks - correspond to some action in game world
  - [ ] combine user input functionality to take over a mouse
  - [ ] log user input while controlling a mouse as data for machine learning
 
@@ -46,7 +42,6 @@ Could be mouse traps loaded with cheese, maybe some already sprung (could learn 
  - [x] Mice detect food -> Eat state
  - [x] Mice detect state -> Run state
  - [ ] Mice Power state -> Can get Snakes (Replace wildcard food or maybe Snakes drop food like RPGs...?)
- - [ ] Actually log stuff to XML
  - [ ] Ability to move blocks
 
 ##Gil
@@ -54,9 +49,8 @@ Could be mouse traps loaded with cheese, maybe some already sprung (could learn 
 #####Mouse (Gil)
   - [x] Roam Maze (On Leash from spawned start)
   - [x] Detect Mice -> chase -> kill 
-  - [ ] Physics based movements
-  - [ ] Collide mice with walls
-
+  - [ ] Mice learning/deciding via XML
+  
 ##Mitchell
 #####Maze (Mitchell)
  - [ ] Make Fancy Walls
@@ -66,16 +60,18 @@ Could be mouse traps loaded with cheese, maybe some already sprung (could learn 
  - [x] Spawn Mice
  - [x] Spawn Snakes
  - [x] Spawn Traps
- - [ ] Refit Mice/Snake movement to work with larger corridors
 
 #####Mouse (Mitchell)
- - [ ] State transitions make use of XML
- - [ ] Can jump
+ - [x] Can jump
+ - [x] Physics Collisions
+ - [x] Impulse on Mouse works
  
 ##Misc (Erick, Everyone)
  - [ ] Design Trap Entities
  - [x] Mouse assets
  - [x] Snake assets
+ - [ ] Gory Death assets...
+ - [ ] Ground/terrain assets...
  - [ ] Trap assets
  - [ ] Wall assets
  - [ ] Player MadScientist/Mouse Management System
