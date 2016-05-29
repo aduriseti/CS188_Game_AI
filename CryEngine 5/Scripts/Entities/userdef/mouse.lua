@@ -1,19 +1,19 @@
 --Amal's file path
-Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
+--Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
 
 --Mitchel's file path
---Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
+Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
 
 
 -- Globals
 
 --Mitchel's file path
---Mouse_Data_Definition_File = "Scripts/Entities/Custom/Mouse_Data_Definition_File.xml"
---Mouse_Default_Data_File = "Scripts/Entities/Custom/DataFiles/Mouse_Data_File.xml"
+Mouse_Data_Definition_File = "Scripts/Entities/Custom/Mouse_Data_Definition_File.xml"
+Mouse_Default_Data_File = "Scripts/Entities/Custom/DataFiles/Mouse_Data_File.xml"
 
 --Amal's file path
-Mouse_Data_Definition_File = "Scripts/Entities/userdef/Mouse_Data_Definition_File.xml"
-Mouse_Default_Data_File = "Scripts/Entities/userdef/DataFiles/Mouse_Data_File.xml"
+--Mouse_Data_Definition_File = "Scripts/Entities/userdef/Mouse_Data_Definition_File.xml"
+--Mouse_Default_Data_File = "Scripts/Entities/userdef/DataFiles/Mouse_Data_File.xml"
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    Mouse Table Declaration                 ---------------------------------------------
@@ -592,6 +592,46 @@ function Mouse:PowerMode()
 end
 
 
+--------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------                      Overridden Functions                            ---------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+--[[
+function Mouse:move_xy(impulseMag, jump)
+	  
+	self.Move.impulseDir = {x=0,y=1,z=0} --self:GetDirectionVector()
+	self.Move.impulseMag = 30
+	if(jump == 1) then self.Move.impulseDir.z = 1 end
+	Log("Mouse's move_xy, adding imp of %d", impulseMag)
+	LogVec("Mouse's ImpulseDirection is ", self.Move.impulseDir)
+	self:AddImpulse(-1, self:GetCenterOfMassPos(), self.Move.impulseDir, self.Move.impulseMag, 1)
+	
+	self.pos = self:GetPos()
+	
+end
+
+function Mouse:Move_to_Pos(frameTime, pos) 
+
+	local a = self:GetPos();
+	local b = pos;
+	
+	self:FaceAt(b, frameTime);
+	
+	local diff = {x = b.x - a.x, y = b.y - a.y};
+	local diff_mag = math.sqrt(diff.x^2 + diff.y^2);
+	local speed_mag = self.Properties.m_speed / diff_mag;
+
+	--self:move_xy({x = a.x + diff.x * speed_mag,
+	--	y = a.y + diff.y * speed_mag});
+	
+	self:move_xy(diff_mag*10, 0)
+
+end
+]]
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------                      FlowGraph Utilities                             ---------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------
 
 function Mouse:GetData(self, entityid)
 	local mouse = System.GetEntity(entityid)
@@ -622,7 +662,6 @@ end
 
 Mouse.FlowEvents = 
 {
-	
 	--[[
 		Value types supported for the inputs and outputs:
 			string
