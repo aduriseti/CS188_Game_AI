@@ -110,6 +110,21 @@ MousePlayer = {
 	},
 	
 	ToEat = {},
+    
+    Snake = {
+        pos,
+    },
+    
+    Food = {
+        type = "",
+        pos,
+    },
+    
+    Trap = {
+        type = "",
+        pos,
+    },
+    
 };
 
 ----------------------------------------------------------------------------------------------------------------------------------
@@ -125,7 +140,8 @@ MousePlayer.PlayerRecorder =
 	OnUpdate = function(self, time)
 
         -- Recording
-        self.MousePlayerDataTable.defaultTable
+        self:UpdateTable()
+        
         -- Movement
         self:Move()
         
@@ -147,10 +163,7 @@ MousePlayer.Player =
 	OnUpdate = function(self, time)
 		 
          -- See anything
-         
-         if --[[See something]] then 
-            self:GotoState("PlayerRecorder")
-         end 
+         --[===[ if --[[See something]] then self:GotoState("PlayerRecorder")  end --]===]
          
          -- Movement
          self:Move()
@@ -360,7 +373,7 @@ end
 -------------------------                      Functions                             ---------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
 
-function MousePlayer:Move()
+function MousePlayer:Move(ft)
 
 --[[
     if #self.moveQueue > 1 then 
@@ -371,14 +384,55 @@ function MousePlayer:Move()
     ]]
     
     if self.nextPos ~= nil then 
-        self:MoveTo(self.nextPos)
-        self.nextPos = nil
+        self:MoveTo(self.nextPos, ft)
     end 
     
 end
 
-function MousePlayer:MoveTo(loc)
+function MousePlayer:MoveTo(loc, ft)
+    local a = self:GetPos()
+    local b = loc
     
+    if a == b then self.nextPos = nil; return; end 
+    
+    self:FaceAt(loc, ft)
+    
+    local diff = {x = b.x-a.x, y=b.y-a.y}
+    local diff_mag = math.sqrt(diff.x^2 + diff.y^2);
+    local speed_mag = self.Properties.m_speed/diff_mag;
+    
+    local x = a.x + diff.x*speed_mag 
+    local y = a.y+diff.y*speed_mag 
+    
+    self:SetPos({x, y, a.z})
+    
+end
+
+
+function MousePlayer:FaceAt(pos, fT)
+	--Log("In FaceAt");
+    local a = self:GetPos();
+    local b = pos;
+    local newAngle = math.atan2 (b.y-a.y, b.x-a.x);    
+    
+    local difference =((((newAngle - self.angles.z) % (2 * math.pi)) + (3 * math.pi)) % (2 * math.pi)) - math.pi;
+    newAngle = (self.angles.z + difference);
+    
+    self.angles.z = Lerp(self.angles.z, newAngle, (self.Properties.fRotSpeed*fT));  
+    self:SetAngles(self.angles);
+end
+
+function MousePlayer:UpdateTable()
+    -- Locations 
+    local locations = self.MousePlayerPlayerDataTable.defaultTable.Locations
+    -- New Index 
+    local index = #locations+1
+    locations[index].MouseLocCur = self:GetPos()
+    locations[index].MouseLocTo = self.nextPos
+    locations[index].SnakeLoc = self.Snake.pos
+    locations[index].TrapLoc = self.Trap.pos
+    locations[index].FoodLoc = self.Food.pos
+
 end
 
 ----------------------------------------------------------------------------------------------------------------------------------
