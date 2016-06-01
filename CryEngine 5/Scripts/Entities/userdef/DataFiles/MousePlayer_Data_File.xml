@@ -1,0 +1,7 @@
+<Data version="Test 1.0">
+ <defaultTable>
+  <Locations>
+   <frame MouseLocCur="0,0,0" MouseLocTo="0,0,0" SnakeLoc="0,0,0" TrapLoc="0,0,0" FoodLoc="0,0,0"/>
+  </Locations>
+ </defaultTable>
+</Data>
