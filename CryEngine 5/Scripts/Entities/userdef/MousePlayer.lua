@@ -47,7 +47,7 @@ MousePlayer = {
 
         MousePlayerPlayerDataTable = {},
         
-        impulse_modifier = 10,
+        impulse_modifier = 5,
         
 		Physics = {
 			
@@ -466,6 +466,8 @@ end
 
 function MousePlayer:NextMove(sender, pos)
     self.nextPos = pos;
+    self.nextPos.z = 32;
+
 end 
 
 MousePlayer.FlowEvents = 
