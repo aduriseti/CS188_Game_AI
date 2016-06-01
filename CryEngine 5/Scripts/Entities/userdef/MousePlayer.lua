@@ -14,7 +14,7 @@ MousePlayer_Default_Data_File = "Scripts/Entities/Custom/DataFiles/MousePlayer_D
 ----------------------------------------------------------------------------------------------------------------------------------
 
 MousePlayer = {
-	type = "MousePlayer",
+	type = "Mouse",
 	
 	States = {
 		"Player",
@@ -46,6 +46,8 @@ MousePlayer = {
         bActive = 1,
 
         MousePlayerPlayerDataTable = {},
+        
+        impulse_modifier = 10,
         
 		Physics = {
 			
@@ -139,6 +141,11 @@ MousePlayer.PlayerRecorder =
 	
 	OnUpdate = function(self, time)
 
+        -- See anything new?
+        --[[ 
+            Update Snake, Food, and Trap tables
+        ]]
+
         -- Recording
         self:UpdateTable()
         
@@ -163,6 +170,9 @@ MousePlayer.Player =
 	OnUpdate = function(self, time)
 		 
          -- See anything
+       --[[ 
+            Update Snake, Food, and Trap tables
+        ]]
          --[===[ if --[[See something]] then self:GotoState("PlayerRecorder")  end --]===]
          
          -- Movement
@@ -384,7 +394,9 @@ function MousePlayer:Move(ft)
     ]]
     
     if self.nextPos ~= nil then 
-        self:MoveTo(self.nextPos, ft)
+       -- self:MoveTo(self.nextPos, ft)
+       self:PhysicsMoveTo(self.nextPos)
+       self.nextPos = nil
     end 
     
 end
@@ -408,18 +420,25 @@ function MousePlayer:MoveTo(loc, ft)
     
 end
 
+function MousePlayer:PhysicsMoveTo(loc)
 
-function MousePlayer:FaceAt(pos, fT)
-	--Log("In FaceAt");
-    local a = self:GetPos();
-    local b = pos;
-    local newAngle = math.atan2 (b.y-a.y, b.x-a.x);    
+    self:FaceAt(loc)
     
-    local difference =((((newAngle - self.angles.z) % (2 * math.pi)) + (3 * math.pi)) % (2 * math.pi)) - math.pi;
-    newAngle = (self.angles.z + difference);
+    local distance = DifferenceVectors(loc, self:GetPos())
+    local distance_mag = math.sqrt(distance.x^2 + distance.y^2)
+    local impulse_mag = distance_mag * self.Properties.impulse_modifier
+    self:AddImpulse(-1, self:GetCenterOfMassPos(), self:GetDirectionVector(), impulse_mag, 1)
     
-    self.angles.z = Lerp(self.angles.z, newAngle, (self.Properties.fRotSpeed*fT));  
-    self:SetAngles(self.angles);
+ end
+
+function MousePlayer:FaceAt(pos)
+    local a = self:GetPos()
+    local b = pos
+	 local vector=DifferenceVectors(b, a);  -- Vector from player to target
+
+     vector=NormalizeVector(vector);  -- Ensure vector is normalised (unit length)
+
+     self:SetDirectionVector(vector); -- Orient player to the vector
 end
 
 function MousePlayer:UpdateTable()
@@ -449,7 +468,8 @@ function MousePlayer:NextMove(sender, pos)
     self.nextPos = pos;
 end 
 
-MousePlayer.FlowEvents{
+MousePlayer.FlowEvents = 
+{
     Inputs = 
 	{	
 		--Coordinates = {MousePlayer.QueueMoveTo, "Vec3"},
