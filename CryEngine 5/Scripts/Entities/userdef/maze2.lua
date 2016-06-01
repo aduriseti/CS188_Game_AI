@@ -469,6 +469,18 @@ function Maze2:pos_to_rowcol(pos)
 
 end
 
+function Maze2:pos_to_cellrowcol(pos)
+	local rowcol = self:pos_to_rowcol(pos);
+	return self:rowcol_to_cellrowcol(rowcol.row, rowcol.col);
+end
+
+function Maze2:rowcol_to_cellrowcol(row, col) 
+	--row = row - 1;
+	--col = col - 1;
+	
+	return {cell_row = math.floor((row - 1)/(self:corridorSize() + 0.5),
+		cell_col = math.floor((col - 1)/self:corridorSize() + 0.5)};
+end
 -- Spawn a wall at coordinates (w,h)
 function Maze2:Wall(w, h)
         

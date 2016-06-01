@@ -29,6 +29,8 @@ Mouse_LOS = {
 		directions = {},
 		
 		grid = {},
+		
+		cell_grid = {},
 	},
 	
 	Food_Properties = {
@@ -145,27 +147,44 @@ function Mouse_LOS:SetupMaze()
     self.Maze_Properties.directions = self.Maze_Properties.ID.directions;
     self.Maze_Properties.model_height = self.Maze_Properties.ID.Model_Height;
     self.Maze_Properties.model_width = self.Maze_Properties.ID.Model_Width;
-    self.Maze_Properties.corridor_width = self.Maze_Properties.ID.CorridorSize;       
+    self.Maze_Properties.corridor_width = self.Maze_Properties.ID.CorridorSize;  
 
-    if #self.Maze_Properties.grid ~= self.Maze_Properties.height then
-        self.Maze_Properties.grid = {};
-        for row = 1, self.Maze_Properties.height do
-            self.Maze_Properties.grid[row] = {};
-            for col = 1, self.Maze_Properties.width do
-                local cur_nslot = self.Maze_Properties.ID:rowcol_to_nslot(row, col);
-                local cur_wall = self.Maze_Properties.ID.myWalls[cur_nslot];
-				self.Maze_Properties.grid[row][col] = {occupied = false, nslot = cur_nslot, n_visited = 0, n_examined = 0}
+	--if #self.Maze_Properties.cell_grid ~= 
+	self.Maze_Properties.cell_grid = {};
+	for cell_row = 1, self.Maze_Properties.cell_height do	
+		self.Maze_Properties.cell_grid[cell_row] = {};
+		for cell_col = 1, self.Maze_Properties.cell_width do
+			self.Maze_Properties.cell_grid[cell_row][cell_col] = {
+				occupied = false,
+				n_visited = 0,
+				n_examined = 0,
+			}
+		end
+	end
 
-                if cur_wall ~= nil then
-                    self.Maze_Properties.grid[row][col].occupied = true;
-					--self.Maze_Properties.grid[row][col].nslot = cur_nslot, n_visited = 0};
-                else
-                    --self.Maze_Properties.grid[row][col] = {occupied = false, nlsot = -1, n_visited = 0};
-                end
-				--Log(tostring(row) .. "," .. tostring(col) .. " occupied: " .. tostring(self.Maze_Properties.grid[row][col].occupied));
-            end
-        end
-    end
+    --if #self.Maze_Properties.grid ~= self.Maze_Properties.height then
+	self.Maze_Properties.grid = {};
+	for row = 1, self.Maze_Properties.height do
+		self.Maze_Properties.grid[row] = {};
+		for col = 1, self.Maze_Properties.width do
+			local cur_nslot = self.Maze_Properties.ID:rowcol_to_nslot(row, col);
+			local cur_wall = self.Maze_Properties.ID.myWalls[cur_nslot];
+			self.Maze_Properties.grid[row][col] = {
+				occupied = false, 
+				nslot = cur_nslot, 
+				n_visited = 0, 
+				n_examined = 0}
+
+			if cur_wall ~= nil then
+				self.Maze_Properties.grid[row][col].occupied = true;
+				--self.Maze_Properties.grid[row][col].nslot = cur_nslot, n_visited = 0};
+			else
+				--self.Maze_Properties.grid[row][col] = {occupied = false, nlsot = -1, n_visited = 0};
+			end
+			--Log(tostring(row) .. "," .. tostring(col) .. " occupied: " .. tostring(self.Maze_Properties.grid[row][col].occupied));
+		end
+	end
+    --end
 
 	(function ()
 		for row = 1, self.Maze_Properties.height do
@@ -259,131 +278,26 @@ function Mouse_LOS:getFarthestUnoccupied(loc_row, loc_col)
 end
 
 function Mouse_LOS:los_search(frameTime)
-
-	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
-	--Lumberyard
-	--local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
-
-	local row = rowcol.row;
-	local col = rowcol.col;
-	
-	
-	--populate movement stack with unvisited and "unexamined" neighbors
-	--local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
-	local empty_neighbors = self:getFarthestUnoccupied(row, col);
-	
-	--self:PrintTable(empty_neighbors);
-	
-	for key,value in pairs(empty_neighbors) do
-		if value.n_visited == 0 and value.n_examined == 0 then
-			--self.PrintTable(value);
-			self.Maze_Properties.grid[row][col].n_examined = self.Maze_Properties.grid[row][col].n_examined + 1;
-			self.movement_stack[#self.movement_stack + 1] = value;
-			local center_row = value.row;
-			local center_col = value.col;
-			local radius = self.Maze_Properties.corridor_width;
-			for i = -radius, radius do
-				for j = -radius, radius do
-					if (i >= 1 and i <= self.Maze_Properties.height) and
-							(j >= 1 and j <= self.Maze_Properties.width) then
-						self.Maze_Properties.grid[center_row + i][center_col + j].n_examined = 
-								self.Maze_Properties.grid[center_row + i][center_col + j].n_examined + 1;
-					end
-				end
-			end
-		end
-	end
-	
-	--entire maze explored - additionally backtrackstack will hold path back to origin
-	if #self.movement_stack == 0 then
-		Log("Explored entire maze");
-	end
-
-	
-	
-	--Log("Backtrack length: " .. tostring(#self.backtrack_stack));
-
-	--if there are still grid spaces in our movement stack
-	if #self.movement_stack ~= 0 then
-		local target_square = self.movement_stack[#self.movement_stack];
-		local target_pos = self.Maze_Properties.ID:rowcol_to_pos(target_square.row, target_square.col);
-		
-		--Log("Target pos: " .. Vec2Str(target_pos));
-		
-		System.DrawLine(self.pos, {target_pos.x, target_pos.y, self.pos.z}, 0, 1, 0, 1);
-		
-		local diff = {x = target_pos.x - self.pos.x, y = target_pos.y - self.pos.y, z = 0};
-		local fucker = {};
-		Physics.RayWorldIntersection(self.pos, diff, 1, ent_all, self.id, nil, fucker);
-		local n_hits = 0;
-		for key, value in pairs(fucker) do
-			n_hits = n_hits + 1
-		end
-		
-		--if the target square is not within LOS follow backtrack stack back to that square
-		if n_hits > 0 then
-			--TODO: implement create movement queue using BFS/A*	
-			--Log("Need to follow movement queue back to target square");
-			local backtrack_square = self.backtrack_stack[#self.backtrack_stack];
-			if row ~= backtrack_square.row or col ~= backtrack_square.col then
-				backtrack_pos = self.Maze_Properties.ID:rowcol_to_pos(backtrack_square.row, backtrack_square.col);
-				self:Move_to_Pos(frameTime, backtrack_pos);
-			else
-				self.backtrack_stack[#self.backtrack_stack] = nil;
-			end
-			--self:Move_to_Pos(frameTime, target_pos);
-			return;
+	--if there are still cells in our movement stack
+		--the target cell is on the top of the mvnt stack
+		--if the target cell isn't within LOS
+			--follow backtrack stack back to that target cell
+		--if the target cell is within sight, but we haven't reached it yet
 		--if we haven't reached the top square in the movement stack
-		elseif row ~= target_square.row or col ~= target_square.col then
-			--Log("STAY ON COURSE");
-			--local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
-			--local target_pos = self.Maze_Properties.ID:rowcol_to_pos(target_square.row, target_square.col);
-			--target_pos.z = 32;
-			self:Move_to_Pos(frameTime, target_pos);
-			return;
-		--else if the top square has been reached
-		else
-			--increment visit counter of current grid space
-			--Log(tostring(self.Maze_Properties.grid[row][col].n_visited));
-			self.Maze_Properties.grid[row][col].n_visited = self.Maze_Properties.grid[row][col].n_visited + 1;
-			--Log(tostring(self.Maze_Properties.grid[row][col].n_visited));
+			--call Move_to_Pos or optionally some other more advanced movement function
+		--if we've reached the top cell in our movement stack
+			--increment visit counter of the cell we are currently in
+			--add the target cell (top of mvmt stack) to backtrack stack so mouse can get out of dead ends
+			--remove top cell of movement stack
+			--now exit out of if statement to add unvisited and unexamined cells within LOS of the mouse
 
-			--add top square of movement stack to backtrack stack so mouse can get out of dead ends
-			self.backtrack_stack[#self.backtrack_stack + 1] = self.movement_stack[#self.movement_stack];
-
-			--remove top square of movement stack
-			--Log("movement stack length: " .. tostring(#self.movement_stack));
-			self.movement_stack[#self.movement_stack] = nil;
-			--Log("movement stack length: " .. tostring(#self.movement_stack));
-
-			--now exit out of if statement to add unvisited neighbors to movement stack
-		end
-	end
+	--populate movement stack with unvisited and unexamied cells within LOS
+		--getFarthestUnoccupied position in each direction
+		--get what cell that position belongs to
+		--if that cell is unvisited and unexamined and not the current cell push it onto the movement stack
 	
-	
-
-	--[[
-	--populate movement stack with unvisited and "unexamined" neighbors
-	--local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
-	local empty_neighbors = self:getFarthestUnoccupied(row, col);
-	
-	--self:PrintTable(empty_neighbors);
-	
-	for key,value in pairs(empty_neighbors) do
-		if value.n_visited == 0 and value.n_examined == 0 then
-			self.movement_stack[#self.movement_stack + 1] = value;
-			self.Maze_Properties.grid[row][col].n_examined = self.Maze_Properties.grid[row][col].n_examined + 1;
-		end
-	end
-	
-	--entire maze explored - additionally backtrackstack will hold path back to origin
-	if #self.movement_stack == 0 then
-		Log("Explored entire maze");
-	end
-	--]]
-	--self:PrintTable(empty_neighbors);
-	--self:PrintTable(self.movement_stack);
-	--]]
+	--if after attempting to add unvisited and unexamined cells within sight to the movement stack, entire maze explored 
+		-- additionally backtrackstack will hold path back to origin
 
 end
 
