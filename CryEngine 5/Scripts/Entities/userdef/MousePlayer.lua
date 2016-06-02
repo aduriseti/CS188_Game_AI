@@ -2,12 +2,12 @@
 -- Globals
 
 --Mitchel's file path
---MousePlayer_Data_Definition_File = "Scripts/Entities/Custom/MousePlayer_Data_Definition_File.xml"
---MousePlayer_Default_Data_File = "Scripts/Entities/Custom/DataFiles/MousePlayer_Data_File.xml"
+MousePlayer_Data_Definition_File = "Scripts/Entities/Custom/MousePlayer_Data_Definition_File.xml"
+MousePlayer_Default_Data_File = "Scripts/Entities/Custom/DataFiles/MousePlayer_Data_File.xml"
 
 --Amal's file path
-MousePlayer_Data_Definition_File = "Scripts/Entities/userdef/MousePlayer_Data_Definition_File.xml"
-MousePlayer_Default_Data_File = "Scripts/Entities/userdef/DataFiles/MousePlayer_Data_File.xml"
+--MousePlayer_Data_Definition_File = "Scripts/Entities/userdef/MousePlayer_Data_Definition_File.xml"
+--MousePlayer_Default_Data_File = "Scripts/Entities/userdef/DataFiles/MousePlayer_Data_File.xml"
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    MousePlayer Player Table Declaration    ---------------------------------------------
@@ -24,9 +24,7 @@ MousePlayer = {
 		"Dead",
 		"Power",
 	},
-	
-	MousePlayerDataTable = {},
-    
+	    
     angles = 0,
     pos = {},
     
@@ -45,7 +43,7 @@ MousePlayer = {
 
         bActive = 1,
 
-        MousePlayerDataTable = {},
+        MousePlayerPlayerDataTable = {},
         
         impulse_modifier = 50,
         
@@ -331,7 +329,9 @@ end
 function MousePlayer:OnReset()
 
     self:SetFromProperties() 
-    self.MousePlayerPlayerDataTable = self:LoadXMLData() 
+	Log("Calling Load XML")
+    self.Properties.MousePlayerDataTable = self:LoadXMLData() 
+	self:PrintTable(self.Properties.MousePlayerDataTable)
     self:GotoState("Player")
 
 end
@@ -401,7 +401,7 @@ end
 
 -- Loads a XML data file and returns it as a script table
 function MousePlayer:LoadXMLData(dataFile)
-	dataFile = dataFile	or MousePlayer_Default_Data_File
+	dataFile = MousePlayer_Default_Data_File --dataFile	or MousePlayer_Default_Data_File
 	return CryAction.LoadXML(MousePlayer_Data_Definition_File, dataFile);
 end
 
@@ -594,6 +594,51 @@ function MousePlayer:UpdateTable()
     locations[index].FoodLoc = self.Food.pos
 	locations[index].FoodType = self.Food.type
 
+end
+
+function MousePlayer:PrintTable(t)
+
+    local print_r_cache={}
+
+    local function sub_print_r(t,indent)
+        if (print_r_cache[tostring(t)]) then
+            Log(indent.."*"..tostring(t))
+        else
+            print_r_cache[tostring(t)]=true
+            if (type(t)=="table") then
+                for pos,val in pairs(t) do
+                    if (type(val)=="table") then
+                        Log(indent.."["..pos.."] => "..tostring(t).." {")
+
+                        sub_print_r(val,indent..string.rep(" ",string.len(pos)+8))
+
+                        Log(indent..string.rep(" ",string.len(pos)+6).."}")
+
+                    elseif (type(val)=="string") then
+
+                        Log(indent.."["..pos..'] => "'..val..'"')
+
+                    else
+
+                        Log(indent.."["..pos.."] => "..tostring(val))
+
+                    end
+
+                end
+
+            else
+                Log(indent..tostring(t))
+            end
+        end
+    end
+
+    if (type(t)=="table") then
+        Log(tostring(t).." {")
+        sub_print_r(t,"  ")
+        Log("}")
+    else
+        sub_print_r(t,"  ")
+    end
 end
 
 ----------------------------------------------------------------------------------------------------------------------------------

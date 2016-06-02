@@ -5,7 +5,7 @@
     <Table name="defaultTable">
 
         <!-- My Locations -->
-        <Array name="Locations" elementname="frame">
+        <Array name="Locations" elementName="frame">
             <Property name="MouseLocCur" type="Vec3"/>
             <Property name="MouseLocTo" type="Vec3" />
             <Property name="SnakeLoc" type="Vec3"/>
