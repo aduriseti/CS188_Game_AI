@@ -2,12 +2,12 @@
 -- Globals
 
 --Mitchel's file path
---MousePlayer_Data_Definition_File = "Scripts/Entities/Custom/MousePlayer_Data_Definition_File.xml"
---MousePlayer_Default_Data_File = "Scripts/Entities/Custom/DataFiles/MousePlayer_Data_File.xml"
+MousePlayer_Data_Definition_File = "Scripts/Entities/Custom/MousePlayer_Data_Definition_File.xml"
+MousePlayer_Default_Data_File = "Scripts/Entities/Custom/DataFiles/MousePlayer_Data_File.xml"
 
 --Amal's file path
-MousePlayer_Data_Definition_File = "Scripts/Entities/userdef/MousePlayer_Data_Definition_File.xml"
-MousePlayer_Default_Data_File = "Scripts/Entities/userdef/DataFiles/MousePlayer_Data_File.xml"
+--MousePlayer_Data_Definition_File = "Scripts/Entities/userdef/MousePlayer_Data_Definition_File.xml"
+--MousePlayer_Default_Data_File = "Scripts/Entities/userdef/DataFiles/MousePlayer_Data_File.xml"
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    MousePlayer Player Table Declaration    ---------------------------------------------
@@ -534,20 +534,20 @@ function MousePlayer:Observe()
 				if(hitData[1].entity.class == "Trap1" or hitData[1].entity.class == "Trap2") then 
 					trap = hitData[1].entity
 				end
-				--[[if(hitData[1].entity.class == "Snake") then 
+				if(hitData[1].entity.class == "Snake") then 
 					enemy = hitData[1].entity
 				end 
 				if(hitData[1].entity.class == "Food") then 
 					food = hitData[1].entity 
 				end 
-				]]
+				
 			end 
 			
 		end 
 		
-		food = self:ray_cast("Food");
+		--food = self:ray_cast("Food");
 
-		if(trap ~=nil and trap.class == "Trap1") then 
+		if(trap ~=nil and trap.class == "Trap1" and food == nil) then 
 		   Log("Mouse: Sees trap")
 		   local child = trap:GetChild(0)
 		   --self:PrintTable(child)
@@ -560,7 +560,7 @@ function MousePlayer:Observe()
 			self.Trap.entity = trap;
 		end 
 	  
-		enemy = self:ray_cast("Snake");
+		--enemy = self:ray_cast("Snake");
 		
 		if(food ~= nil) then 
 			self.Food.type = food.type
@@ -582,17 +582,33 @@ function MousePlayer:Observe()
 end 
 
 function MousePlayer:UpdateTable()
+	self:PrintTable(self.Properties.MousePlayerDataTable.defaultTable.Locations)
     -- Locations 
     local locations = self.Properties.MousePlayerDataTable.defaultTable.Locations
     -- New Index 
     local index = #locations+1
-    locations[index].MouseLocCur = self:GetPos()
-    locations[index].MouseLocTo = self.nextPos
-    locations[index].SnakeLoc = self.Snake.pos
-    locations[index].TrapLoc = self.Trap.pos
-	locations[index].TrapType = self.Trap.type
-    locations[index].FoodLoc = self.Food.pos
-	locations[index].FoodType = self.Food.type
+	
+	local newElement = {
+		--[[
+		MouseLocCur = self:GetPos();
+		MouseLocTo = self.nextPos;
+		SnakeLoc = self.Snake.pos;
+		TrapLoc = self.Trap.pos;
+		TrapType = self.Trap.type;
+		FoodLoc = self.Food.pos;
+		FoodType = self.Food.type;
+		]]
+	}
+	
+	table.insert(self.Properties.MousePlayerDataTable.defaultTable.Locations, index, newElement)
+    
+	locations[index].MouseLocCur = self:GetPos() or {x=0,y=0,z=0}
+    locations[index].MouseLocTo = self.nextPos or {x=0,y=0,z=0}
+    locations[index].SnakeLoc = self.Snake.pos or {x=0,y=0,z=0}
+    locations[index].TrapLoc = self.Trap.pos or {x=0,y=0,z=0}
+	locations[index].TrapType = self.Trap.type or ""
+    locations[index].FoodLoc = self.Food.pos or {x=0,y=0,z=0}
+	locations[index].FoodType = self.Food.type or ""
 
 end
 
