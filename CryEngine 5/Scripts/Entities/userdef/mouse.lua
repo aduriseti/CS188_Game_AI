@@ -1,19 +1,19 @@
 --Amal's file path
---Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
+Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
 
 --Mitchel's file path
-Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
+--Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
 
 
 -- Globals
 
 --Mitchel's file path
-Mouse_Data_Definition_File = "Scripts/Entities/Custom/Mouse_Data_Definition_File.xml"
-Mouse_Default_Data_File = "Scripts/Entities/Custom/DataFiles/Mouse_Data_File.xml"
+--Mouse_Data_Definition_File = "Scripts/Entities/Custom/Mouse_Data_Definition_File.xml"
+--Mouse_Default_Data_File = "Scripts/Entities/Custom/DataFiles/Mouse_Data_File.xml"
 
 --Amal's file path
---Mouse_Data_Definition_File = "Scripts/Entities/userdef/Mouse_Data_Definition_File.xml"
---Mouse_Default_Data_File = "Scripts/Entities/userdef/DataFiles/Mouse_Data_File.xml"
+Mouse_Data_Definition_File = "Scripts/Entities/userdef/Mouse_Data_Definition_File.xml"
+Mouse_Default_Data_File = "Scripts/Entities/userdef/DataFiles/Mouse_Data_File.xml"
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    Mouse Table Declaration                 ---------------------------------------------
@@ -110,9 +110,10 @@ Mouse.Test =
 		  self.Move.prev_state = "Test"
 		  self.Move.impulseDir = self:GetDirectionVector()
 		  self.Move.impulseMag = 30
+		  self:SetScale(4)
 		  --Log(self.Move.impulseMag)
 		 -- LogVec("ImpulseDir", self.Move.impulseDir)
-		  self:GotoState("Move")
+		  --self:GotoState("Move")
 
 	end,
 	
@@ -151,7 +152,7 @@ Mouse.Search =
 	OnBeginState = function(self)
 		Log("Mouse: Entering Search State")
 		self.Properties.mouseDataTable = self:LoadXMLData(Mouse_Default_Data_File)
-		--self:PrintTable(self.Properties.mouseDataTable.defaultTable)
+		self:PrintTable(self.Properties.mouseDataTable.defaultTable)
 	end,
 
 	OnUpdate = function(self,time)
@@ -188,6 +189,7 @@ Mouse.Search =
 	  
 		for i = 1, #self.Properties.mouseDataTable.defaultTable.KnownDangerEnts do 
 			--Log("Checking for dangerous entity " .. tostring(self.Properties.mouseDataTable.defaultTable.KnownDangerEnts[i]));
+			--self:PrintTable(self.Properties.mouseDataTable)
 			local enemy = self:ray_cast(self.Properties.mouseDataTable.defaultTable.KnownDangerEnts[i]);
 			if enemy ~= nil then 
 				self:GotoState("Avoid"); 
@@ -429,12 +431,12 @@ end
 function Mouse:THEFUCK()
 	Log("Mouse: :In THEFUCK")
 	--self:GotoState("Search")
-	--self:SetScale(3)
+	self:SetScale(4)
 	--self.Properties.mouseDataTable = self:LoadXMLData()
 	--self:PrintTable(self.Properties.mouseDataTable);
 	  --self:GotoState("Test")
 
-	self:GotoState("Search")
+	self:GotoState("Test")
 	--Log("WTF")
 end 
 
@@ -470,7 +472,7 @@ end
 
 
 function Mouse:OnUpdate(frameTime)
-	self:SetScale(5);
+	self:SetScale(4);
 
 	--[[
 	if (self.state == "search") then
@@ -684,7 +686,7 @@ Mouse.FlowEvents =
 	
 	Inputs = 
 	{	
-		ID = {Mouse.GetData, "entityid"},
+		ID = {Mouse.GetData, "entity"},
 
 	},
 
