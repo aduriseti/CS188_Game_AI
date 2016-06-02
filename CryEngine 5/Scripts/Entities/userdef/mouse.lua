@@ -4,7 +4,6 @@
 --Mitchel's file path
 Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
 
-
 -- Globals
 
 --Mitchel's file path
@@ -41,7 +40,8 @@ Mouse = {
         object_Model = "Objects/characters/animals/rat/rat.cdf",
 	    --object_Model = "objects/default/primitive_cube_small.cgf",
 		fRotSpeed = 10, --[0.1, 20, 0.1, "Speed of rotation"]
-		m_speed = 0.15;
+		m_speed = 0.15,
+		impulse_Modifier = 10,
 
 		maze_ent_name = "",         --maze_ent_name = "Maze1",
 
@@ -81,6 +81,9 @@ Mouse = {
 		jump = 0,
 		impulseMag = 50,
 		impulseDir = {x=0,y=0,z=0},
+		newPos = nil,
+		curPos = nil,
+		first = 1,
 	},
 	
 	eatCount = {
@@ -91,7 +94,7 @@ Mouse = {
 	},
 	
 	ToEat = {},
-};
+}
 
 MakeDerivedEntityOverride(Mouse, LivingEntityBase);
 
@@ -101,7 +104,7 @@ MakeDerivedEntityOverride(Mouse, LivingEntityBase);
 Mouse.Test = 
 {
 	OnBeginState = function(self)
-		--Log("Mouse: Test state")
+		Log("Mouse: Test state")
 		
   	end,
 	
@@ -112,7 +115,10 @@ Mouse.Test =
 		  self.Move.impulseMag = 30
 		  --Log(self.Move.impulseMag)
 		 -- LogVec("ImpulseDir", self.Move.impulseDir)
-		  self:GotoState("Move")
+		 -- self:Move_to_Pos(time, {x=0,y=0,z=0})
+		 
+		 self:FaceAt({x=0,y=0,z=0}, time);
+		 self:AddImpulse(-1, self:GetCenterOfMassPos(), self:GetDirectionVector(), 20, 1)
 
 	end,
 	
@@ -433,6 +439,15 @@ function Mouse:THEFUCK()
 	--self.Properties.mouseDataTable = self:LoadXMLData()
 	--self:PrintTable(self.Properties.mouseDataTable);
 	  --self:GotoState("Test")
+	self.Properties.mouseDataTable = self:LoadXMLData()
+	self.Move.first = 1
+	self.Move.again = 0
+	self.Move.prev_state = ""
+	self.Move.jump = 0
+	self.Move.impulseMag = 10
+	self.Move.impulseDir = {x=0,y=0,z=0}
+	self.newPos = nil
+	self.curPos = nil
 
 	self:GotoState("Search")
 	--Log("WTF")
@@ -446,9 +461,9 @@ function Mouse:abstractReset()
 	--self.direction = self.directions.up;
 	--Log(tostring(self.direction.row_inc));
 	-- Load Knowledge Base in
-	self.Properties.mouseDataTable = self:LoadXMLData() -- Optional Parameter to SPecify what file to read
+	--self.Properties.mouseDataTable = self:LoadXMLData() -- Optional Parameter to SPecify what file to read
 	
-	self:PrintTable(self.Properties.mouseDataTable)
+	--self:PrintTable(self.Properties.mouseDataTable)
 
 	--self:GotoState("Search");
 
@@ -596,49 +611,77 @@ end
 -------------------------                      Overridden Functions                            ---------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------------
 
---[[
 function Mouse:move_xy(impulseMag, jump)
 	
 	 self.Move.prev_state = self:GetState()
 	 self.Move.impulseDir = self:GetDirectionVector()
-	 self.Move.impulseMag = impulseMag
+	 self.Move.impulseMag = impulseMag * self.Properties.impulse_Modifier
 		  --Log(self.Move.impulseMag)
 		 -- LogVec("ImpulseDir", self.Move.impulseDir)
 		
 	  
-	self.Move.impulseDir = {x=0,y=1,z=0} --self:GetDirectionVector()
-	self.Move.impulseMag = 30
+	self:GetDirectionVector()
+	--self.Move.impulseMag = 30
 	if(jump == 1) then self.Move.impulseDir.z = 1 end
 	
-	Log("Mouse's move_xy, adding imp of %d", impulseMag)
-	LogVec("Mouse's ImpulseDirection is ", self.Move.impulseDir)
-	--self:AddImpulse(-1, self:GetCenterOfMassPos(), self.Move.impulseDir, self.Move.impulseMag, 1)
+	--Log("Mouse's move_xy, adding imp of %d", impulseMag)
+	--LogVec("Mouse's ImpulseDirection is ", self.Move.impulseDir)
+	self:AddImpulse(-1, self:GetCenterOfMassPos(), self.Move.impulseDir, self.Move.impulseMag, 1)
 	
-	self:GotoState("Move")  
+	--self:GotoState("Move")  
 
 	self.pos = self:GetPos()
 	
 end
 
 function Mouse:Move_to_Pos(frameTime, pos) 
-
-	local a = self:GetPos();
-	local b = pos;
+	--LogVec("Try to move to", pos)
+	--LogVec("current pos", self:GetPos())
+	--Log("Mouse:Move_to_pos, first = %d", self.Move.first)
 	
-	self:FaceAt(b, frameTime);
-	
-	local diff = {x = b.x - a.x, y = b.y - a.y};
-	local diff_mag = math.sqrt(diff.x^2 + diff.y^2);
-	local speed_mag = self.Properties.m_speed / diff_mag;
+	if( self.Move.first == 1 or self:GetSpeed() < 1 ) then --self.Move.curPos == nil or self.Move.newPos == nil or (self.Move.curPos.x == self.Move.newPos.x and self.Move.curPos.y == self.Move.newPos.y) ) then 
+		--Log("In if statement")
+		
+		self.Move.first = 0
+		--self.Move.again = 0
+		local a = self:GetPos();
+		local b = pos;
+		
+		self.Move.newPos = b
+		self.Move.curPos = a
+		
+		self:FaceAt(b, frameTime);
+		
+		local diff = {x = b.x - a.x, y = b.y - a.y};
+		local diff_mag = math.sqrt(diff.x^2 + diff.y^2);
+		local speed_mag = self.Properties.m_speed / diff_mag;
 
-	--self:move_xy({x = a.x + diff.x * speed_mag,
-	--	y = a.y + diff.y * speed_mag});
-	
-	self:move_xy(diff_mag*10, 0)
-
+		--self:move_xy({x = a.x + diff.x * speed_mag,
+		--	y = a.y + diff.y * speed_mag});
+		
+		self:move_xy(diff_mag, 0)
+	end 
+	--[[self.Move.curPos = self:GetPos()
+	if(self.Move.newPos.x == self.Move.curPos.x and self.Move.newPos.y == self.Move.curPos.y) then 
+		self.Move.again =1 
+	end ]]
 end
 
-]]
+
+function Mouse:FaceAt(pos, fT)
+	--Log("In FaceAt");
+
+	local a = self:GetPos()
+    local b = pos
+	local newVector = DifferenceVectors(b, a);  -- Vector from player to target
+	
+    newVector=NormalizeVector(newVector);  -- Ensure vector is normalised (unit length)
+
+	newVector = vecLerp(self:GetDirectionVector(), newVector, self.Properties.fRotSpeed*fT)
+    newVector=NormalizeVector(newVector);  -- Ensure vector is normalised (unit length)
+
+    self:SetDirectionVector(newVector); -- Orient player to the vector
+end
 --------------------------------------------------------------------------------------------------------------------------------------------
 -------------------------                      FlowGraph Utilities                             ---------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------------

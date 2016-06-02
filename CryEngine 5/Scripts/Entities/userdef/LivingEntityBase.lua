@@ -202,7 +202,7 @@ function LivingEntityBase:PhysicalizeThis() -- Helper function to physicalize, C
    
    --self:Physicalize(0, PE_AREA, self.Properties.Physics);
    --Log(self.Properties.Physics.PlayerDim.cyl_r)
-   
+   Log("LivingEntityBase: Physicalize")
    self:Physicalize(0, PE_LIVING, self.Properties.Physics);
    self:SetPhysicParams(PHYSICPARAM_PLAYERDIM, self.Properties.Physics.PlayerDim)
    self:AwakePhysics(1)
@@ -210,7 +210,7 @@ function LivingEntityBase:PhysicalizeThis() -- Helper function to physicalize, C
 end
 
 function LivingEntityBase:SetFromProperties()
-	--Log("LivingEntityBase: SetFromProperties()")
+	Log("LivingEntityBase: SetFromProperties()")
 
     self:SetupModel();
 	self.angles = self:GetAngles(); --gets the current angles of Rotating
@@ -767,9 +767,9 @@ function LivingEntityBase:chase(target_class, time)
 		if (target.class ~= "") then
 			--Log("In if state")
 			local distance = vecLen(vecSub(target.pos, self.pos));
-			--Log("Distance = %d", distance)
-			if distance < 1.1 then
-				--Log("Distance <= 1, Eat")
+			Log("Distance = %d", distance)
+			if distance < 2 then
+				Log("Distance <= 2, Eat")
 				target:OnEat(self, 2);
 				self.target = nil;
 
