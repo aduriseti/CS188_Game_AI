@@ -673,13 +673,17 @@ function MousePlayer:NextMove(sender, pos)
 
 end 
 
+function MousePlayer:ChangeDir(sender, pos)
+	self:FaceAt(pos)
+end
+
 MousePlayer.FlowEvents = 
 {
     Inputs = 
 	{	
 		--Coordinates = {MousePlayer.QueueMoveTo, "Vec3"},
         Coordinates = {MousePlayer.NextMove, "Vec3"},
-
+		FacePos = {MousePlayer.ChangeDir, "Vec3"},
 	},
 
 	Outputs = 
