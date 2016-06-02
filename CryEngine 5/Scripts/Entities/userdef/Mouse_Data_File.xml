@@ -1,0 +1,18 @@
+<Data version="Test 1.0">
+ <defaultTable EnemyInMemory="0" LeftTurnTendency="0.5" Boldness="0.1" DeathCounter="0" WinCounter="0" ImpulseMagnitude="1">
+  <ToEat Cheese="3" Berry="2" Potato="3" Grains="4"/>
+  <FoodLocations>
+   <Cheese NorthEastCounter="0" SouthEastCounter="0" SouthWestCounter="23" NorthWestCounter="0"/>
+   <Berry NorthEastCounter="0" SouthEastCounter="0" SouthWestCounter="0" NorthWestCounter="0"/>
+   <Potato NorthEastCounter="2" SouthEastCounter="0" SouthWestCounter="0" NorthWestCounter="0"/>
+   <Grains NorthEastCounter="2" SouthEastCounter="4" SouthWestCounter="0" NorthWestCounter="3"/>
+  </FoodLocations>
+  <KnownDangerEnts>
+   <Killer value="Snake"/>
+   <Killer value="Trap"/>
+  </KnownDangerEnts>
+  <Allies>
+   <Mouse value="Mouse_2"/>
+  </Allies>
+ </defaultTable>
+</Data>
