@@ -45,7 +45,7 @@ MousePlayer = {
 
         bActive = 1,
 
-        MousePlayerPlayerDataTable = {},
+        MousePlayerDataTable = {},
         
         impulse_modifier = 50,
         
