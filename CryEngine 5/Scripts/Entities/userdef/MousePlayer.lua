@@ -47,7 +47,7 @@ MousePlayer = {
 
         MousePlayerPlayerDataTable = {},
         
-        impulse_modifier = 5,
+        impulse_modifier = 50,
         
 		Physics = {
 			
@@ -148,7 +148,7 @@ MousePlayer.PlayerRecorder =
         self:UpdateTable()
 
         -- See anything new?
-        if(~self:Observe()) then 
+        if self:Observe() == false then 
 			self:GotoState("Player")
 		end 
         
@@ -423,6 +423,41 @@ end
 -------------------------                      Functions                             ---------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
 
+function MousePlayer:ray_cast(target_class)
+
+	local target = System.GetNearestEntityByClass({self.pos.x, self.pos.y, self.pos.z},
+ 			 20, target_class);
+
+	if target == nil then
+		return nil;
+	end
+
+ 	--Log(tostring(target));
+
+ 	System.DrawLine(self.pos, target.pos, 1, 0, 0, 1);
+
+ 	local diff = {x = target.pos.x - self.pos.x, y = target.pos.y - self.pos.y, z = 0};
+
+ 	local fucker = {};
+
+ 	Physics.RayWorldIntersection(self.pos, diff, 1, ent_all, self.id, target.id, fucker);--, self:GetRawId(), target_mouse:GetRawId());
+
+	
+	local n_hits = 0;
+
+	for key, value in pairs(fucker) do
+		n_hits = n_hits + 1
+	end
+
+	if (n_hits > 0) then
+		--Log("Raycast intersect");
+		return nil;
+	end
+	
+	
+	return target;
+end
+
 function MousePlayer:Move(ft)
 
 --[[
@@ -512,7 +547,7 @@ function MousePlayer:Observe()
 		
 		food = self:ray_cast("Food");
 
-		if(trap ~=nil && trap.class == "Trap1") then 
+		if(trap ~=nil and trap.class == "Trap1") then 
 		   Log("Mouse: Sees trap")
 		   local child = trap:GetChild(0)
 		   --self:PrintTable(child)
@@ -548,7 +583,7 @@ end
 
 function MousePlayer:UpdateTable()
     -- Locations 
-    local locations = self.MousePlayerPlayerDataTable.defaultTable.Locations
+    local locations = self.MousePlayerDataTable.defaultTable.Locations
     -- New Index 
     local index = #locations+1
     locations[index].MouseLocCur = self:GetPos()
