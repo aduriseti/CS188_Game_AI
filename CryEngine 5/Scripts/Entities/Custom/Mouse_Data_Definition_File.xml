@@ -1,0 +1,57 @@
+<Definition root="Data">
+ 
+    <Property name="version" type="string"/>
+ 
+    <Table name="defaultTable">
+    
+        <Property name="EnemyInMemory" type="bool"/>
+        <Property name="LeftTurnTendency" type="float" />
+        <Property name="Boldness" type="float"/>
+        <Property name="DeathCounter" type="int"/>
+        <Property name="WinCounter" type="int" />
+		
+		<Property name="ImpulseMagnitude" type = "float" />
+        
+        <!--In Future have ToEat become table with number of each item" -->
+        <Table name="ToEat">
+            <Property name="Cheese" type="int"/>
+            <Property name="Berry" type="int"/>
+            <Property name="Potato" type="int"/>
+            <Property name="Grains" type="int"/>
+        </Table>
+
+        <Table name="FoodLocations">
+            <Table name="Cheese">
+                <Property name="NorthEastCounter" type="int"/>
+                <Property name="SouthEastCounter" type="int"/>
+                <Property name="SouthWestCounter" type="int"/>
+                <Property name="NorthWestCounter" type="int"/>
+            </Table>
+            <Table name="Berry">
+                <Property name="NorthEastCounter" type="int"/>
+                <Property name="SouthEastCounter" type="int"/>
+                <Property name="SouthWestCounter" type="int"/>
+                <Property name="NorthWestCounter" type="int"/>
+            </Table>
+            <Table name="Potato">
+                <Property name="NorthEastCounter" type="int"/>
+                <Property name="SouthEastCounter" type="int"/>
+                <Property name="SouthWestCounter" type="int"/>
+                <Property name="NorthWestCounter" type="int"/>
+            </Table>
+            <Table name="Grains">
+                <Property name="NorthEastCounter" type="int"/>
+                <Property name="SouthEastCounter" type="int"/>
+                <Property name="SouthWestCounter" type="int"/>
+                <Property name="NorthWestCounter" type="int"/>
+            </Table>
+        </Table>
+        
+        <!-- In Future Have KnownDangerEnts become table with number times killed by that ent -->
+        <Array name="KnownDangerEnts" type="string" elementName="Killer" />
+        
+        <!-- If we ever get that far.... -->
+        <Array name="Allies" type="string" elementName="Mouse" />
+    </Table>
+     
+</Definition>
