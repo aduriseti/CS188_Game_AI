@@ -2,12 +2,12 @@
 -- Globals
 
 --Mitchel's file path
-MousePlayer_Data_Definition_File = "Scripts/Entities/Custom/MousePlayer_Data_Definition_File.xml"
-MousePlayer_Default_Data_File = "Scripts/Entities/Custom/DataFiles/MousePlayer_Data_File.xml"
+--MousePlayer_Data_Definition_File = "Scripts/Entities/Custom/MousePlayer_Data_Definition_File.xml"
+--MousePlayer_Default_Data_File = "Scripts/Entities/Custom/DataFiles/MousePlayer_Data_File.xml"
 
 --Amal's file path
---MousePlayer_Data_Definition_File = "Scripts/Entities/userdef/MousePlayer_Data_Definition_File.xml"
---MousePlayer_Default_Data_File = "Scripts/Entities/userdef/DataFiles/MousePlayer_Data_File.xml"
+MousePlayer_Data_Definition_File = "Scripts/Entities/userdef/MousePlayer_Data_Definition_File.xml"
+MousePlayer_Default_Data_File = "Scripts/Entities/userdef/DataFiles/MousePlayer_Data_File.xml"
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    MousePlayer Player Table Declaration    ---------------------------------------------
@@ -341,7 +341,7 @@ function MousePlayer:OnReset()
     self:SetFromProperties() 
 	Log("Calling Load XML")
     self.Properties.MousePlayerDataTable = self:LoadXMLData() 
-	self:PrintTable(self.Properties.MousePlayerDataTable)
+	--self:PrintTable(self.Properties.MousePlayerDataTable)
     self:GotoState("Player")
 
 end
@@ -592,7 +592,7 @@ function MousePlayer:Observe()
 end 
 
 function MousePlayer:UpdateTable()
-	self:PrintTable(self.Properties.MousePlayerDataTable.defaultTable.Locations)
+	--self:PrintTable(self.Properties.MousePlayerDataTable.defaultTable.Locations)
     -- Locations 
     local locations = self.Properties.MousePlayerDataTable.defaultTable.Locations
     -- New Index 
