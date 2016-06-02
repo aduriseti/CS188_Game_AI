@@ -115,16 +115,19 @@ MousePlayer = {
     
     Snake = {
         pos,
+		entity,
     },
     
     Food = {
         type = "",
         pos,
+		entity,
     },
     
     Trap = {
         type = "",
         pos,
+		entity,
     },
     
 };
@@ -141,22 +144,45 @@ MousePlayer.PlayerRecorder =
 	
 	OnUpdate = function(self, time)
 
-        -- See anything new?
-        --[[ 
-            Update Snake, Food, and Trap tables
-        ]]
-
         -- Recording
         self:UpdateTable()
+
+        -- See anything new?
+        if(~self:Observe()) then 
+			self:GotoState("Player")
+		end 
         
         -- Movement
         self:Move()
         
 	end,
 	
+	OnCollision = function(self, hitdata)
+		Log("A COLLISION!")
+		local target = hitdata.target
+		Log("Target.type is "..target.type)
+		
+		if target.type == "Food" then
+			Log("Eating Food")
+			--self:GotoState("Eat")
+			target:DeleteThis()
+		elseif target.type == "Snake" or target.type == "Trap1" or target.type == "Trap2" then 
+			self:GotoState("Dead")
+		end 
+		
+	end, 
+	
 	OnEndState = function(self)
 		Log("MousePlayer: Exiting Record State")
         self:SaveXMLData()
+		self.Snake.pos = nil 
+		self.Snake.entity = nil 
+		self.Food.type = nil 
+		self.Food.pos = nil
+		self.Food.entity = nil 
+		self.Trap.type = nil 
+		self.Trap.pos = nil 
+		self.Trap.entity = nil 
 	end,
 }
 
@@ -169,16 +195,30 @@ MousePlayer.Player =
 	
 	OnUpdate = function(self, time)
 		 
-         -- See anything
-       --[[ 
-            Update Snake, Food, and Trap tables
-        ]]
-         --[===[ if --[[See something]] then self:GotoState("PlayerRecorder")  end --]===]
-         
+		-- Ray trace and check for food, traps, snakes
+		 if(self:Observe()) then 
+		 	self:GotoState("PlayerRecorder");
+		 end 
+		          
          -- Movement
          self:Move()
          
 	end,
+	
+	OnCollision = function(self, hitdata)
+		Log("A COLLISION!")
+        local target = hitdata.target
+        Log("Target.type is "..target.type)
+		
+        if target.type == "Food" then
+			Log("Eating Food")
+            --self:GotoState("Eat")
+			target:DeleteThis()
+        elseif target.type == "Snake" or target.type == "Trap1" or target.type == "Trap2" then 
+			self:GotoState("Dead")
+		end 
+		
+	end, 
 	
 	OnEndState = function(self)
 		Log("MousePlayer: Exiting Player State")
@@ -441,6 +481,71 @@ function MousePlayer:FaceAt(pos)
      self:SetDirectionVector(vector); -- Orient player to the vector
 end
 
+function MousePlayer:Observe()
+         -- See anything
+        local trap;
+		local enemy;
+		local food;
+		
+		local hitData = {};
+		local dir = self:GetDirectionVector();
+		
+		dir = vecScale(dir, 50); --See up to 50 away
+		local hits = Physics.RayWorldIntersection(self:GetPos(), dir, 1, ent_all, self.id, nil, hitData )
+		if(hits > 0) then 
+
+			if(hitData[1].entity) then
+			
+				if(hitData[1].entity.class == "Trap1" or hitData[1].entity.class == "Trap2") then 
+					trap = hitData[1].entity
+				end
+				--[[if(hitData[1].entity.class == "Snake") then 
+					enemy = hitData[1].entity
+				end 
+				if(hitData[1].entity.class == "Food") then 
+					food = hitData[1].entity 
+				end 
+				]]
+			end 
+			
+		end 
+		
+		food = self:ray_cast("Food");
+
+		if(trap ~=nil && trap.class == "Trap1") then 
+		   Log("Mouse: Sees trap")
+		   local child = trap:GetChild(0)
+		   --self:PrintTable(child)
+		   food = child;	
+		end 
+		
+		if(trap ~= nil) then 
+			self.Trap.type = trap.type
+			self.Trap.pos = trap:GetPos()
+			self.Trap.entity = trap;
+		end 
+	  
+		enemy = self:ray_cast("Snake");
+		
+		if(food ~= nil) then 
+			self.Food.type = food.type
+			self.Food.pos = food:GetPos()
+			self.Food.entity = food;
+		end 
+		if(enemy ~= nil) then 
+			self.Snake.pos = enemy:GetPos()
+			self.Snake.entity = enemy;
+		end 
+		
+		if(enemy ~= nil or trap ~= nil or food ~= nil) then 
+			return true;
+		else
+			return false;
+		end 
+		
+		return false;
+end 
+
 function MousePlayer:UpdateTable()
     -- Locations 
     local locations = self.MousePlayerPlayerDataTable.defaultTable.Locations
@@ -450,7 +555,9 @@ function MousePlayer:UpdateTable()
     locations[index].MouseLocTo = self.nextPos
     locations[index].SnakeLoc = self.Snake.pos
     locations[index].TrapLoc = self.Trap.pos
+	locations[index].TrapType = self.Trap.type
     locations[index].FoodLoc = self.Food.pos
+	locations[index].FoodType = self.Food.type
 
 end
 

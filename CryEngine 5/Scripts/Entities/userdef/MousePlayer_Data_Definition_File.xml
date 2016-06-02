@@ -10,7 +10,9 @@
             <Property name="MouseLocTo" type="Vec3" />
             <Property name="SnakeLoc" type="Vec3"/>
             <Property name="TrapLoc" type="Vec3"/>
+            <Property name="TrapType" type="string"/>
             <Property name="FoodLoc" type="Vec3"/>
+            <Property name="FoodType" type="string"/>
         </Array>
         
     </Table>
