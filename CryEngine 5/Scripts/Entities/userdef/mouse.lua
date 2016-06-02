@@ -151,7 +151,7 @@ Mouse.Search =
 	OnBeginState = function(self)
 		Log("Mouse: Entering Search State")
 		self.Properties.mouseDataTable = self:LoadXMLData(Mouse_Default_Data_File)
-		--self:PrintTable(self.Properties.mouseDataTable)
+		self:PrintTable(self.Properties.mouseDataTable.defaultTable)
 	end,
 
 	OnUpdate = function(self,time)
@@ -415,12 +415,12 @@ function Mouse:OnEat(userId, index)
 	
 	for i = 1, #self.Properties.mouseDataTable.defaultTable.KnownDangerEnts do 
 		if self.Properties.mouseDataTable.defaultTable.KnownDangerEnts[i] == tostring(userId.type) then
-			Log(tostring(userID.type) .. " already in data table");
+			Log(tostring(userId.type) .. " already in data table");
 			self:GotoState("Dead")
 		end
 	end
-	Log("Adding " .. tostring(userID.type) .. " to data table");
-	self.Properties.mouseDataTable.defaultTable.KnownDangerEnts[#self.Properties.mouseDataTable.defaultTable.KnownDangerEnts + 1] = userID.type;
+	Log("Adding " .. tostring(userId.type) .. " to data table");
+	self.Properties.mouseDataTable.defaultTable.KnownDangerEnts[#self.Properties.mouseDataTable.defaultTable.KnownDangerEnts + 1] = userId.type;
 	self:SaveXMLData(self.Properties.mouseDataTable, Mouse_Default_Data_File);
 	self:GotoState("Dead")
 end
