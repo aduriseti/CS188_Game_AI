@@ -151,7 +151,7 @@ Mouse.Search =
 	OnBeginState = function(self)
 		Log("Mouse: Entering Search State")
 		self.Properties.mouseDataTable = self:LoadXMLData(Mouse_Default_Data_File)
-		self:PrintTable(self.Properties.mouseDataTable.defaultTable)
+		--self:PrintTable(self.Properties.mouseDataTable.defaultTable)
 	end,
 
 	OnUpdate = function(self,time)

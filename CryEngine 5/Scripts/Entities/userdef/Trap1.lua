@@ -42,6 +42,7 @@ Trap1.Ready =
     end,
     
     OnEnterArea = function(self,entity,areaId)
+      Log("Trap1: In my area!")
       if (entity.type == "Mouse") then
         Log("Mouse Entered my Box")
         entity:OnEat(self,2)
@@ -84,7 +85,9 @@ function Trap1:OnReset()
     self:Activate(1)
     self:RegisterForAreaEvents(1);
     local v1, v2 = self:GetLocalBBox()
-
+    v2.z = 3
+    LogVec("V1", v1)
+    LogVec("V2", v2)
     self:SetTriggerBBox(v1, v2)
 
     self:GotoState("Ready")
