@@ -13,7 +13,7 @@ LivingEntityBase = {
 	dimensions = {},
 	
    Properties = {
-
+	   	entType = "LivingEntity",
         bUsable = 0,
         --object_Model = "objects/default/primitive_cube_small.cgf",
 		fRotSpeed = 3, --[0.1, 20, 0.1, "Speed of rotation"]

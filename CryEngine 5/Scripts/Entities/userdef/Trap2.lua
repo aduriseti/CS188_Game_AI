@@ -11,9 +11,10 @@ Trap2 =
   
   Properties =
   {
+   entType = "Trap",
    object_Model = "objects/default/primitive_cube.cgf",
    bActive = 1,
-   m_speed = 0.1,
+   m_speed = 0.005,
    Physics = {
         bPhysicalize = 1, -- True if object should be physicalized at all.
         bRigidBody = 1, -- True if rigid body, False if static.
@@ -39,7 +40,7 @@ Trap2.Up =
  {
 
     OnBeginState = function(self)
-        --Log("Trap2: Time to CRUSH! Down we gooooo~")
+        Log("Trap2: Time to CRUSH! Down we gooooo~")
         --self:MoveTo(32)
         --self:GotoState("Down")
     end,
@@ -75,7 +76,7 @@ Trap2.Up =
     end,
 
   OnEndState = function(self)
-  	--Log("Trap2: Kill? Goin' up~ ")
+  	Log("Trap2: Kill? Goin' up~ ")
     --self:Kill()
   end,
 
@@ -85,7 +86,7 @@ Trap2.Down =
  {
 
     OnBeginState = function(self)
-        --Log("Trap2: Up up and away")
+        Log("Trap2: Up up and away")
         --self:MoveTo(34)
     end,
     

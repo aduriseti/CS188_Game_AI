@@ -27,7 +27,7 @@ Snake = {
         --maze_ent_name = "Maze1",f
 		maze_ent_name = "",
         bActive = 0,
-
+		entType = "Snake",
         initial_direction = "up",
 		
 		--Copied from BasicEntity.lua

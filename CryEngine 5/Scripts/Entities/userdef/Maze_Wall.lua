@@ -11,9 +11,10 @@ Maze_Wall = {
   
   -- Copied from BasicEntity.lua
   Properties = {
+      entType = "Maze_Wall",
      bUsable = 0,
 	 object_Model = "objects/default/primitive_cube.cgf",
-     
+    -- file_Material = "", 
      --Copied from BasicEntity.lua
      Physics = {
         bPhysicalize = 1, -- True if object should be physicalized at all.
@@ -86,6 +87,11 @@ function Maze_Wall:SetupModel()
         end
         
     end
+    
+    --if(Properties.file_Material ~= "") then 
+     --   self:SetMaterial(Properties.file_Material)
+     --   self.Material = Properties.file_Material;
+   -- end
     
 end
 

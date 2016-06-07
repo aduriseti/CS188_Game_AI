@@ -38,6 +38,7 @@ Maze2 = {
   
   -- Copied from BasicEntity.lua
   Properties = {
+      bPlayer = 0,
      bUsable = 0,
    iM_Width = 20,
      iM_Height = 20,
@@ -46,7 +47,7 @@ Maze2 = {
      file_map_txt = "Scripts\\Entities\\maps\\map_default.txt",
      bMap_Save_TXT = 0,
      iM_CorridorSize = 1,
-     
+     entType = "Maze2",
      
      --Copied from BasicEntity.lua
      Physics = {
@@ -1034,8 +1035,9 @@ function Maze2:CoordTransform(x,y)
 end
 
 function Maze2:SpawnMice()
+
         Log("Spawning Mice")
-        local w, h = 2,2
+        local w, h = 2,4
         local Properties = self.Properties;
         local width = 1+ self:width()*(self:corridorSize()+1)
         local nSlot = (h-1)*width + w;
@@ -1054,9 +1056,13 @@ function Maze2:SpawnMice()
         --Log("Spawning at (%d, %d)", sx, sy);
         local spawnPos = {x=sx,y=sy,z=33}
         local dVec = self:GetDirectionVector()
+        local spawnClass = "Mouse"
+        if(self.Properties.bPlayer == 1) then 
+            spawnClass = "MousePlayer"
+        end 
         --LogVec("Maze orientation: ", dVec)
         local params = {
-            class = "Mouse";
+            class = spawnClass;
             name = "M";
             position = spawnPos;
             orientation = dVec;
@@ -1254,7 +1260,7 @@ end
 function Maze2:SpawnTraps(num)
         Log("Spawning Traps")
             
-      --  local w, h = 2, 16
+        local w, h = 2, 16
         local Properties = self.Properties;
         local width = 1+ self:width()*(self:corridorSize()+1)
         
@@ -1266,7 +1272,8 @@ function Maze2:SpawnTraps(num)
         end 
         local xOffset = self.Origin.x;
         local yOffset = self.Origin.y;
-        
+       
+       
         local i = 0;
         while i < num do
         
@@ -1286,7 +1293,7 @@ function Maze2:SpawnTraps(num)
             if w%2 ~= 0  then w = w-1 end
             local h = random(2, self:height()*2+1)
             if h%2 ~= 0  then h = h-1 end
-            
+           
             local sx = objX*(w-1) + xOffset
             local sy = objY*(h-1) + yOffset
 
@@ -1295,13 +1302,13 @@ function Maze2:SpawnTraps(num)
             local dVec = self:GetDirectionVector()
             --LogVec("Maze orientation: ", dVec)
             local params = {
-                class = tClass;
-                name = tName;
+                class = tClass or "Trap1";
+                name = tName or "Spring";
                 position = spawnPos;
                 --orientation = dVec;
                 properties = {
                     bActive = 1;
-                    object_Model = tModel;
+                    object_Model = tModel or "objects/default/primitive_box.cgf";
                 --  object_Model = self.Model;
                 };
             };
