@@ -2,12 +2,12 @@
 -- Globals
 
 --Mitchel's file path
---MousePlayer_Data_Definition_File = "Scripts/Entities/Custom/MousePlayer_Data_Definition_File.xml"
---MousePlayer_Default_Data_File = "Scripts/Entities/Custom/DataFiles/MousePlayer_Data_File.xml"
+MousePlayer_Data_Definition_File = "Scripts/Entities/Custom/MousePlayer_Data_Definition_File.xml"
+MousePlayer_Default_Data_File = "Scripts/Entities/Custom/DataFiles/MousePlayer_Data_File.xml"
 
 --Amal's file path
-MousePlayer_Data_Definition_File = "Scripts/Entities/userdef/MousePlayer_Data_Definition_File.xml"
-MousePlayer_Default_Data_File = "Scripts/Entities/userdef/DataFiles/MousePlayer_Data_File.xml"
+--MousePlayer_Data_Definition_File = "Scripts/Entities/userdef/MousePlayer_Data_Definition_File.xml"
+--MousePlayer_Default_Data_File = "Scripts/Entities/userdef/DataFiles/MousePlayer_Data_File.xml"
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    MousePlayer Player Table Declaration    ---------------------------------------------
@@ -45,7 +45,7 @@ MousePlayer = {
 
         MousePlayerDataTable = {},
         
-        impulse_modifier = 50,
+        impulse_modifier = 5,
         
 		Physics = {
 			
@@ -142,7 +142,7 @@ MousePlayer.PlayerRecorder =
 	
 	OnUpdate = function(self, time)
 	
-		self:Scale()
+		self:OnUpdate()
 		
         -- Recording
         self:UpdateTable()
@@ -158,23 +158,26 @@ MousePlayer.PlayerRecorder =
 	end,
 	
 	OnCollision = function(self, hitdata)
-		Log("A COLLISION!")
+		--Log("A COLLISION!")
 		local target = hitdata.target
-		Log("Target.type is "..target.type)
-		
-		if target.type == "Food" then
-			Log("Eating Food")
-			--self:GotoState("Eat")
-			target:DeleteThis()
-		elseif target.type == "Snake" or target.type == "Trap1" or target.type == "Trap2" then 
-			self:GotoState("Dead")
-		end 
+		if target ~= nil then 
+			Log("Target.type is "..target.type)
+			
+			if target.type == "Food" then
+				Log("Eating Food")
+				--self:GotoState("Eat")
+				target:DeleteThis()
+			elseif target.type == "Snake" or target.type == "Trap1" or target.type == "Trap2" then 
+				self:GotoState("Dead")
+			end 
+		end
 		
 	end, 
 	
 	OnEndState = function(self)
 		Log("MousePlayer: Exiting Record State")
-        self:SaveXMLData()
+		self:PrintTable(self.Properties.MousePlayerDataTable)
+		self:SaveXMLData(self.Properties.MousePlayerDataTable, MousePlayer_Default_Data_File)
 		self.Snake.pos = nil 
 		self.Snake.entity = nil 
 		self.Food.type = nil 
@@ -195,12 +198,12 @@ MousePlayer.Player =
 	
 	OnUpdate = function(self, time)
 		 
-		 self:Scale()
-		 
+		 --self:OnUpdate()
+		 self:Observe()
 		-- Ray trace and check for food, traps, snakes
-		 if(self:Observe()) then 
-		 	self:GotoState("PlayerRecorder");
-		 end 
+		-- if(self:Observe()) then 
+		 	--self:GotoState("PlayerRecorder");
+		 --end 
 		          
          -- Movement
          self:Move()
@@ -208,17 +211,19 @@ MousePlayer.Player =
 	end,
 	
 	OnCollision = function(self, hitdata)
-		Log("A COLLISION!")
+		--Log("A COLLISION!")
         local target = hitdata.target
-        Log("Target.type is "..target.type)
-		
-        if target.type == "Food" then
-			Log("Eating Food")
-            --self:GotoState("Eat")
-			target:DeleteThis()
-        elseif target.type == "Snake" or target.type == "Trap1" or target.type == "Trap2" then 
-			self:GotoState("Dead")
-		end 
+		if target ~= nil then 
+			Log("Target.type is "..target.type)
+			
+			if target.type == "Food" then
+				Log("Eating Food")
+				--self:GotoState("Eat")
+				target:DeleteThis()
+			elseif target.type == "Snake" or target.type == "Trap1" or target.type == "Trap2" then 
+				self:GotoState("Dead")
+			end 
+		end
 		
 	end, 
 	
@@ -239,7 +244,7 @@ MousePlayer.Eat =
 
  	OnUpdate = function(self,time)
 	 
-	 		self:Scale()
+	 		self:OnUpdate()
 
   		local continue_chase = self:chase("Food", time);
 
@@ -267,7 +272,7 @@ MousePlayer.Sleep =
 
  	OnUpdate = function(self,time)
   	
-		self:Scale()
+		self:OnUpdate()
 
 	end,
 
@@ -292,7 +297,7 @@ MousePlayer.Dead =
 
  	OnUpdate = function(self,time)
   	
-		self:Scale()
+		self:OnUpdate()
 
 	end,
 
@@ -316,7 +321,7 @@ MousePlayer.Power =
 			  
 			  self:PowerMode();
 		  ]]
-		self:Scale()
+		self:OnUpdate()
 
 	end,
 
@@ -341,9 +346,9 @@ function MousePlayer:OnReset()
     self:SetFromProperties() 
 	Log("Calling Load XML")
     self.Properties.MousePlayerDataTable = self:LoadXMLData() 
-	--self:PrintTable(self.Properties.MousePlayerDataTable)
+	self:PrintTable(self.Properties.MousePlayerDataTable)
     self:GotoState("Player")
-
+	
 end
 
 function MousePlayer:SetupModel()
@@ -357,8 +362,13 @@ function MousePlayer:SetupModel()
 		self.Properties.Physics.Area.box_min = v1
 		self.Properties.Physics.Area.box_max = v2
 
-		self.Properties.Physics.PlayerDim.cyl_r = v2.x
-		self.Properties.Physics.PlayerDim.cyl_pos = v2.y 
+		local m_x = v2.x
+		local m_y = v2.y
+		--local m_x = 0.25
+		--local m_y = 0.05
+
+		self.Properties.Physics.PlayerDim.cyl_r = m_x
+		self.Properties.Physics.PlayerDim.cyl_pos = m_y
         self:PhysicalizeThis();
         
     end
@@ -417,6 +427,7 @@ end
 
 -- Saves XML data from dataTable to dataFile
 function MousePlayer:SaveXMLData(dataTable, dataFile)
+	Log("Saving Data")
 	dataFile = dataFile or MousePlayer_Default_Data_File
 	dataTable = dataTable or self.Properties.MousePlayerDataTable
 	
@@ -424,8 +435,8 @@ function MousePlayer:SaveXMLData(dataTable, dataFile)
 end
 
 
-function MousePlayer:Scale()
-	self:SetScale(4);
+function MousePlayer:OnUpdate(frameTime)
+	--self:SetScale(3);
 
 end
 
@@ -558,7 +569,7 @@ function MousePlayer:Observe()
 		--food = self:ray_cast("Food");
 
 		if(trap ~=nil and trap.class == "Trap1" and food == nil) then 
-		   Log("Mouse: Sees trap")
+		   --Log("Mouse: Sees trap")
 		   local child = trap:GetChild(0)
 		   --self:PrintTable(child)
 		   food = child;	
@@ -612,13 +623,40 @@ function MousePlayer:UpdateTable()
 	
 	table.insert(self.Properties.MousePlayerDataTable.defaultTable.Locations, index, newElement)
     
-	locations[index].MouseLocCur = self:GetPos() or {x=0,y=0,z=0}
-    locations[index].MouseLocTo = self.nextPos or {x=0,y=0,z=0}
-    locations[index].SnakeLoc = self.Snake.pos or {x=0,y=0,z=0}
-    locations[index].TrapLoc = self.Trap.pos or {x=0,y=0,z=0}
-	locations[index].TrapType = self.Trap.type or ""
-    locations[index].FoodLoc = self.Food.pos or {x=0,y=0,z=0}
-	locations[index].FoodType = self.Food.type or ""
+	locations[index].MouseLocCur = self:GetPos() --or {x=0,y=0,z=0}
+    
+	if self.nextPos == nil then 
+		locations[index].MouseLocTo = {x=0,y=0,z=0}
+	else 
+		locations[index].MouseLocTo = self.nextPos --or {x=0,y=0,z=0}
+    end
+	if self.Snake.pos == nil then 
+		locations[index].SnakeLoc = {x=0,y=0,z=0}
+	else 
+		locations[index].SnakeLoc = self.Snake.pos --or {x=0,y=0,z=0}
+    end
+	if self.Trap.pos == nil then 
+		locations[index].TrapLoc = {x=0,y=0,z=0}
+	else 
+    	locations[index].TrapLoc = self.Trap.pos --or {x=0,y=0,z=0}
+    end
+	if self.TrapType == nil then 
+		locations[index].TrapType = ""
+	else 
+		locations[index].TrapType = self.Trap.type --or ""
+    end
+	if self.Food.pos == nil then 
+		locations[index].FoodLoc = {x=0,y=0,z=0}
+	else 
+	    locations[index].FoodLoc = self.Food.pos --or {x=0,y=0,z=0}
+	end 
+	if self.Food.Type == nil then 
+		locations[index].FoodType = ""
+	else 
+		locations[index].FoodType = self.Food.type --or ""
+	end 
+	
+	self:SaveXMLData()
 
 end
 
@@ -680,12 +718,11 @@ end
 function MousePlayer:NextMove(sender, pos)
     self.nextPos = pos;
     self.nextPos.z = 32;
-
+	self:UpdateTable();
 end 
 
 function MousePlayer:ChangeDir(sender, pos)
 	self:FaceAt(pos)
-	self:Scale()
 end
 
 MousePlayer.FlowEvents = 
