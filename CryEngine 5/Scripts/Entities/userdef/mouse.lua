@@ -594,35 +594,27 @@ function Mouse:Eating(foodType)
 		while lookfood do
 			local randfood = math.random(4);
 
-			if randfood == 1 then	-- Cheese
-				if self.Properties.mouseDataTable.defaultTable.ToEat.Cheese > 0 then
-					self.Properties.mouseDataTable.defaultTable.ToEat.Cheese = self.Properties.mouseDataTable.defaultTable.ToEat.Cheese - 1;
-					lookfood = false;
-					break
-				end
+			if randfood == 1 and self.Properties.mouseDataTable.defaultTable.ToEat.Cheese > 0 then
+				self.Properties.mouseDataTable.defaultTable.ToEat.Cheese = self.Properties.mouseDataTable.defaultTable.ToEat.Cheese - 1;
+				lookfood = false;
+				break	
 			end
-			if randfood == 2 then 	-- Berry
-				if self.Properties.mouseDataTable.defaultTable.ToEat.Berry > 0 then
-					self.Properties.mouseDataTable.defaultTable.ToEat.Berry = self.Properties.mouseDataTable.defaultTable.ToEat.Berry - 1;
-					lookfood = false;
-					break
-				end
+			if randfood == 2 and self.Properties.mouseDataTable.defaultTable.ToEat.Berry > 0 then
+				self.Properties.mouseDataTable.defaultTable.ToEat.Berry = self.Properties.mouseDataTable.defaultTable.ToEat.Berry - 1;
+				lookfood = false;
+				break
 			end
-			if randfood == 3 then	-- Potato
-				if self.Properties.mouseDataTable.defaultTable.ToEat.Potato > 0 then
-					self.Properties.mouseDataTable.defaultTable.ToEat.Potato = self.Properties.mouseDataTable.defaultTable.ToEat.Potato - 1;
-					lookfood = false;
-					break
-				end
+			if randfood == 3 and self.Properties.mouseDataTable.defaultTable.ToEat.Potato > 0 then
+				self.Properties.mouseDataTable.defaultTable.ToEat.Potato = self.Properties.mouseDataTable.defaultTable.ToEat.Potato - 1;
+				lookfood = false;
+				break
 			end
-			if randfood == 4 then	-- Grains
-				if self.Properties.mouseDataTable.defaultTable.ToEat.Grains > 0 then
-					self.Properties.mouseDataTable.defaultTable.ToEat.Grains = self.Properties.mouseDataTable.defaultTable.ToEat.Grains - 1;
-					lookfood = false;
-					break
-				end
+			if randfood == 4 and self.Properties.mouseDataTable.defaultTable.ToEat.Grains > 0 then
+				self.Properties.mouseDataTable.defaultTable.ToEat.Grains = self.Properties.mouseDataTable.defaultTable.ToEat.Grains - 1;
+				lookfood = false;
+				break
 			end
-
+		end
     else
         Log("Mouse:OnEat = I am eating IDK")
     end
