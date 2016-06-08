@@ -2,12 +2,12 @@
 -- Globals
 
 --Mitchel's file path
-MousePlayer_Data_Definition_File = "Scripts/Entities/Custom/MousePlayer_Data_Definition_File.xml"
-MousePlayer_Default_Data_File = "Scripts/Entities/Custom/DataFiles/MousePlayer_Data_File.xml"
+--MousePlayer_Data_Definition_File = "Scripts/Entities/Custom/MousePlayer_Data_Definition_File.xml"
+--MousePlayer_Default_Data_File = "Scripts/Entities/Custom/DataFiles/MousePlayer_Data_File.xml"
 
 --Amal's file path
---MousePlayer_Data_Definition_File = "Scripts/Entities/userdef/MousePlayer_Data_Definition_File.xml"
---MousePlayer_Default_Data_File = "Scripts/Entities/userdef/DataFiles/MousePlayer_Data_File.xml"
+MousePlayer_Data_Definition_File = "Scripts/Entities/userdef/MousePlayer_Data_Definition_File.xml"
+MousePlayer_Default_Data_File = "Scripts/Entities/userdef/DataFiles/MousePlayer_Data_File.xml"
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    MousePlayer Player Table Declaration    ---------------------------------------------
@@ -192,7 +192,7 @@ MousePlayer.PlayerRecorder =
 	
 	OnEndState = function(self)
 		Log("MousePlayer: Exiting Record State")
-		self:PrintTable(self.Properties.MousePlayerDataTable)
+		--self:PrintTable(self.Properties.MousePlayerDataTable)
 		self:SaveXMLData(self.Properties.MousePlayerDataTable, MousePlayer_Default_Data_File)
 		self.Snake.pos = nil 
 		self.Snake.entity = nil 
@@ -376,7 +376,7 @@ function MousePlayer:OnReset()
     self:SetFromProperties() 
 	Log("Calling Load XML")
     self.Properties.MousePlayerDataTable = self:LoadXMLData() 
-	self:PrintTable(self.Properties.MousePlayerDataTable)
+	--self:PrintTable(self.Properties.MousePlayerDataTable)
     self:GotoState("Player")
 	
 end
@@ -764,6 +764,15 @@ function MousePlayer:ChangeDir(sender, pos)
 	self:FaceAt(pos)
 end
 
+function MousePlayer:GetStats(sender, ent)
+	local table = self.toEat
+
+	self:ActivateOutput("ToEatCheese", table.Cheese)
+	self:ActivateOutput("ToEatBerry", table.Berry)
+	self:ActivateOutput("ToEatGrains", table.Grains)
+	self:ActivateOutput("ToEatPotato", table.Potato)
+end
+
 MousePlayer.FlowEvents = 
 {
     Inputs = 
@@ -771,10 +780,14 @@ MousePlayer.FlowEvents =
 		--Coordinates = {MousePlayer.QueueMoveTo, "Vec3"},
         Coordinates = {MousePlayer.NextMove, "Vec3"},
 		FacePos = {MousePlayer.ChangeDir, "Vec3"},
+		Stats = {MousePlayer.GetStats, "bool"}
 	},
 
 	Outputs = 
 	{
-		-- 
+		ToEatCheese = "int",
+		ToEatBerry = "int",
+		ToEatGrains = "int",
+		ToEatPotato = "int",
 	},
 }

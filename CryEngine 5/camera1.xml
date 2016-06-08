@@ -132,31 +132,31 @@
   <Node Id="48" Class="Input:MouseButtonInfo" pos="-460,-1100,0" flags="0">
    <Inputs MouseButton="1" MouseWheel="0"/>
   </Node>
-  <Node Id="51" Name="Click to select params of mouse" Class="_commentbox" pos="-660,-1178.0333,0" flags="0">
+  <Node Id="51" Name="Click to select params of mouse" Class="_commentbox" pos="-660,-1177.8597,0" flags="0">
    <Inputs TextSize="1" Color="0.838799,0.584079,0.584079" DisplayFilled="1" DisplayBox="1" SortPriority="16"/>
    <ResizeBorder X="0" Y="0" Width="1590" Height="1010"/>
-   <NodeSize Width="1590" Height="1041.325"/>
+   <NodeSize Width="1590" Height="1041.1515"/>
   </Node>
-  <Node Id="52" Name="Check WASD input" Class="_commentbox" pos="-750,-74.441994,0" flags="0">
+  <Node Id="52" Name="Check WASD input" Class="_commentbox" pos="-750,-74.268372,0" flags="0">
    <Inputs TextSize="1" Color="0.715694,0.564712,0.863157" DisplayFilled="1" DisplayBox="1" SortPriority="16"/>
    <ResizeBorder X="0" Y="0" Width="850" Height="610"/>
-   <NodeSize Width="850" Height="641.32501"/>
+   <NodeSize Width="850" Height="641.15155"/>
   </Node>
   <Node Id="53" Name="Fixes first-person model glitches when using a detached camera" Class="_comment" pos="-1220,-1190,0" flags="0"/>
-  <Node Id="54" Name="Set as main camera" Class="_commentbox" pos="-1940,-1068.0338,0" flags="0">
+  <Node Id="54" Name="Set as main camera" Class="_commentbox" pos="-1940,-1067.8604,0" flags="0">
    <Inputs TextSize="1" Color="0.597202,0.651406,0.854993" DisplayFilled="1" DisplayBox="1" SortPriority="16"/>
    <ResizeBorder X="0" Y="0" Width="240" Height="270"/>
-   <NodeSize Width="240" Height="301.32498"/>
+   <NodeSize Width="240" Height="301.15155"/>
   </Node>
-  <Node Id="55" Name="Start in Third-Person Mode" Class="_commentbox" pos="-1240,-1248.0338,0" flags="0">
+  <Node Id="55" Name="Start in Third-Person Mode" Class="_commentbox" pos="-1240,-1247.8602,0" flags="0">
    <Inputs TextSize="1" Color="0.806952,0.610496,0.40724" DisplayFilled="1" DisplayBox="1" SortPriority="16"/>
    <ResizeBorder X="0" Y="0" Width="470" Height="210"/>
-   <NodeSize Width="470" Height="241.325"/>
+   <NodeSize Width="470" Height="241.15152"/>
   </Node>
-  <Node Id="56" Name="Move using WASD" Class="_commentbox" pos="-750,583.20337,0" flags="0">
+  <Node Id="56" Name="Move using WASD" Class="_commentbox" pos="-750,583.37665,0" flags="0">
    <Inputs TextSize="1" Color="0.617207,0.863157,0.665387" DisplayFilled="1" DisplayBox="1" SortPriority="16"/>
    <ResizeBorder X="0" Y="0" Width="1650" Height="1050"/>
-   <NodeSize Width="1650" Height="1081.325"/>
+   <NodeSize Width="1650" Height="1081.1515"/>
   </Node>
   <Node Id="58" Class="Mission:GameTokenGet" pos="260,1260,0" flags="0">
    <Inputs gametoken_Token="LastSeconds"/>
@@ -187,16 +187,13 @@
   <Node Id="72" Class="String:Concat" pos="320,-1110,0" flags="0">
    <Inputs String1="" String2=""/>
   </Node>
-  <Node Id="81" Class="entity:MousePlayer" pos="-70,-780,0" flags="0" EntityGUID="{BDA53DEA-DBD7-4F98-B7BC-42274ED4E931}" EntityGUID_64="4F98DBD7BDA53DEA">
-   <Inputs Coordinates="0,0,0" FacePos="0,0,0"/>
-  </Node>
   <Node Id="83" Class="Logic:IfCondition" pos="-320,-780,0" flags="0">
    <Inputs Condition="0"/>
   </Node>
-  <Node Id="85" Class="entity:Mouse" pos="160,-640,0" flags="0" EntityGUID="{D4BB139A-AC1C-4D26-A511-091E70BD8EE2}" EntityGUID_64="4D26AC1CD4BB139A">
+  <Node Id="85" Class="entity:Mouse" pos="160,-640,0" flags="0">
    <Inputs />
   </Node>
-  <Node Id="86" Class="Logic:AND" pos="-300,-610,0" flags="1">
+  <Node Id="86" Class="Logic:AND" pos="-300,-610,0" flags="0">
    <Inputs A="0" B="0"/>
   </Node>
   <Node Id="87" Class="Debug:InputKey" pos="-600,-620,0" flags="0">
@@ -204,6 +201,42 @@
   </Node>
   <Node Id="88" Class="Logic:IfCondition" pos="-60,-640,0" flags="0">
    <Inputs Condition="0"/>
+  </Node>
+  <Node Id="89" Class="UI:Canvas:Load" pos="-2350,-400,0" flags="0">
+   <Inputs CanvasPathname="MousePlayerHUD.uicanvas"/>
+  </Node>
+  <Node Id="92" Class="UI:Text:SetText" pos="-1710,-350,0" flags="0">
+   <Inputs CanvasID="0" ElementID="4" Value=""/>
+  </Node>
+  <Node Id="93" Class="String:Concat" pos="-2040,-290,0" flags="0">
+   <Inputs String1="Berries: " String2=""/>
+  </Node>
+  <Node Id="94" Class="UI:Text:SetText" pos="-1690,80,0" flags="0">
+   <Inputs CanvasID="0" ElementID="7" Value=""/>
+  </Node>
+  <Node Id="95" Class="UI:Text:SetText" pos="-1690,-70,0" flags="0">
+   <Inputs CanvasID="0" ElementID="6" Value=""/>
+  </Node>
+  <Node Id="96" Class="UI:Text:SetText" pos="-1700,-210,0" flags="0">
+   <Inputs CanvasID="0" ElementID="5" Value=""/>
+  </Node>
+  <Node Id="97" Class="String:Concat" pos="-2020,-30,0" flags="0">
+   <Inputs String1="Grains: " String2=""/>
+  </Node>
+  <Node Id="98" Class="String:Concat" pos="-2010,90,0" flags="0">
+   <Inputs String1="Potatoes: " String2=""/>
+  </Node>
+  <Node Id="99" Class="String:Concat" pos="-2030,-160,0" flags="0">
+   <Inputs String1="Cheese: " String2=""/>
+  </Node>
+  <Node Id="100" Class="Time:Time" pos="-2710,-170,0" flags="0">
+   <Inputs paused="0"/>
+  </Node>
+  <Node Id="102" Class="entity:MousePlayer" pos="-2470,-310,0" flags="0" EntityGUID="{BDA53DEA-DBD7-4F98-B7BC-42274ED4E931}" EntityGUID_64="4F98DBD7BDA53DEA">
+   <Inputs Coordinates="0,0,0" FacePos="0,0,0" Stats="0"/>
+  </Node>
+  <Node Id="104" Class="entity:MousePlayer" pos="-70,-780,0" flags="1" EntityGUID="{BDA53DEA-DBD7-4F98-B7BC-42274ED4E931}" EntityGUID_64="4F98DBD7BDA53DEA">
+   <Inputs Coordinates="0,0,0" FacePos="0,0,0" Stats="0"/>
   </Node>
  </Nodes>
  <Edges>
@@ -216,6 +249,7 @@
   <Edge nodeIn="46" nodeOut="1" portIn="Show" portOut="output" enabled="1"/>
   <Edge nodeIn="47" nodeOut="1" portIn="Enable" portOut="output" enabled="1"/>
   <Edge nodeIn="48" nodeOut="1" portIn="Enable" portOut="output" enabled="1"/>
+  <Edge nodeIn="89" nodeOut="1" portIn="Activate" portOut="output" enabled="1"/>
   <Edge nodeIn="7" nodeOut="4" portIn="true" portOut="Pressed" enabled="1"/>
   <Edge nodeIn="7" nodeOut="4" portIn="false" portOut="Released" enabled="1"/>
   <Edge nodeIn="4" nodeOut="5" portIn="entityId" portOut="entityId" enabled="1"/>
@@ -287,9 +321,9 @@
   <Edge nodeIn="66" nodeOut="47" portIn="entityId" portOut="EntityId" enabled="1"/>
   <Edge nodeIn="67" nodeOut="47" portIn="Get" portOut="EntityId" enabled="1"/>
   <Edge nodeIn="67" nodeOut="47" portIn="entityId" portOut="EntityId" enabled="1"/>
-  <Edge nodeIn="81" nodeOut="47" portIn="FacePos" portOut="HitPos" enabled="1"/>
   <Edge nodeIn="83" nodeOut="47" portIn="In" portOut="HitPos" enabled="1"/>
   <Edge nodeIn="88" nodeOut="47" portIn="In" portOut="EntityId" enabled="1"/>
+  <Edge nodeIn="104" nodeOut="47" portIn="FacePos" portOut="HitPos" enabled="1"/>
   <Edge nodeIn="64" nodeOut="48" portIn="Compare" portOut="MousePressed" enabled="1"/>
   <Edge nodeIn="83" nodeOut="48" portIn="Activate" portOut="MousePressed" enabled="1"/>
   <Edge nodeIn="83" nodeOut="48" portIn="Condition" portOut="MousePressed" enabled="1"/>
@@ -304,7 +338,7 @@
   <Edge nodeIn="72" nodeOut="71" portIn="Set" portOut="Out" enabled="1"/>
   <Edge nodeIn="72" nodeOut="71" portIn="String1" portOut="Out" enabled="1"/>
   <Edge nodeIn="65" nodeOut="72" portIn="message" portOut="Out" enabled="1"/>
-  <Edge nodeIn="81" nodeOut="83" portIn="Coordinates" portOut="OnTrue" enabled="1"/>
+  <Edge nodeIn="104" nodeOut="83" portIn="Coordinates" portOut="OnTrue" enabled="1"/>
   <Edge nodeIn="72" nodeOut="85" portIn="String2" portOut="numWins" enabled="1"/>
   <Edge nodeIn="65" nodeOut="86" portIn="Show" portOut="OnTrue" enabled="1"/>
   <Edge nodeIn="88" nodeOut="86" portIn="Condition" portOut="OnFalse" enabled="1"/>
@@ -313,6 +347,27 @@
   <Edge nodeIn="88" nodeOut="87" portIn="Activate" portOut="Pressed" enabled="1"/>
   <Edge nodeIn="85" nodeOut="88" portIn="ID" portOut="OnTrue" enabled="1"/>
   <Edge nodeIn="85" nodeOut="88" portIn="entityId" portOut="OnTrue" enabled="1"/>
+  <Edge nodeIn="92" nodeOut="89" portIn="CanvasID" portOut="CanvasID" enabled="1"/>
+  <Edge nodeIn="92" nodeOut="89" portIn="Activate" portOut="OnLoad" enabled="1"/>
+  <Edge nodeIn="94" nodeOut="89" portIn="CanvasID" portOut="CanvasID" enabled="1"/>
+  <Edge nodeIn="94" nodeOut="89" portIn="Activate" portOut="OnLoad" enabled="1"/>
+  <Edge nodeIn="95" nodeOut="89" portIn="CanvasID" portOut="CanvasID" enabled="1"/>
+  <Edge nodeIn="95" nodeOut="89" portIn="Activate" portOut="OnLoad" enabled="1"/>
+  <Edge nodeIn="96" nodeOut="89" portIn="CanvasID" portOut="CanvasID" enabled="1"/>
+  <Edge nodeIn="96" nodeOut="89" portIn="Activate" portOut="OnLoad" enabled="1"/>
+  <Edge nodeIn="92" nodeOut="93" portIn="Value" portOut="Out" enabled="1"/>
+  <Edge nodeIn="95" nodeOut="97" portIn="Value" portOut="Out" enabled="1"/>
+  <Edge nodeIn="94" nodeOut="98" portIn="Value" portOut="Out" enabled="1"/>
+  <Edge nodeIn="96" nodeOut="99" portIn="Value" portOut="Out" enabled="1"/>
+  <Edge nodeIn="93" nodeOut="100" portIn="Set" portOut="tick" enabled="1"/>
+  <Edge nodeIn="97" nodeOut="100" portIn="Set" portOut="tick" enabled="1"/>
+  <Edge nodeIn="98" nodeOut="100" portIn="Set" portOut="tick" enabled="1"/>
+  <Edge nodeIn="99" nodeOut="100" portIn="Set" portOut="tick" enabled="1"/>
+  <Edge nodeIn="102" nodeOut="100" portIn="Stats" portOut="tick" enabled="1"/>
+  <Edge nodeIn="93" nodeOut="102" portIn="String2" portOut="ToEatBerry" enabled="1"/>
+  <Edge nodeIn="97" nodeOut="102" portIn="String2" portOut="ToEatGrains" enabled="1"/>
+  <Edge nodeIn="98" nodeOut="102" portIn="String2" portOut="ToEatPotato" enabled="1"/>
+  <Edge nodeIn="99" nodeOut="102" portIn="String2" portOut="ToEatCheese" enabled="1"/>
  </Edges>
  <GraphTokens>
   <Token Name="LastSeconds" Type="2"/>
