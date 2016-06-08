@@ -17,7 +17,7 @@ Snake = {
     cur_direction = "NorthEast",
 	--pos = {},
 	
-	States = {"Opened","Closed","Destroyed", "Patrol", "Eat"},
+	States = {"Opened","Closed","Destroyed", "Patrol", "Eat", "EatPlayer"},
 	
     Properties = {
         --object_Model = "objects/characters/animals/reptiles/snake/snake.cdf",
@@ -83,10 +83,13 @@ Snake.Patrol =
 		  --self:myPatrol(time)
 
 		  local target = self:ray_cast("Mouse");
-
+		  --local target2 = self:ray_cast("MousePlayer")
 		  if target ~= nil then
 		  	self:GotoState("Eat");
 		  end
+		  --if target2 ~= nil then
+		  --	self:GotoState("EatPlayer");
+		 -- end
 
 		  self:bounce(time);
 
@@ -112,6 +115,30 @@ Snake.Eat =
   OnUpdate = function(self,time)
   	
 	local continue_chase = self:chase("Mouse", time);
+
+		if continue_chase == false then
+			self:GotoState("Patrol");
+		else end;
+
+  end,
+
+  OnEndState = function(self)
+  	Log("Snake: Exiting Eat State")
+  end,
+	
+}
+
+Snake.EatPlayer =
+{
+	OnBeginState = function(self)
+		Log("Snake: Enter Eat State")
+    --self:Eat();
+
+  	end,
+
+  OnUpdate = function(self,time)
+  	
+	local continue_chase = self:chase("MousePlayer", time);
 
 		if continue_chase == false then
 			self:GotoState("Patrol");

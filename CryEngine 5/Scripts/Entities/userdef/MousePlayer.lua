@@ -143,7 +143,7 @@ MousePlayer.PlayerRecorder =
   	end,
 	
 	OnUpdate = function(self, time)
-	
+	--self:SetScale(5)
 		self:OnUpdate()
 		
         -- Recording
@@ -213,7 +213,7 @@ MousePlayer.Player =
   	end,
 	
 	OnUpdate = function(self, time)
-		 
+		 --self:SetScale(5)
 		 self:OnUpdate()
 		 self:Observe()
 		-- Ray trace and check for food, traps, snakes
@@ -273,7 +273,7 @@ MousePlayer.Eat =
   	end,
 
  	OnUpdate = function(self,time)
-	 
+	 --self:SetScale(5)
 	 		self:OnUpdate()
 
   		local continue_chase = self:chase("Food", time);
@@ -302,7 +302,8 @@ MousePlayer.Sleep =
 
  	OnUpdate = function(self,time)
   	
-		--self:OnUpdate()
+	  --self:SetScale(5)
+		self:OnUpdate()
 
 	end,
 
@@ -326,7 +327,7 @@ MousePlayer.Dead =
   	end,
 
  	OnUpdate = function(self,time)
-  	
+  	--self:SetScale(5)
 		self:OnUpdate()
 
 	end,
@@ -352,7 +353,7 @@ MousePlayer.Power =
 			  self:PowerMode();
 		  ]]
 		self:OnUpdate()
-
+--self:SetScale(5)
 	end,
 
   	OnEndState = function(self)
@@ -372,7 +373,7 @@ function MousePlayer:OnPropertyChange()
 end
 
 function MousePlayer:OnReset()
-
+	--self:SetScale(5)
     self:SetFromProperties() 
 	Log("Calling Load XML")
     self.Properties.MousePlayerDataTable = self:LoadXMLData() 
@@ -466,7 +467,7 @@ end
 
 
 function MousePlayer:OnUpdate(frameTime)
-	--self:SetScale(3);
+	--self:SetScale(5);
 	if(self:Full()) then self:GotoState("Sleep") end 
 end
 
@@ -755,12 +756,16 @@ end
 ]]
 
 function MousePlayer:NextMove(sender, pos)
-    self.nextPos = pos;
+    --self:OnUpdate()
+	--self:SetScale(5)
+	self.nextPos = pos;
     self.nextPos.z = 32;
 	self:UpdateTable();
 end 
 
 function MousePlayer:ChangeDir(sender, pos)
+	--self:OnUpdate()
+	--self:SetScale(5)
 	self:FaceAt(pos)
 end
 
