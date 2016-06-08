@@ -176,11 +176,11 @@ end
 function Maze2:SetFromProperties()
     Log("In SetFromProperties")
     
-  local Properties = self.Properties;
-  
-  if (Properties.object_Model == "") then
-    do return end;
-  end
+    local Properties = self.Properties;
+    
+    if (Properties.object_Model == "") then
+        do return end;
+    end
        
     -- Free Spawn 
     local width, height, map, model, corSize = Properties.iM_Width, Properties.iM_Height, Properties.file_map_txt, Properties.object_Model, Properties.iM_CorridorSize
@@ -720,6 +720,7 @@ function Maze2:corridorSize()
     local Properties = self.Properties;
     local cSize = Properties.iM_CorridorSize
     return cSize
+    --return self.CorridorSize
 end
 
 -- OOO Buddy, the fun part, picking the doors to unlock to make a Maze2
@@ -1036,6 +1037,7 @@ end
 
 function Maze2:SpawnMice()
 
+        if( self.Properties.bPlayer == 1) then return end;
         Log("Spawning Mice")
         local w, h = 2,4
         local Properties = self.Properties;
@@ -1082,14 +1084,15 @@ end
 function Maze2:SpawnSnakes(num)
         local Properties = self.Properties;
         local width = 1+ self:width()*(self:corridorSize()+1)
+        local height = 1+ (self:height()*(self:corridorSize()+1));     
         
         for i =1, num do
             -- Get random open coord
-            local h = random(2, self:height()*2+1)
+            local h = random(2, height)
             if h < 1 then h = h+1 end
             if h%2 ~= 0 and h > 0 then h = h-1 end
             
-            local w = random(2, self:width()*2+1)
+            local w = random(2, width)
             if w < 1 then w = w+1 end
             if w%2 ~= 0 and w > 0 then w = w-1 end 
             
@@ -1139,14 +1142,19 @@ function Maze2:SpawnFood(nCheese, nBerry, nPotato, nGrains, powerBallProb)
         local numBerry = nBerry or 3
         local numPotato = nPotato or 3
         local numGrains = nGrains or 3
-        local PB_Prob = powerBallProb or 1
+        local PB_Prob = powerBallProb or 2
+        
+        local width = 1+ self:width()*(self:corridorSize()+1)
+        local height = 1+ (self:height()*(self:corridorSize()+1));     
+        local w = 2
+        local h = 2
         
         -- Spawn Cheese
         while #self.myFoods.Cheese < numCheese do
             -- NorthEast
-            local w = random(self:width(), self:width()*2+1)
+            w = random(width/2, width)
             if w%2 ~= 0 then w = w-1 end
-            local h = random(self:height(), self:height()*2+1)
+            h = random(height/2, height)
             if h%2 ~= 0 then h = h-1 end
             
             self.myFoods.Cheese[#self.myFoods.Cheese+1] = self:FoodSpawnHelper(w,h,"Cheese")
@@ -1157,9 +1165,9 @@ function Maze2:SpawnFood(nCheese, nBerry, nPotato, nGrains, powerBallProb)
         -- Spawn Berry 
         while #self.myFoods.Berry < numBerry do
             -- NorthWest
-            local w = random(2, self:width())
+            w = random(2, width/2)
             if w%2 ~= 0 then w = w-1 end
-            local h = random(self:height(), self:height()*2+1)
+            h = random(height/2, height)
             if h%2 ~= 0 then h = h-1 end
             
             self.myFoods.Berry[#self.myFoods.Berry+1] = self:FoodSpawnHelper(w,h,"Berry")
@@ -1169,9 +1177,9 @@ function Maze2:SpawnFood(nCheese, nBerry, nPotato, nGrains, powerBallProb)
         -- Spawn Potato
         while #self.myFoods.Potato < numPotato do
             -- South East
-            local w = random(self:width(), self:width()*2+1)
+            w = random(width/2, width)
             if w%2 ~= 0 then w = w-1 end
-            local h = random(2, self:height())
+            h = random(2, height/2)
             if h%2 ~= 0 then h = h-1 end
             
             self.myFoods.Potato[#self.myFoods.Potato+1] = self:FoodSpawnHelper(w,h,"Potato")
@@ -1180,25 +1188,30 @@ function Maze2:SpawnFood(nCheese, nBerry, nPotato, nGrains, powerBallProb)
         -- Spawn Grains
         while #self.myFoods.Grains < numGrains do 
             -- South West
-            local w = random(2, self:width())
+            w = random(2, width/2)
             if w%2 ~= 0 and w > 0 then w = w-1 end
-            local h = random(2, self:height())
+            h = random(2, height/2)
             if h%2 ~= 0 then h = h-1 end
             
             self.myFoods.Grains[#self.myFoods.Grains+1] = self:FoodSpawnHelper(w,h,"Grains")
         end
         
         -- Spawn PowerBalls
-        local i = 1
+        local i = 0
         while i < PB_Prob do 
             
             if(PB_Prob > random(10)) then 
-            local w = random(2, self:width()*2+1) end
-            if w%2 ~= 0  then w = w-1 end
-            local h = random(2, self:height()*2+1)
-            if h%2 ~= 0  then h = h-1 end
+                w = random(2, width) 
+                if w%2 ~= 0  then w = w-1 end
             
-            self.myFoods.PowerBall[#self.myFoods.PowerBall+1] = self:FoodSpawnHelper(w,h,"PowerBall")
+                h = random(2, height)
+                if h%2 ~= 0  then h = h-1 end
+                
+                self.myFoods.PowerBall[#self.myFoods.PowerBall+1] = self:FoodSpawnHelper(w,h,"PowerBall")
+            end
+           
+           i = i+1
+           
         end
     
       
@@ -1218,7 +1231,7 @@ function Maze2:FoodSpawnHelper(w,h, foodType)
         local xOffset = self.Origin.x;
         local yOffset = self.Origin.y;
         
-         local sx = objX*(w-1) + xOffset
+        local sx = objX*(w-1) + xOffset
         local sy = objY*(h-1) + yOffset
 
         local spawnPos = {x=sx,y=sy,z=32}
@@ -1262,8 +1275,10 @@ function Maze2:SpawnTraps(num)
             
         local w, h = 2, 16
         local Properties = self.Properties;
-        local width = 1+ self:width()*(self:corridorSize()+1)
         
+        local width = 1+ self:width()*(self:corridorSize()+1)
+        local height = 1+ (self:height()*(self:corridorSize()+1));     
+             
         local objX = self.Model_Width;
         local objY = self.Model_Height;
 
@@ -1272,7 +1287,6 @@ function Maze2:SpawnTraps(num)
         end 
         local xOffset = self.Origin.x;
         local yOffset = self.Origin.y;
-       
        
         local i = 0;
         while i < num do
@@ -1289,9 +1303,9 @@ function Maze2:SpawnTraps(num)
             end
             
             i = i +1
-            local w = random(2, self:width()*2+1) 
+            local w = random(2, width) 
             if w%2 ~= 0  then w = w-1 end
-            local h = random(2, self:height()*2+1)
+            local h = random(2, height)
             if h%2 ~= 0  then h = h-1 end
            
             local sx = objX*(w-1) + xOffset
