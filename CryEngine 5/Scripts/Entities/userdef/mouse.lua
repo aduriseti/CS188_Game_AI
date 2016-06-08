@@ -1,18 +1,19 @@
 --Amal's file path
-Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
+--Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
 
 --Mitchel's file path
---Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
+Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
+
 
 -- Globals
 
 --Mitchel's file path
---Mouse_Data_Definition_File = "Scripts/Entities/Custom/Mouse_Data_Definition_File.xml"
---Mouse_Default_Data_File = "Scripts/Entities/Custom/DataFiles/Mouse_Data_File.xml"
+Mouse_Data_Definition_File = "Scripts/Entities/Custom/Mouse_Data_Definition_File.xml"
+Mouse_Default_Data_File = "Scripts/Entities/Custom/DataFiles/Mouse_Data_File.xml"
 
 --Amal's file path
-Mouse_Data_Definition_File = "Scripts/Entities/userdef/Mouse_Data_Definition_File.xml"
-Mouse_Default_Data_File = "Scripts/Entities/userdef/DataFiles/Mouse_Data_File.xml"
+--Mouse_Data_Definition_File = "Scripts/Entities/userdef/Mouse_Data_Definition_File.xml"
+--Mouse_Default_Data_File = "Scripts/Entities/userdef/DataFiles/Mouse_Data_File.xml"
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    Mouse Table Declaration                 ---------------------------------------------
@@ -40,12 +41,12 @@ Mouse = {
         object_Model = "Objects/characters/animals/rat/rat.cdf",
 	    --object_Model = "objects/default/primitive_cube_small.cgf",
 		fRotSpeed = 10, --[0.1, 20, 0.1, "Speed of rotation"]
-		m_speed = 0.15,
-		impulse_Modifier = 10,
+		m_speed = 0.15;
 
 		maze_ent_name = "",         --maze_ent_name = "Maze1",
 
         bActive = 1,
+        supermouse = 0,
 
         mouseDataTable = {},
         
@@ -81,9 +82,6 @@ Mouse = {
 		jump = 0,
 		impulseMag = 50,
 		impulseDir = {x=0,y=0,z=0},
-		newPos = nil,
-		curPos = nil,
-		first = 1,
 	},
 	
 	eatCount = {
@@ -94,7 +92,9 @@ Mouse = {
 	},
 	
 	ToEat = {},
-}
+
+	timePassed = 0,
+};
 
 MakeDerivedEntityOverride(Mouse, LivingEntityBase);
 
@@ -104,7 +104,7 @@ MakeDerivedEntityOverride(Mouse, LivingEntityBase);
 Mouse.Test = 
 {
 	OnBeginState = function(self)
-		Log("Mouse: Test state")
+		--Log("Mouse: Test state")
 		
   	end,
 	
@@ -113,14 +113,9 @@ Mouse.Test =
 		  self.Move.prev_state = "Test"
 		  self.Move.impulseDir = self:GetDirectionVector()
 		  self.Move.impulseMag = 30
-		  self:SetScale(4)
 		  --Log(self.Move.impulseMag)
 		 -- LogVec("ImpulseDir", self.Move.impulseDir)
-		 -- self:Move_to_Pos(time, {x=0,y=0,z=0})
-		 
-		 --self:FaceAt({x=0,y=0,z=0}, time);
-		-- self:AddImpulse(-1, self:GetCenterOfMassPos(), self:GetDirectionVector(), 20, 1)
-		  --self:GotoState("Move")
+		  self:GotoState("Move")
 
 	end,
 	
@@ -196,7 +191,6 @@ Mouse.Search =
 	  
 		for i = 1, #self.Properties.mouseDataTable.defaultTable.KnownDangerEnts do 
 			--Log("Checking for dangerous entity " .. tostring(self.Properties.mouseDataTable.defaultTable.KnownDangerEnts[i]));
-			--self:PrintTable(self.Properties.mouseDataTable)
 			local enemy = self:ray_cast(self.Properties.mouseDataTable.defaultTable.KnownDangerEnts[i]);
 			if enemy ~= nil then 
 				self:GotoState("Avoid"); 
@@ -397,21 +391,31 @@ Mouse.Power =
 	
 	OnBeginState = function(self)
 		Log("Mouse: Entering Power State")
+		timePassed = 1000;
+		self.Properties.supermouse = 1;
   	end,
 
  	OnUpdate = function(self,time)
-  		--[[
-			  if timePassed > powerTime then
-			  	self:GotoState("Search")
-			  end
+
+		if timePassed > powerTime then
+			self:GotoState("Search")
+		end
 			  
-			  self:PowerMode();
-		  ]]
+			 
+
+		local continue_chase = self:chase("Snake", time);
+
+  		if continue_chase == false then
+  			self:GotoState("Search");
+  		else end;	
+
+  		timePassed = timePassed - 1;
 
 	end,
 
   	OnEndState = function(self)
 	  	Log("Mouse: Exiting Power State")
+	  	self.Properties.supermouse = 0;
   	end,
 }
 ---------------------------------------------------------------------------------------------------------------------------------
@@ -438,21 +442,12 @@ end
 function Mouse:THEFUCK()
 	Log("Mouse: :In THEFUCK")
 	--self:GotoState("Search")
-	self:SetScale(4)
+	--self:SetScale(3)
 	--self.Properties.mouseDataTable = self:LoadXMLData()
 	--self:PrintTable(self.Properties.mouseDataTable);
 	  --self:GotoState("Test")
-	self.Properties.mouseDataTable = self:LoadXMLData()
-	self.Move.first = 1
-	self.Move.again = 0
-	self.Move.prev_state = ""
-	self.Move.jump = 0
-	self.Move.impulseMag = 10
-	self.Move.impulseDir = {x=0,y=0,z=0}
-	self.newPos = nil
-	self.curPos = nil
 
-	self:GotoState("Test")
+	self:GotoState("Search")
 	--Log("WTF")
 end 
 
@@ -464,9 +459,9 @@ function Mouse:abstractReset()
 	--self.direction = self.directions.up;
 	--Log(tostring(self.direction.row_inc));
 	-- Load Knowledge Base in
-	--self.Properties.mouseDataTable = self:LoadXMLData() -- Optional Parameter to SPecify what file to read
+	self.Properties.mouseDataTable = self:LoadXMLData() -- Optional Parameter to SPecify what file to read
 	
-	--self:PrintTable(self.Properties.mouseDataTable)
+	self:PrintTable(self.Properties.mouseDataTable)
 
 	--self:GotoState("Search");
 
@@ -488,7 +483,7 @@ end
 
 
 function Mouse:OnUpdate(frameTime)
-	self:SetScale(4);
+	self:SetScale(5);
 
 	--[[
 	if (self.state == "search") then
@@ -591,6 +586,35 @@ function Mouse:Eating(foodType)
     elseif foodType == "PowerBall" then -- PowerBall
         Log("Mouse:OnEat = I am eating PowerBall")
 		self:GotoState("Power")
+	elseif foodType == "Snake" then		-- Mouse eating Snake in Power Mode
+		Log("Mouse: I am powerful and eating Snake!")
+
+		-- Snake turns into random food that mouse still has to eat
+		local lookfood = true;
+		while lookfood do
+			local randfood = math.random(4);
+
+			if randfood == 1 and self.Properties.mouseDataTable.defaultTable.ToEat.Cheese > 0 then
+				self.Properties.mouseDataTable.defaultTable.ToEat.Cheese = self.Properties.mouseDataTable.defaultTable.ToEat.Cheese - 1;
+				lookfood = false;
+				break	
+			end
+			if randfood == 2 and self.Properties.mouseDataTable.defaultTable.ToEat.Berry > 0 then
+				self.Properties.mouseDataTable.defaultTable.ToEat.Berry = self.Properties.mouseDataTable.defaultTable.ToEat.Berry - 1;
+				lookfood = false;
+				break
+			end
+			if randfood == 3 and self.Properties.mouseDataTable.defaultTable.ToEat.Potato > 0 then
+				self.Properties.mouseDataTable.defaultTable.ToEat.Potato = self.Properties.mouseDataTable.defaultTable.ToEat.Potato - 1;
+				lookfood = false;
+				break
+			end
+			if randfood == 4 and self.Properties.mouseDataTable.defaultTable.ToEat.Grains > 0 then
+				self.Properties.mouseDataTable.defaultTable.ToEat.Grains = self.Properties.mouseDataTable.defaultTable.ToEat.Grains - 1;
+				lookfood = false;
+				break
+			end
+		end
     else
         Log("Mouse:OnEat = I am eating IDK")
     end
@@ -614,77 +638,49 @@ end
 -------------------------                      Overridden Functions                            ---------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------------
 
+--[[
 function Mouse:move_xy(impulseMag, jump)
 	
 	 self.Move.prev_state = self:GetState()
 	 self.Move.impulseDir = self:GetDirectionVector()
-	 self.Move.impulseMag = impulseMag * self.Properties.impulse_Modifier
+	 self.Move.impulseMag = impulseMag
 		  --Log(self.Move.impulseMag)
 		 -- LogVec("ImpulseDir", self.Move.impulseDir)
 		
 	  
-	self:GetDirectionVector()
-	--self.Move.impulseMag = 30
+	self.Move.impulseDir = {x=0,y=1,z=0} --self:GetDirectionVector()
+	self.Move.impulseMag = 30
 	if(jump == 1) then self.Move.impulseDir.z = 1 end
 	
-	--Log("Mouse's move_xy, adding imp of %d", impulseMag)
-	--LogVec("Mouse's ImpulseDirection is ", self.Move.impulseDir)
-	self:AddImpulse(-1, self:GetCenterOfMassPos(), self.Move.impulseDir, self.Move.impulseMag, 1)
+	Log("Mouse's move_xy, adding imp of %d", impulseMag)
+	LogVec("Mouse's ImpulseDirection is ", self.Move.impulseDir)
+	--self:AddImpulse(-1, self:GetCenterOfMassPos(), self.Move.impulseDir, self.Move.impulseMag, 1)
 	
-	--self:GotoState("Move")  
+	self:GotoState("Move")  
 
 	self.pos = self:GetPos()
 	
 end
 
 function Mouse:Move_to_Pos(frameTime, pos) 
-	--LogVec("Try to move to", pos)
-	--LogVec("current pos", self:GetPos())
-	--Log("Mouse:Move_to_pos, first = %d", self.Move.first)
-	
-	if( self.Move.first == 1 or self:GetSpeed() < 1 ) then --self.Move.curPos == nil or self.Move.newPos == nil or (self.Move.curPos.x == self.Move.newPos.x and self.Move.curPos.y == self.Move.newPos.y) ) then 
-		--Log("In if statement")
-		
-		self.Move.first = 0
-		--self.Move.again = 0
-		local a = self:GetPos();
-		local b = pos;
-		
-		self.Move.newPos = b
-		self.Move.curPos = a
-		
-		self:FaceAt(b, frameTime);
-		
-		local diff = {x = b.x - a.x, y = b.y - a.y};
-		local diff_mag = math.sqrt(diff.x^2 + diff.y^2);
-		local speed_mag = self.Properties.m_speed / diff_mag;
 
-		--self:move_xy({x = a.x + diff.x * speed_mag,
-		--	y = a.y + diff.y * speed_mag});
-		
-		self:move_xy(diff_mag, 0)
-	end 
-	--[[self.Move.curPos = self:GetPos()
-	if(self.Move.newPos.x == self.Move.curPos.x and self.Move.newPos.y == self.Move.curPos.y) then 
-		self.Move.again =1 
-	end ]]
+	local a = self:GetPos();
+	local b = pos;
+	
+	self:FaceAt(b, frameTime);
+	
+	local diff = {x = b.x - a.x, y = b.y - a.y};
+	local diff_mag = math.sqrt(diff.x^2 + diff.y^2);
+	local speed_mag = self.Properties.m_speed / diff_mag;
+
+	--self:move_xy({x = a.x + diff.x * speed_mag,
+	--	y = a.y + diff.y * speed_mag});
+	
+	self:move_xy(diff_mag*10, 0)
+
 end
 
-
-function Mouse:FaceAt(pos, fT)
-	--Log("In FaceAt");
-
-	local a = self:GetPos()
-    local b = pos
-	local newVector = DifferenceVectors(b, a);  -- Vector from player to target
-	
-    newVector=NormalizeVector(newVector);  -- Ensure vector is normalised (unit length)
-
-	newVector = vecLerp(self:GetDirectionVector(), newVector, self.Properties.fRotSpeed*fT)
-    newVector=NormalizeVector(newVector);  -- Ensure vector is normalised (unit length)
-
-    self:SetDirectionVector(newVector); -- Orient player to the vector
-end
+]]
 --------------------------------------------------------------------------------------------------------------------------------------------
 -------------------------                      FlowGraph Utilities                             ---------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------------
@@ -730,7 +726,7 @@ Mouse.FlowEvents =
 	
 	Inputs = 
 	{	
-		ID = {Mouse.GetData, "entity"},
+		ID = {Mouse.GetData, "entityid"},
 
 	},
 
