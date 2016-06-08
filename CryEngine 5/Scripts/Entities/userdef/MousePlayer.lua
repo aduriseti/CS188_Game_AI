@@ -31,6 +31,8 @@ MousePlayer = {
     --moveQueue = {},
     nextPos,
 	
+	toEat = {Cheese = 2, Berry = 2, Grains = 2, Potato = 2},
+	
     Properties = {
     	entType = "MousePlayer",
 		bUsable = 0,
@@ -165,6 +167,20 @@ MousePlayer.PlayerRecorder =
 			
 			if target.type == "Food" then
 				Log("Eating Food")
+				local foodType = target.Properties.esFoodType;
+				if foodType == "Cheese" or foodType == "0" then     -- Cheese
+					--Log("I am cheese")
+					self.toEat.Cheese = self.toEat.Cheese - 1
+				elseif foodType == "Berry" or foodType == "1" then -- Berry
+					--Log("I am Berry")
+					self.toEat.Berry = self.toEat.Berry - 1
+				elseif foodType == "Potato" or foodType == "2" then -- Potato
+					self.toEat.Potato = self.toEat.Potato - 1
+				elseif foodType == "3" or foodType == "Grains" then -- Grains
+					self.toEat.Grains = self.toEat.Grains - 1
+				elseif foodType == "4" or foodType == "PowerBall" then -- PowerBall
+					self:GotoState("PowerMode")
+				end
 				--self:GotoState("Eat")
 				target:DeleteThis()
 			elseif target.type == "Snake" or target.type == "Trap1" or target.type == "Trap2" then 
@@ -198,7 +214,7 @@ MousePlayer.Player =
 	
 	OnUpdate = function(self, time)
 		 
-		 --self:OnUpdate()
+		 self:OnUpdate()
 		 self:Observe()
 		-- Ray trace and check for food, traps, snakes
 		-- if(self:Observe()) then 
@@ -218,6 +234,20 @@ MousePlayer.Player =
 			
 			if target.type == "Food" then
 				Log("Eating Food")
+				local foodType = target.Properties.esFoodType;
+				if foodType == "Cheese" or foodType == "0" then     -- Cheese
+					--Log("I am cheese")
+					self.toEat.Cheese = self.toEat.Cheese - 1
+				elseif foodType == "Berry" or foodType == "1" then -- Berry
+					--Log("I am Berry")
+					self.toEat.Berry = self.toEat.Berry - 1
+				elseif foodType == "Potato" or foodType == "2" then -- Potato
+					self.toEat.Potato = self.toEat.Potato - 1
+				elseif foodType == "3" or foodType == "Grains" then -- Grains
+					self.toEat.Grains = self.toEat.Grains - 1
+				elseif foodType == "4" or foodType == "PowerBall" then -- PowerBall
+					self:GotoState("PowerMode")
+				end
 				--self:GotoState("Eat")
 				target:DeleteThis()
 			elseif target.type == "Snake" or target.type == "Trap1" or target.type == "Trap2" then 
@@ -272,7 +302,7 @@ MousePlayer.Sleep =
 
  	OnUpdate = function(self,time)
   	
-		self:OnUpdate()
+		--self:OnUpdate()
 
 	end,
 
@@ -437,7 +467,7 @@ end
 
 function MousePlayer:OnUpdate(frameTime)
 	--self:SetScale(3);
-
+	if(self:Full()) then self:GotoState("Sleep") end 
 end
 
 ----------------------------------------------------------------------------------------------------------------------------------
@@ -600,6 +630,15 @@ function MousePlayer:Observe()
 		end 
 		
 		return false;
+end 
+
+function MousePlayer:Full()
+	local toDo = self.toEat
+	if toDo.Cheese < 1 and toDo.Berry < 1 and toDo.Grains < 1 and toDo.Potato < 1 then 
+		return true 
+	end 
+	
+	return false
 end 
 
 function MousePlayer:UpdateTable()
