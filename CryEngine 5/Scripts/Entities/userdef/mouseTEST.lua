@@ -39,17 +39,17 @@ Mouse = {
 
 	t_m = 1,
 
-	t_b = 2,
+	t_b = 0.5,
 
 	s_m = 1,
 
-	s_b = 5,
+	s_b = 0.5,
 
 	d_t = 1,
 
 	f_m = 2,
 
-	f_b = 1,
+	f_b = 0.5,
 	
 	mouseDataTable = {},
 	
@@ -802,56 +802,51 @@ function Mouse:updateHeatMapBFS(class,pos)
 	elseif class == "Trap" then
 		m = self.t_m
 		b = self.t_b
+		s = -1
 	
 	elseif class == "Snake" then
 		m = self.s_m
 		b = self.s_b
+		s = -1
 	end
 
 	local p = List.popleft(dq)
 	local i = 0
 	while p ~= nil do
 
-		
-		--self:PrintTable(p)
-
+		if i <= 9 then
+			self:PrintTable(p)
+			i = i + 1
+		end
 		if p.i <= 9 then
 			local tt = p
 			tt.i = p.i + 1
 
-			tt.pos.y = tt.pos.y + 1
-			local up = tt
+			local up = {pos = {x = tt.pos.x, y= tt.pos.y+1}, i=tt.i}
 			--Log(up.pos.x.." "..up.pos.y)
 			if up.pos.y <= 21 and qV[up.pos.x][up.pos.y] == 0 then
 				List.pushright(dq,up)
 				qV[up.pos.x][up.pos.y] = 1
 			end
 
-
-			tt.pos.y = tt.pos.y -2
-			local down = tt
+			local down = {pos = {x = tt.pos.x, y= tt.pos.y-1}, i=tt.i}
 			--Log(down.pos.x.." "..down.pos.y)
 			if down.pos.y >= 1 and qV[down.pos.x][down.pos.y] == 0 then
 				List.pushright(dq,down)
 				qV[down.pos.x][down.pos.y] = 1
 			end
 
-
-			tt.pos.y = tt.pos.y + 1
-			tt.pos.x = tt.pos.x + 1
-			local right = tt
+			local right = {pos = {x = tt.pos.x+1, y= tt.pos.y}, i=tt.i}
 			--Log(right.pos.x.." "..right.pos.y)
 			if right.pos.x <= 21 and qV[right.pos.x][right.pos.y] == 0 then
 				List.pushright(dq,right)
 				qV[right.pos.x][right.pos.y] = 1
 			end
 
-
-
-			tt.pos.x = tt.pos.x -2
-			local left = tt
+			local left = {pos = {x = tt.pos.x-1, y= tt.pos.y}, i=tt.i}
 			--Log(left.pos.x.." "..left.pos.y)
 
+			--Log(left.pos.x)
 			if left.pos.x >= 1 and qV[left.pos.x][left.pos.y] == 0 then
 				List.pushright(dq,left)
 				qV[left.pos.x][left.pos.y] = 1
@@ -861,6 +856,7 @@ function Mouse:updateHeatMapBFS(class,pos)
 		end
 
 		local value = m * (b^p.i) * s
+		--Log(p.pos.x..","..p.pos.y)
 		self.heatmap[p.pos.x][p.pos.y] = self.heatmap[p.pos.x][p.pos.y] + value
 		--Log("m,b"..m..","..b.."; value:"..value)
 		--Log(self.heatmap[p.pos.x][p.pos.y])
@@ -935,7 +931,7 @@ function Mouse:calc_heatmap()
 
 	Log("-------MousePos"..mpos.x.." "..mpos.y.." "..mpos.z)
 
-	self:PrintTable(self.heatmap)
+	--self:PrintTable(self.heatmap)
 
 end
 
