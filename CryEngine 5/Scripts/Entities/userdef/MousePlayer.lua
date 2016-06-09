@@ -31,6 +31,7 @@ MousePlayer = {
     
     --moveQueue = {},
     nextPos,
+	prevPos,
 	
 	toEat = {Cheese = 2, Berry = 2, Grains = 2, Potato = 2},
 	
@@ -138,6 +139,12 @@ MousePlayer = {
     
 };
 
+function MousePlayer:Round(val)
+	local temp = val + 0.5
+	temp = math.floor(temp)
+	return temp
+end
+
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    MousePlayer States                 --------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
@@ -150,10 +157,16 @@ MousePlayer.PlayerRecorder =
 	
 	OnUpdate = function(self, time)
 	--self:SetScale(5)
+		--self.prevPos 
 		self:OnUpdate()
 		
         -- Recording
-        --self:UpdateTable()
+		local curPos = self:GetPos()
+		local difX = math.abs(curPos.x - self.prevPos.x)
+		local difY = math.abs(curPos.y - self.prevPos.y)
+		if( (self:Round(curPos.x) ~= self:Round(self.prevPos.x)) or (self:Round(curPos.y) ~= self:Round(self.prevPos.y)) ) then  
+        	self:UpdateTable()
+		end
 
         -- See anything new?
         if self:Observe() == false then 
@@ -161,6 +174,7 @@ MousePlayer.PlayerRecorder =
 		end 
         
         -- Movement
+		--self.prevPos = self:GetPos()
         self:Move()
         
 	end,
@@ -390,6 +404,7 @@ function MousePlayer:OnReset()
 	--self:SetScale(5)
     self:SetFromProperties() 
 	Log("Calling Load XML")
+	self.prevPos = self:GetPos();
     self.Properties.MousePlayerDataTable = self:LoadXMLData() 
 	--self:PrintTable(self.Properties.MousePlayerDataTable)
 	--self:PrintTable(self.Properties.MousePlayerDataTable)
@@ -485,6 +500,7 @@ end
 
 function MousePlayer:OnUpdate(frameTime)
 	--self:SetScale(5);
+	self.pos = self:GetPos();
 	if(self:Full()) then self:GotoState("Sleep") end 
 end
 
@@ -536,7 +552,7 @@ function MousePlayer:Move(ft)
 
     end 
     ]]
-    
+    --self.prevPos = self:GetPos();
     if self.nextPos ~= nil then 
        -- self:MoveTo(self.nextPos, ft)
        self:PhysicsMoveTo(self.nextPos)
@@ -726,6 +742,7 @@ function MousePlayer:UpdateTable()
 	
 	self.Properties.MousePlayerDataTable.defaultTable.God[index].Time = timeSinceLast
 	self.Properties.MousePlayerDataTable.defaultTable.God[index].MouseLocCur = self:GetPos();
+	self.prevPos = self:GetPos();
 	self.Properties.MousePlayerDataTable.defaultTable.God[index].MouseLocTo = self.nextPos or {x=0,y=0,z=0}
 
 	local WallStr, SnakeStr, TrapStr, FoodStr = "", "", "", ""
@@ -879,7 +896,7 @@ function MousePlayer:NextMove(sender, pos)
 	--self:SetScale(5)
 	self.nextPos = pos;
     self.nextPos.z = 32;
-	if(self:GetState() == "PlayerRecorder") then self:UpdateTable() end;
+	--if(self:GetState() == "PlayerRecorder") then self:UpdateTable() end;
 end 
 
 function MousePlayer:ChangeDir(sender, pos)
