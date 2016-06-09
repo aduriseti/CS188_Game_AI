@@ -102,9 +102,21 @@ Snake.Patrol =
 		  if target2.type == "Mouse" then 
 			local distance = vecLen(vecSub(target2:GetPos(),p));
 			--Log("Distance = %d", distance)
-			if distance < 5 then
-				--Log("distance is small enough")
-				--self:GotoState("EatPlayer");
+			if distance < 20 then
+			
+			 	System.DrawLine(self:GetPos(), self.Player:GetPos(), 1, 0, 0, 1);
+ 				local diff = {x = self.Player:GetPos().x - self:GetPos().x, y = self.Player:GetPos().y - self:GetPos().y, z = 0};
+ 				local fucker = {};
+			 	Physics.RayWorldIntersection(self.pos, diff, 1, ent_all, self.id, self.Player.id, fucker);--, self:GetRawId(), target_mouse:GetRawId());
+				local n_hits = 0;
+
+				for key, value in pairs(fucker) do
+					n_hits = n_hits + 1
+				end
+
+				if (n_hits == 0) then
+					self:GotoState("EatPlayer");
+				end
 			end 
 		  end 
 		  --[[
@@ -183,7 +195,7 @@ Snake.EatPlayer =
 				self.Player:OnEat(self, 2);
 				self.Player = nil;
 				self:GotoState("Patrol");
-			elseif distance > 5 then 
+			elseif distance > 20 then 
 				self:GotoState("Patrol");
 			end 
 			
