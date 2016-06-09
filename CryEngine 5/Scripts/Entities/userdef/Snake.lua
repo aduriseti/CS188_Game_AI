@@ -83,13 +83,30 @@ Snake.Patrol =
 		  --self:myPatrol(time)
 
 		  local target = self:ray_cast("Mouse");
-		  --local target2 = self:ray_cast("MousePlayer")
 		  if target ~= nil then
 		  	self:GotoState("Eat");
 		  end
-		  --if target2 ~= nil then
-		  --	self:GotoState("EatPlayer");
-		 -- end
+		  
+		  --[[
+		  local target2
+		  local hitData = {}-- = --System.GetEntitiesInSphereByClass(self:GetPos(), 10, "MousePlayer")
+		  local dir = self:GetDirectionVector();
+			dir = vecScale(dir, 20);
+		  local hits = Physics.RayWorldIntersection(self:GetPos(), dir, 1, ent_all, self.id, nil, hitData )
+		  local endPos = {dir.x+self:GetPos().x, dir.y+self:GetPos().y, 33}
+		   	System.DrawLine(self:GetPos(), endPos, 1, 0, 1, 1);
+
+		--Log(hits)
+			if(hits > 0) then 
+			--self:PrintTable(hitData)
+			if(hitData[1].entity and hitData[1].entity.class == "MousePlayer") then 
+				target2 = hitData[1].entity
+			end 
+		end 
+
+		  if target2 ~= nil then
+		  	self:GotoState("EatPlayer");
+		  end--]]
 
 		  self:bounce(time);
 
@@ -131,23 +148,49 @@ Snake.Eat =
 Snake.EatPlayer =
 {
 	OnBeginState = function(self)
-		Log("Snake: Enter Eat State")
+		Log("Snake: Enter EatPlayer State")
     --self:Eat();
 
   	end,
 
   OnUpdate = function(self,time)
   	
-	local continue_chase = self:chase("MousePlayer", time);
+		 local target2
+		 local hitData = {}-- = --System.GetEntitiesInSphereByClass(self:GetPos(), 10, "MousePlayer")
+		 local dir = self:GetDirectionVector();
+		 dir = vecScale(dir, 20);
+		 local hits = Physics.RayWorldIntersection(self:GetPos(), dir, 1, ent_all, self.id, nil, hitData )
+		--Log(hits)
+		if(hits > 0) then 
+			--self:PrintTable(hitData)
+			if(hitData[1].entity and hitData[1].entity.class == "MousePlayer") then 
+				target2 = hitData[1].entity
+			end 
+		end 
 
-		if continue_chase == false then
-			self:GotoState("Patrol");
-		else end;
+		if target2 ~= nil then
+			local distance = vecLen(vecSub(target.pos, self.pos));
+			Log("Distance = %d", distance)
+			if distance < 2 then
+				Log("Distance <= 2, Eat")
+				target:OnEat(self, 2);
+				self.target = nil;
+				self:GotoState("Patrol");
+			end
+			
+			self:Move_to_Pos(time, target2.pos);
+			
+		end
+		
+		if target2 == nil then 
+					self:GotoState("Patrol");
+		end 
+		
 
   end,
 
   OnEndState = function(self)
-  	Log("Snake: Exiting Eat State")
+  	Log("Snake: Exiting EatPlayer State")
   end,
 	
 }
