@@ -37,11 +37,11 @@ Mouse = {
 
 	},
 
-	t_m = 50,
+	t_m = 100,
 
 	t_b = 0.5,
 
-	s_m = 50,
+	s_m = 100,
 
 	s_b = 0.5,
 
@@ -126,6 +126,7 @@ Mouse.Test =
 		self:calc_heatmap()
 		--self:PrintTable(self.heatmap)
 		
+		
   	end,
 	
 	OnUpdate = function(self, time)
@@ -136,7 +137,7 @@ Mouse.Test =
 		  --Log(self.Move.impulseMag)
 		 -- LogVec("ImpulseDir", self.Move.impulseDir)
 		  --self:GotoState("Move")
-
+		  self:DisplayHeatmap()
 	end,
 	
 	OnEndState = function(self)
@@ -931,11 +932,13 @@ function Mouse:calc_heatmap()
 
 	Log("-------MousePos"..mpos.x.." "..mpos.y.." "..mpos.z)
 
-	--self:PrintTable(self.heatmap)
+	self:PrintTable(self.heatmap)
 
 end
 
 function Mouse:GreedyWalk(frameTime)
+
+	self:calc_heatmap()
 
 	local maxVal = self.heatmap[10][10];
 	local maxPos_x = 10;
@@ -985,27 +988,19 @@ function Mouse:GreedyWalk(frameTime)
 
 	--	local newpos = self:heatmap_to_pos(maxPos_x, maxPos_y);
 
-	local newpos = {x = self.pos.x + maxPos_x - 11, y = self.pos.y + maxPos_y}
+	local newpos = {x = self.pos.x + maxPos_x - 11, y = self.pos.y + maxPos_y, z= self.pos.z}
 	self:Move_to_Pos(frameTime, newpos);
 
 end
 
--- Assuming we have heatmap width/height and origin
-function Mouse:heatmap_to_pos(row, col)
-
-	local h = row;
-  	local w = col;
-  	return {x = self.heatmap_width*(w-1) + self.heatmap_origin.x, y = self.heatmap_height*(h-1) + self.heatmap_origin.y, z = self:GetPos().z}; 
-
-end
 
 -- Display heat map labels on screen
 function Mouse:DisplayHeatmap()
 
 	for row=1, 21 do
 		for col=1, 21 do
-			local pos = self:heatmap_to_pos(row, col);
-			System.DrawLabel(pos, 1.7, tostring(self.heatmap[row][col]), 0.6, 0, 0, 1);
+			local pos = {x=self.pos.x + col-11, y= self.pos.y + row -11, z=self.pos.z};
+			System.DrawLabel(pos, 1.7, tostring(self.heatmap[col][row]), 0.6, 0, 0, 1);
 		end
 	end
 
