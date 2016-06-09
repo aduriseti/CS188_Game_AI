@@ -83,18 +83,36 @@ Snake.Patrol =
 		  --self:myPatrol(time)
 
 		  local target = self:ray_cast("Mouse");
-
 		  if target ~= nil then
 		  	self:GotoState("Eat");
 		  end
 		  
-		  --[[
+		  local p = self:GetPos()
+		  local tab = System.GetEntitiesByClass("MousePlayer")
 		  local target2
+		  if(#tab > 0) then 
+			target2 = tab[1]
+			self.Player = target2
+		  end
+		  --Log(#target2)
+		  --self:PrintTable(target2)
+		 -- Log(target2.class)
+		  --Log("Target)
+		  
+		  if target2.type == "Mouse" then 
+			local distance = vecLen(vecSub(target2:GetPos(),p));
+			--Log("Distance = %d", distance)
+			if distance < 5 then
+				--Log("distance is small enough")
+				--self:GotoState("EatPlayer");
+			end 
+		  end 
+		  --[[
 		  local hitData = {}-- = --System.GetEntitiesInSphereByClass(self:GetPos(), 10, "MousePlayer")
 		  local dir = self:GetDirectionVector();
 			dir = vecScale(dir, 20);
-		  local hits = Physics.RayWorldIntersection(self:GetPos(), dir, 1, ent_all, self.id, nil, hitData )
-		  local endPos = {dir.x+self:GetPos().x, dir.y+self:GetPos().y, 33}
+		  local hits = Physics.RayWorldIntersection({self:GetPos().x, self:GetPos().y, 32}, dir, 1, ent_all, self.id, nil, hitData )
+		  local endPos = {dir.x+self:GetPos().x, dir.y+self:GetPos().y, 32}
 		   	System.DrawLine(self:GetPos(), endPos, 1, 0, 1, 1);
 
 		--Log(hits)
@@ -156,34 +174,24 @@ Snake.EatPlayer =
 
   OnUpdate = function(self,time)
   	
-		 local target2
-		 local hitData = {}-- = --System.GetEntitiesInSphereByClass(self:GetPos(), 10, "MousePlayer")
-		 local dir = self:GetDirectionVector();
-		 dir = vecScale(dir, 20);
-		 local hits = Physics.RayWorldIntersection(self:GetPos(), dir, 1, ent_all, self.id, nil, hitData )
-		--Log(hits)
-		if(hits > 0) then 
-			--self:PrintTable(hitData)
-			if(hitData[1].entity and hitData[1].entity.class == "MousePlayer") then 
-				target2 = hitData[1].entity
-			end 
-		end 
-
-		if target2 ~= nil then
-			local distance = vecLen(vecSub(target.pos, self.pos));
-			Log("Distance = %d", distance)
+		
+		if self.Player ~= nil then
+			local distance = vecLen(vecSub(self.Player:GetPos(), self:GetPos()));
+			--Log("Distance = %d", distance)
 			if distance < 2 then
 				Log("Distance <= 2, Eat")
-				target:OnEat(self, 2);
-				self.target = nil;
+				self.Player:OnEat(self, 2);
+				self.Player = nil;
 				self:GotoState("Patrol");
-			end
+			elseif distance > 5 then 
+				self:GotoState("Patrol");
+			end 
 			
-			self:Move_to_Pos(time, target2.pos);
+			self:Move_to_Pos(time, self.Player:GetPos());
 			
 		end
 		
-		if target2 == nil then 
+		if self.Player == nil then 
 					self:GotoState("Patrol");
 		end 
 		
@@ -290,4 +298,14 @@ end
 function Snake:KillMouse()
 	self.ToEat[1]:GetEaten()
 	self:GotoState("Patrol")
+end
+
+function Snake:FaceAt(pos)
+    local a = self:GetPos()
+    local b = pos
+	 local vector=DifferenceVectors(b, a);  -- Vector from player to target
+
+     vector=NormalizeVector(vector);  -- Ensure vector is normalised (unit length)
+
+     self:SetDirectionVector(vector); -- Orient player to the vector
 end
