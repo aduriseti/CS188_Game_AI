@@ -76,6 +76,15 @@ Snake.Patrol =
   	self.direction = self.directions[up];
 
   end,
+  
+  OnEnterArea = function(self, entity, areaId)
+  		Log("Entered snake area")
+		  if(entity.type == "Mouse") then 
+		  	self.Player = entity 
+			self.Player.pos = entity:GetPos()
+			self:GotoState("EatPlayer")
+		end 
+  end, 
 
   OnUpdate = function(self,time)
   
@@ -92,8 +101,10 @@ Snake.Patrol =
 		  local target2
 		  if(#tab > 0) then 
 			target2 = tab[1]
-			self.Player = target2
+			self.PlayID = target2.id
+			self.Player = System.GetEntity(self.PlayID)
 		  end
+		  
 		  --Log(#target2)
 		  --self:PrintTable(target2)
 		 -- Log(target2.class)
@@ -104,8 +115,8 @@ Snake.Patrol =
 			--Log("Distance = %d", distance)
 			if distance < 20 then
 			
-			 	System.DrawLine(self:GetPos(), self.Player:GetPos(), 1, 0, 0, 1);
- 				local diff = {x = self.Player:GetPos().x - self:GetPos().x, y = self.Player:GetPos().y - self:GetPos().y, z = 0};
+			 	System.DrawLine(self:GetPos(), self.Player.pos, 1, 0, 0, 1);
+ 				local diff = {x = self.Player.pos.x - self:GetPos().x, y = self.Player.pos.y - self:GetPos().y, z = 0};
  				local fucker = {};
 			 	Physics.RayWorldIntersection(self.pos, diff, 1, ent_all, self.id, self.Player.id, fucker);--, self:GetRawId(), target_mouse:GetRawId());
 				local n_hits = 0;
@@ -188,18 +199,19 @@ Snake.EatPlayer =
   	
 		
 		if self.Player ~= nil then
-			local distance = vecLen(vecSub(self.Player:GetPos(), self:GetPos()));
+			local distance = vecLen(vecSub(self.Player.pos, self:GetPos()));
 			--Log("Distance = %d", distance)
-			if distance < 2 then
+			if distance < 1 then
 				Log("Distance <= 2, Eat")
 				self.Player:OnEat(self, 2);
 				self.Player = nil;
-				self:GotoState("Patrol");
+				self:GotoState("Destroyed");
 			elseif distance > 20 then 
 				self:GotoState("Patrol");
 			end 
-			
-			self:Move_to_Pos(time, self.Player:GetPos());
+			if(self.Player ~=nil) then 
+			self:Move_to_Pos(time, self.Player.pos);
+			end
 			
 		end
 		
@@ -250,6 +262,14 @@ Snake.Dead =
 ---------------------------------------------------------------------------------------------------------------------------------
 function Snake:THEFUCK()
 	Log("Snake: Thefuck")
+	 self:RegisterForAreaEvents(1);
+    local v1, v2 = self:GetLocalBBox()
+    v2.z = 3
+	v2.x = 5*v2.x
+	v2.y = 5*v2.y
+    LogVec("V1", v1)
+    LogVec("V2", v2)
+    self:SetTriggerBBox(v1, v2)
 		self:GotoState("Patrol");
 end 
 --sets the Snake's properties
