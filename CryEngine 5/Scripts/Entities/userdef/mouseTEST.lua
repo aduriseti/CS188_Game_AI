@@ -935,6 +935,98 @@ function Mouse:calc_heatmap()
 
 end
 
+function Mouse:GreedyWalk(frameTime)
+
+	local maxVal = self.heatmap[10][10];
+	local maxPos_x = 10;
+	local maxPos_y = 10;
+
+	if self.heatmap[11][10] > maxVal then
+		maxVal = self.heatmap[11][10];
+		maxPos_x = 11;
+		maxPos_y = 10;
+	end
+
+	if self.heatmap[12][10] > maxVal then
+		maxVal = self.heatmap[12][10];
+		maxPos_x = 12;
+		maxPos_y = 10;
+	end
+
+	if self.heatmap[10][11] > maxVal then
+		maxVal = self.heatmap[10][11];
+		maxPos_x = 10;
+		maxPos_y = 11;
+	end
+
+	if self.heatmap[12][11] > maxVal then
+		maxVal = self.heatmap[12][11];
+		maxPos_x = 12;
+		maxPos_y = 11;
+	end
+
+	if self.heatmap[10][12] > maxVal then
+		maxVal = self.heatmap[10][12];
+		maxPos_x = 10;
+		maxPos_y = 12;
+	end
+
+	if self.heatmap[11][12] > maxVal then
+		maxVal = self.heatmap[11][12];
+		maxPos_x = 11;
+		maxPos_y = 12;
+	end
+
+	if self.heatmap[12][12] > maxVal then
+		maxVal = self.heatmap[12][12];
+		maxPos_x = 12;
+		maxPos_y = 12;
+	end
+
+	--	local newpos = self:heatmap_to_pos(maxPos_x, maxPos_y);
+
+	local newpos = {x = self.pos.x + maxPos_x - 11, y = self.pos.y + maxPos_y}
+	self:Move_to_Pos(frameTime, newpos);
+
+end
+
+-- Assuming we have heatmap width/height and origin
+function Mouse:heatmap_to_pos(row, col)
+
+	local h = row;
+  	local w = col;
+  	return {x = self.heatmap_width*(w-1) + self.heatmap_origin.x, y = self.heatmap_height*(h-1) + self.heatmap_origin.y, z = self:GetPos().z}; 
+
+end
+
+-- Display heat map labels on screen
+function Mouse:DisplayHeatmap()
+
+	for row=1, 21 do
+		for col=1, 21 do
+			local pos = self:heatmap_to_pos(row, col);
+			System.DrawLabel(pos, 1.7, tostring(self.heatmap[row][col]), 0.6, 0, 0, 1);
+		end
+	end
+
+end
+
+
+function Mouse:print_heatmap()
+
+	Log("HeatMap: ")
+	for row=1, 21 do
+		local rowprint = "";
+		for col=1, 21 do
+			rowprint = rowprint..tostring(self.heatmap[row][col])..", ";
+		end
+		Log(rowprint)
+	end
+
+end
+
+
+
 List = {}
 function List.new ()
   return {first = 0, last = -1}
