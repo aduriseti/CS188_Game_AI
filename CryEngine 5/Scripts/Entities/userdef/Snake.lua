@@ -81,8 +81,15 @@ Snake.Patrol =
   
 		  --Log("FUCKERS")
 		  --self:myPatrol(time)
-
-		  local target = self:ray_cast("Mouse");
+		  local target = nil
+		  local ents = System.GetEntitiesInSphere(self:GetPos(), 20);
+			for i, ent in pairs(ents) do
+			     if (ent.EntityType and ent.EntityType == "MousePlayer") then
+			          target = ent
+			          break
+			     end
+			end
+		  
 		  --local target2 = self:ray_cast("MousePlayer")
 		  if target ~= nil then
 		  	self:GotoState("Eat");

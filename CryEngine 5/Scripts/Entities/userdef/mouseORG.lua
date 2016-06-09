@@ -1,19 +1,19 @@
 --Amal's file path
-Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
+--Script.ReloadScript( "SCRIPTS/Entities/userdef/LivingEntityBase.lua");
 
 --Mitchel's file path
---Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
+Script.ReloadScript( "SCRIPTS/Entities/Custom/LivingEntityBase.lua");
 
 
 -- Globals
 
 --Mitchel's file path
---Mouse_Data_Definition_File = "Scripts/Entities/Custom/Mouse_Data_Definition_File.xml"
---Mouse_Default_Data_File = "Scripts/Entities/Custom/DataFiles/Mouse_Data_File.xml"
+Mouse_Data_Definition_File = "Scripts/Entities/Custom/Mouse_Data_Definition_File.xml"
+Mouse_Default_Data_File = "Scripts/Entities/Custom/DataFiles/Mouse_Data_File.xml"
 
 --Amal's file path
-Mouse_Data_Definition_File = "Scripts/Entities/userdef/Mouse_Data_Definition_File.xml"
-Mouse_Default_Data_File = "Scripts/Entities/userdef/DataFiles/Mouse_Data_File.xml"
+--Mouse_Data_Definition_File = "Scripts/Entities/userdef/Mouse_Data_Definition_File.xml"
+--Mouse_Default_Data_File = "Scripts/Entities/userdef/DataFiles/Mouse_Data_File.xml"
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    Mouse Table Declaration                 ---------------------------------------------
@@ -32,24 +32,6 @@ Mouse = {
 		"Dead",
 		"Power",
 	},
-
-	heatmap = {
-
-	},
-
-	t_m = 100,
-
-	t_b = 0.5,
-
-	s_m = 100,
-
-	s_b = 0.5,
-
-	d_t = 1,
-
-	f_m = 20,
-
-	f_b = 0.5,
 	
 	mouseDataTable = {},
 	
@@ -123,9 +105,6 @@ Mouse.Test =
 {
 	OnBeginState = function(self)
 		--Log("Mouse: Test state")
-		self:calc_heatmap()
-		--self:PrintTable(self.heatmap)
-		
 		
   	end,
 	
@@ -136,8 +115,8 @@ Mouse.Test =
 		  self.Move.impulseMag = 30
 		  --Log(self.Move.impulseMag)
 		 -- LogVec("ImpulseDir", self.Move.impulseDir)
-		  --self:GotoState("Move")
-		  self:DisplayHeatmap()
+		  self:GotoState("Move")
+
 	end,
 	
 	OnEndState = function(self)
@@ -175,7 +154,7 @@ Mouse.Search =
 	OnBeginState = function(self)
 		Log("Mouse: Entering Search State")
 		self.Properties.mouseDataTable = self:LoadXMLData(Mouse_Default_Data_File)
-		--self:PrintTable(self.Properties.mouseDataTable.defaultTable)
+		self:PrintTable(self.Properties.mouseDataTable.defaultTable)
 	end,
 
 	OnUpdate = function(self,time)
@@ -204,7 +183,7 @@ Mouse.Search =
 		if(trap ~=nil) then 
 		   Log("Mouse: Sees trap")
 		   local child = trap:GetChild(0)
-		   --self:PrintTable(child)
+		   self:PrintTable(child)
 		   target = child;	
 		end 
 		--Log(tostring(enemy));
@@ -468,7 +447,7 @@ function Mouse:THEFUCK()
 	--self:PrintTable(self.Properties.mouseDataTable);
 	  --self:GotoState("Test")
 
-	self:GotoState("Test")
+	self:GotoState("Search")
 	--Log("WTF")
 end 
 
@@ -482,7 +461,7 @@ function Mouse:abstractReset()
 	-- Load Knowledge Base in
 	self.Properties.mouseDataTable = self:LoadXMLData() -- Optional Parameter to SPecify what file to read
 	
-	--self:PrintTable(self.Properties.mouseDataTable)
+	self:PrintTable(self.Properties.mouseDataTable)
 
 	--self:GotoState("Search");
 
@@ -778,303 +757,3 @@ Mouse.FlowEvents =
 	},
 
 }
-
-function Mouse:updateHeatMapBFS(class,pos)
-
-	local qV = {}
-	for i = 1,21 do
-		qV[i] = {}
-		for j = 1,21 do
-			qV[i][j] = 0
-		end
-	end
-
-	local dq = List.new()
-	local item = {pos={x=pos.x, y=pos.y}, i=0}
-	qV[item.pos.x][item.pos.y] = 1
-	List.pushright(dq,item)
-	local m = 0
-	local b = 0
-	local s = -1
-	if class == "Food" then
-		m = self.f_m
-		b = self.f_b
-		s = 1
-	
-	elseif class == "Trap" then
-		m = self.t_m
-		b = self.t_b
-		s = -1
-	
-	elseif class == "Snake" then
-		m = self.s_m
-		b = self.s_b
-		s = -1
-	end
-
-	local p = List.popleft(dq)
-	local i = 0
-	while p ~= nil do
-
-		if i <= 9 then
-			--self:PrintTable(p)
-			i = i + 1
-		end
-		if p.i <= 9 then
-			local tt = p
-
-			local up = {pos = {x = tt.pos.x, y= tt.pos.y+1}, i=tt.i+1}
-			--Log(up.pos.x.." "..up.pos.y)
-			if up.pos.y <= 21 and qV[up.pos.x][up.pos.y] == 0 then
-				List.pushright(dq,up)
-				qV[up.pos.x][up.pos.y] = 1
-			end
-
-			local down = {pos = {x = tt.pos.x, y= tt.pos.y-1}, i=tt.i+1}
-			--Log(down.pos.x.." "..down.pos.y)
-			if down.pos.y >= 1 and qV[down.pos.x][down.pos.y] == 0 then
-				List.pushright(dq,down)
-				qV[down.pos.x][down.pos.y] = 1
-			end
-
-			local right = {pos = {x = tt.pos.x+1, y= tt.pos.y}, i=tt.i+1}
-			--Log(right.pos.x.." "..right.pos.y)
-			if right.pos.x <= 21 and qV[right.pos.x][right.pos.y] == 0 then
-				List.pushright(dq,right)
-				qV[right.pos.x][right.pos.y] = 1
-			end
-
-			local left = {pos = {x = tt.pos.x-1, y= tt.pos.y}, i=tt.i+1}
-			--Log(left.pos.x.." "..left.pos.y)
-
-			--Log(left.pos.x)
-			if left.pos.x >= 1 and qV[left.pos.x][left.pos.y] == 0 then
-				List.pushright(dq,left)
-				qV[left.pos.x][left.pos.y] = 1
-			end
-			
-
-		end
-
-		local value = m * (b^p.i) * s
-		--Log(class..p.pos.x..","..p.pos.y.."value:"..value..s)
-		self.heatmap[p.pos.x][p.pos.y] = self.heatmap[p.pos.x][p.pos.y] + value
-		--Log("m,b"..m..","..b.."; value:"..value)
-		--Log(self.heatmap[p.pos.x][p.pos.y])
-		
-		
-		p = List.popleft(dq)
-	end
-
-
-
-	return nil
-end
-
-function Mouse:calc_heatmap()
-
-	local ents = System.GetEntitiesInSphere(self.pos,10)
-	local mpos = {x = math.floor(self.pos.x+0.5), y = math.floor(self.pos.y+0.5), z = math.floor(self.pos.z+0.5)}
-	--self:PrintTable(surEnt)
-
-	--initialize heatmap
-	for row = 1, 21 do
-        self.heatmap[row] = {};
-        for col = 1, 21 do
-            self.heatmap[row][col] = col * self.d_t
-        end
-    end
-
-
-	for i, ent in pairs(ents) do
-
-		--self:PrintTable(ent)
-
-		if(ent.class and ent.class == "Maze_Wall") then
-			local pos = ent:GetPos()
-			local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-10), y = math.floor(pos.y+0.5) - (mpos.y-10), z = math.floor(pos.z+0.5)}
-			--Log("Wall:"..rpos.x..","..rpos.y)
-			self.heatmap[rpos.x][rpos.y] = -math.huge
-			if(rpos.x > 1 and rpos.y < 21) then 
-				self.heatmap[rpos.x][rpos.y+1] = -math.huge
-				self.heatmap[rpos.x-1][rpos.y] = -math.huge
-				self.heatmap[rpos.x-1][rpos.y+1] = -math.huge
-			end
-
-		end
-
-
-		if(ent.class and ent.class == "Food") then
-			local pos = ent:GetPos()
-			local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-10), y = math.floor(pos.y+0.5) - (mpos.y-10), z = math.floor(pos.z+0.5)}
-			--Log("Food:"..rpos.x..","..rpos.y)
-			self:updateHeatMapBFS("Food",rpos)
-
-		end
-
-
-		if(ent.class and ent.class == "Snake") then
-			local pos = ent:GetPos()
-			local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-10), y = math.floor(pos.y+0.5) - (mpos.y-10), z = math.floor(pos.z+0.5)}
-			--Log("Snake:"..rpos.x..","..rpos.y)
-			self:updateHeatMapBFS("Snake",rpos)
-
-		end
-
-
-		if(ent.class and (ent.class == "Trap1" or ent.class == "Trap2")) then
-			local pos = ent:GetPos()
-			local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-10), y = math.floor(pos.y+0.5) - (mpos.y-10), z = math.floor(pos.z+0.5)}
-			--Log("Trap:"..rpos.x..","..rpos.y)
-			self:updateHeatMapBFS("Trap",rpos)
-
-		end
-		
-
-	end
-
-	
-
-	Log("-------MousePos"..mpos.x.." "..mpos.y.." "..mpos.z)
-
-	self:PrintTable(self.heatmap)
-
-end
-
-function Mouse:GreedyWalk(frameTime)
-
-	self:calc_heatmap()
-
-	local maxVal = self.heatmap[10][10];
-	local maxPos_x = 10;
-	local maxPos_y = 10;
-
-	if self.heatmap[11][10] > maxVal then
-		maxVal = self.heatmap[11][10];
-		maxPos_x = 11;
-		maxPos_y = 10;
-	end
-
-	if self.heatmap[12][10] > maxVal then
-		maxVal = self.heatmap[12][10];
-		maxPos_x = 12;
-		maxPos_y = 10;
-	end
-
-	if self.heatmap[10][11] > maxVal then
-		maxVal = self.heatmap[10][11];
-		maxPos_x = 10;
-		maxPos_y = 11;
-	end
-
-	if self.heatmap[12][11] > maxVal then
-		maxVal = self.heatmap[12][11];
-		maxPos_x = 12;
-		maxPos_y = 11;
-	end
-
-	if self.heatmap[10][12] > maxVal then
-		maxVal = self.heatmap[10][12];
-		maxPos_x = 10;
-		maxPos_y = 12;
-	end
-
-	if self.heatmap[11][12] > maxVal then
-		maxVal = self.heatmap[11][12];
-		maxPos_x = 11;
-		maxPos_y = 12;
-	end
-
-	if self.heatmap[12][12] > maxVal then
-		maxVal = self.heatmap[12][12];
-		maxPos_x = 12;
-		maxPos_y = 12;
-	end
-
-	--	local newpos = self:heatmap_to_pos(maxPos_x, maxPos_y);
-
-	local newpos = {x = self.pos.x + maxPos_x - 10, y = self.pos.y + maxPos_y, z= self.pos.z}
-	self:Move_to_Pos(frameTime, newpos);
-
-end
-
-
--- Display heat map labels on screen
-function Mouse:DisplayHeatmap()
-
-	local r = 0.0
-	local g = 0.0
-	local b = 0.0
-
-	for row=1, 21 do
-		for col=1, 21 do
-			local pos = {x = self:GetPos().x + col - 10, y = self:GetPos().y + row - 10, z = self:GetPos().z}
-			r = 0.0
-			g = 0.0
-			b = 0.0
-
-			if self.heatmap[col][row] < -10 then
-				r = 0.6
-			elseif self.heatmap[col][row] > -10 and self.heatmap[col][row] < 10 then
-				g = 0.6
-			else
-				b = 0.6
-			end
-
-			System.DrawLabel(pos, 1.7, tostring(self.heatmap[col][row]), r, g, b, 1);
-
-		end
-	end
-
-end
-
-
-function Mouse:print_heatmap()
-
-	Log("HeatMap: ")
-	for row=1, 21 do
-		local rowprint = "";
-		for col=1, 21 do
-			rowprint = rowprint..tostring(self.heatmap[row][col])..", ";
-		end
-		Log(rowprint)
-	end
-
-end
-
-
-
-List = {}
-function List.new ()
-  return {first = 0, last = -1}
-end
-
-function List.pushleft (list, value)
-  local first = list.first - 1
-  list.first = first
-  list[first] = value
-end
-
-function List.pushright (list, value)
-  local last = list.last + 1
-  list.last = last
-  list[last] = value
-end
-
-function List.popleft (list)
-  local first = list.first
-  if first > list.last then return nil end --error("list is empty") end
-  local value = list[first]
-  list[first] = nil        -- to allow garbage collection
-  list.first = first + 1
-  return value
-end
-
-function List.popright (list)
-  local last = list.last
-  if list.first > last then return nil end--error("list is empty") end
-  local value = list[last]
-  list[last] = nil         -- to allow garbage collection
-  list.last = last - 1
-  return value
-end
