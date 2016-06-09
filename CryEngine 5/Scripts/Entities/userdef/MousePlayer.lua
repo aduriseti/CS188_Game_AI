@@ -2,12 +2,12 @@
 -- Globals
 
 --Mitchel's file path
-MousePlayer_Data_Definition_File = "Scripts/Entities/Custom/MousePlayer_Data_Definition_File.xml"
-MousePlayer_Default_Data_File = "Scripts/Entities/Custom/DataFiles/MousePlayer_Data_File.xml"
+--MousePlayer_Data_Definition_File = "Scripts/Entities/Custom/MousePlayer_Data_Definition_File.xml"
+--MousePlayer_Default_Data_File = "Scripts/Entities/Custom/DataFiles/MousePlayer_Data_File.xml"
 
 --Amal's file path
---MousePlayer_Data_Definition_File = "Scripts/Entities/userdef/MousePlayer_Data_Definition_File.xml"
---MousePlayer_Default_Data_File = "Scripts/Entities/userdef/DataFiles/MousePlayer_Data_File.xml"
+MousePlayer_Data_Definition_File = "Scripts/Entities/userdef/MousePlayer_Data_Definition_File.xml"
+MousePlayer_Default_Data_File = "Scripts/Entities/userdef/DataFiles/MousePlayer_Data_File.xml"
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    MousePlayer Player Table Declaration    ---------------------------------------------
@@ -115,26 +115,21 @@ MousePlayer = {
 	ToEat = {},
     
     Snake = {
-        --pos,
-		--entity,
+        pos,
+		entity,
     },
     
     Food = {
-        --type = "",
-        --pos,
-		--entity,
+        type = "",
+        pos,
+		entity,
     },
     
     Trap = {
-       -- type = "",
-       -- pos,
-		--entity,
-		
+        type = "",
+        pos,
+		entity,
     },
-	
-	Wall = {
-		
-	},
     
 };
 
@@ -153,7 +148,7 @@ MousePlayer.PlayerRecorder =
 		self:OnUpdate()
 		
         -- Recording
-        --self:UpdateTable()
+        self:UpdateTable()
 
         -- See anything new?
         if self:Observe() == false then 
@@ -202,13 +197,13 @@ MousePlayer.PlayerRecorder =
 		--self:PrintTable(self.Properties.MousePlayerDataTable)
 		self:SaveXMLData(self.Properties.MousePlayerDataTable, MousePlayer_Default_Data_File)
 		--self.Snake.pos = nil 
-		--self.Snake.entity = nil 
+		self.Snake.entity = nil 
 		--self.Food.type = nil 
 		--self.Food.pos = nil
-		--self.Food.entity = nil 
+		self.Food.entity = nil 
 		--self.Trap.type = nil 
 		--self.Trap.pos = nil 
-		--self.Trap.entity = nil 
+		self.Trap.entity = nil 
 	end,
 }
 
@@ -222,11 +217,11 @@ MousePlayer.Player =
 	OnUpdate = function(self, time)
 		 --self:SetScale(5)
 		 self:OnUpdate()
-		 --self:Observe()
+		 self:Observe()
 		-- Ray trace and check for food, traps, snakes
-		 if(self:Observe()) then 
-		 	self:GotoState("PlayerRecorder");
-		 end 
+		 --if(self:Observe()) then 
+		 --	self:GotoState("PlayerRecorder");
+		-- end 
 		          
          -- Movement
          self:Move()
@@ -392,7 +387,6 @@ function MousePlayer:OnReset()
 	Log("Calling Load XML")
     self.Properties.MousePlayerDataTable = self:LoadXMLData() 
 	--self:PrintTable(self.Properties.MousePlayerDataTable)
-	--self:PrintTable(self.Properties.MousePlayerDataTable)
     self:GotoState("Player")
 	
 end
@@ -477,8 +471,11 @@ function MousePlayer:SaveXMLData(dataTable, dataFile)
 	dataFile = dataFile or MousePlayer_Default_Data_File
 	dataTable = dataTable or self.Properties.MousePlayerDataTable
 	
+<<<<<<< HEAD
+=======
 	--self:PrintTable(dataTable)
 	
+>>>>>>> 8b6970a3d449acf4ea73c68407c60e314733577e
 	CryAction.SaveXML(MousePlayer_Data_Definition_File, dataFile, dataTable);
 end
 
@@ -587,41 +584,11 @@ end
 
 function MousePlayer:Observe()
          -- See anything
-        local traps = {};
-		local enemies = {};
-		local food = {};
-		local walls = {};
+        local trap;
+		local enemy;
+		local food;
 		
 		local hitData = {};
-		
-		local entities = {};
-		entities = System.GetEntitiesInSphere(self:GetPos(), 10)
-		--self:PrintTable(entities);
-
-		for x, y in ipairs(entities) do
-			if y.class == "Maze_Wall" then 
-				walls[#walls+1] = y
-			elseif y.class == "Snake" then 
-				enemies[#enemies + 1] = y 
-			elseif y.class == "Food" then 
-				food[#food+1] = y 
-			elseif y.class == "Trap1" or y.class == "Trap2" then 
-				traps[#traps+1] = y 
-			end 
-		end 
-		
-		self.Trap = traps 
-		self.Snake = enemies
-		self.Food = food 
-		self.Wall = walls 
-		
-		if(#traps > 0 or #enemies > 0 or #food > 0) then 
-			return true;
-		end 
-		
-		
-		-- Old way with Raycast
-		--[[
 		local dir = self:GetDirectionVector();
 		
 		dir = vecScale(dir, 50); --See up to 50 away
@@ -648,8 +615,7 @@ function MousePlayer:Observe()
 		end 
 		
 		--food = self:ray_cast("Food");
-		--]]
-		--[[
+
 		if(trap ~=nil and trap.class == "Trap1" and food == nil) then 
 		   --Log("Mouse: Sees trap")
 		   local child = trap:GetChild(0)
@@ -693,8 +659,6 @@ function MousePlayer:Observe()
 			return false;
 		end 
 		
-		--]]
-		
 		return false;
 end 
 
@@ -709,6 +673,8 @@ function MousePlayer:Full()
 end 
 
 function MousePlayer:UpdateTable()
+<<<<<<< HEAD
+=======
 	
 	local God = self.Properties.MousePlayerDataTable.defaultTable.God
 		-- New Index 
@@ -757,6 +723,7 @@ function MousePlayer:UpdateTable()
 
 
 --[==[
+>>>>>>> 8b6970a3d449acf4ea73c68407c60e314733577e
 	--self:PrintTable(self.Properties.MousePlayerDataTable.defaultTable.Locations)
     -- Locations 
     local locations = self.Properties.MousePlayerDataTable.defaultTable.Locations
@@ -815,8 +782,12 @@ function MousePlayer:UpdateTable()
 	end 
 	
 	self:SaveXMLData()
+<<<<<<< HEAD
+
+=======
 --]==]
 self:SaveXMLData()
+>>>>>>> 8b6970a3d449acf4ea73c68407c60e314733577e
 end
 
 function MousePlayer:PrintTable(t)
@@ -879,7 +850,7 @@ function MousePlayer:NextMove(sender, pos)
 	--self:SetScale(5)
 	self.nextPos = pos;
     self.nextPos.z = 32;
-	if(self:GetState() == "PlayerRecorder") then self:UpdateTable() end;
+	self:UpdateTable();
 end 
 
 function MousePlayer:ChangeDir(sender, pos)

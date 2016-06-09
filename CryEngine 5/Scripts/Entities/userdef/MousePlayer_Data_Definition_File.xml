@@ -1,6 +1,24 @@
 <Definition root="Data">
  
     <Property name="version" type="string"/>
+<<<<<<< HEAD
+ 
+    <Table name="defaultTable">
+
+        <!-- My Locations -->
+        <Array name="Locations" elementName="frame">
+            <Property name="Time" type="float"/>
+            <Property name="MouseLocCur" type="Vec3"/>
+            <Property name="MouseLocTo" type="Vec3" />
+            <Property name="SnakeLoc" type="Vec3"/>
+            <Property name="TrapLoc" type="Vec3"/>
+            <Property name="TrapType" type="string"/>
+            <Property name="FoodLoc" type="Vec3"/>
+            <Property name="FoodType" type="string"/>
+        </Array>
+        
+    </Table>
+=======
     
         <Table name="defaultTable">
                 
@@ -16,5 +34,6 @@
 
             
         </Table>
+>>>>>>> 8b6970a3d449acf4ea73c68407c60e314733577e
      
 </Definition>

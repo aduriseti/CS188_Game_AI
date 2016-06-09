@@ -83,6 +83,7 @@ Snake.Patrol =
 		  --self:myPatrol(time)
 
 		  local target = self:ray_cast("Mouse");
+
 		  if target ~= nil then
 		  	self:GotoState("Eat");
 		  end

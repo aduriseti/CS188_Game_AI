@@ -1105,11 +1105,11 @@ function Maze2:SpawnSnakes(num)
         
         for i =1, num do
             -- Get random open coord
-            local h = random(2, height-1)
+            local h = random(2, height)
             if h < 1 then h = h+1 end
             --if h%2 ~= 0 and h > 0 then h = h-1 end
             
-            local w = random(2, width-1)
+            local w = random(2, width)
             if w < 1 then w = w+1 end
             --if w%2 ~= 0 and w > 0 then w = w-1 end 
             
@@ -1180,9 +1180,9 @@ function Maze2:SpawnFood(nCheese, nBerry, nPotato, nGrains, powerBallProb)
         -- Spawn Cheese
         while #self.myFoods.Cheese < numCheese do
             -- NorthEast
-            w = random(math.ceil(width/2), width-1)
+            w = random(math.ceil(width/2), width)
             --if w%2 ~= 0 then w = w-1 end
-            h = random(math.ceil(height/2), height-1)
+            h = random(math.ceil(height/2), height)
             --if h%2 ~= 0 then h = h-1 end
             
             -- Check if wall there 
@@ -1205,7 +1205,7 @@ function Maze2:SpawnFood(nCheese, nBerry, nPotato, nGrains, powerBallProb)
             -- NorthWest
             w = random(2, math.floor(width/2))
             --if w%2 ~= 0 then w = w-1 end
-            h = random(math.ceil(height/2), height-1)
+            h = random(math.ceil(height/2), height)
             --if h%2 ~= 0 then h = h-1 end
             
             -- Check if wall there 
@@ -1225,7 +1225,7 @@ function Maze2:SpawnFood(nCheese, nBerry, nPotato, nGrains, powerBallProb)
         -- Spawn Potato
         while #self.myFoods.Potato < numPotato do
             -- South East
-            w = random(math.ceil(width/2), width-1)
+            w = random(math.ceil(width/2), width)
             --if w%2 ~= 0 then w = w-1 end
             h = random(2, math.floor(height/2))
             --if h%2 ~= 0 then h = h-1 end
@@ -1269,10 +1269,10 @@ function Maze2:SpawnFood(nCheese, nBerry, nPotato, nGrains, powerBallProb)
         while i < PB_Prob do 
             
             if(PB_Prob > random(10)) then 
-                w = random(2, width-1) 
+                w = random(2, width) 
                 --if w%2 ~= 0  then w = w-1 end
             
-                h = random(2, height-1)
+                h = random(2, height)
                 --if h%2 ~= 0  then h = h-1 end
                 
                 -- Check if wall there 
@@ -1381,9 +1381,9 @@ function Maze2:SpawnTraps(num)
             end
             
             i = i +1
-            local w = random(2, width-1) 
+            local w = random(2, width) 
             --if w%2 ~= 0  then w = w-1 end
-            local h = random(2, height-1)
+            local h = random(2, height)
             --if h%2 ~= 0  then h = h-1 end
             
             -- Check if wall there 
