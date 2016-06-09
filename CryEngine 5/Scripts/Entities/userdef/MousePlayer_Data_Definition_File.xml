@@ -1,7 +1,6 @@
 <Definition root="Data">
  
-    <Property name="version" type="string"/>
-    
+    <Property name="version" type="string"/>    
         <Table name="defaultTable">
                 
             <Array name="God" elementName="Jesus">
@@ -16,5 +15,5 @@
 
             
         </Table>
-     
+
 </Definition>
