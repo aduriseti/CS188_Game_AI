@@ -1,76 +1,20 @@
 <Definition root="Data">
  
     <Property name="version" type="string"/>
- 
-    <Table name="defaultTable">
-        <Array name="clicks" elementName="cTable">
-            <Table name="clickTable">
-              
+    
+        <Table name="defaultTable">
+                
+            <Array name="God" elementName="Jesus">
                 <Property name="Time" type="float"/>
-            
-                <!-- Walls -->
-                <Array name="Walls" elementName="Wall">
-                    <Property name="WallLoc" type="Vec3"/>
-                </Array>
-                
-                <!-- Mouse Data -->
-                <Property name="MouseLocCur" type="Vec3"/>
-                <Property name="MouseLocTo" type="Vec3"/>
-                
-                <!-- Snake Data -->
-                <Array name="Snakes" elementName="Snake">
-                    <Property name="SnakeLoc" type="Vec3"/>
-                </Array>
-                
-                
-                <!-- Trap Data -->
-                <Array name="Traps" elementName="Trap">
-                    <Property name="TrapLoc" type="Vec3"/>
-                    <Property name="TrapType" type="string"/>
-                </Array> 
-                
-                
-                <!-- Food Data -->
-                <Array name="Foods" elementName="Food">
-                    <Property name="FoodLoc" type="Vec3"/>
-                    <Property name="FoodType" type="string"/>
-                </Array>
-                            
-            </Table>
-        </Array>
-        <!-- 
-        <Array name="clicks" elementName="click">
-            
+                 <Property name="MouseLocCur" type="Vec3"/>
+                 <Property name="MouseLocTo" type="Vec3"/>
+                 <Property name="AllWalls" type="string"/>
+                 <Property name="AllSnakes" type="string"/>
+                 <Property name="AllTraps" type="string"/>
+                 <Property name="AllFoods" type="string"/>
+            </Array>    
 
-            <Array name="Walls" elementName="Wall">
-                <Property name="WallLoc" type="Vec3"/>
-            </Array>
             
-            
-            <Property name="MouseLocCur" type="Vec3"/>
-            <Property name="MouseLocTo" type="Vec3"/>
-            
-            
-            <Array name="Snakes" elementName="Snake">
-                <Property name="SnakeLoc" type="Vec3"/>
-            </Array>
-            
-            
-            
-            <Table name="trapTable">
-                <Property name="TrapLoc" type="Vec3">
-                <Property name="TrapType" type="string">
-            </Table>
-            
-            
-            <Table name="foodTable">
-                <Property name="FoodLoc" type="Vec3">
-                <Property name="FoodType" type="string">
-            </Table>
-                           
-        </Array>
-        -->
-        
-    </Table>
+        </Table>
      
 </Definition>

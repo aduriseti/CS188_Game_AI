@@ -477,7 +477,7 @@ function MousePlayer:SaveXMLData(dataTable, dataFile)
 	dataFile = dataFile or MousePlayer_Default_Data_File
 	dataTable = dataTable or self.Properties.MousePlayerDataTable
 	
-	self:PrintTable(dataTable)
+	--self:PrintTable(dataTable)
 	
 	CryAction.SaveXML(MousePlayer_Data_Definition_File, dataFile, dataTable);
 end
@@ -709,56 +709,51 @@ function MousePlayer:Full()
 end 
 
 function MousePlayer:UpdateTable()
+	
+	local God = self.Properties.MousePlayerDataTable.defaultTable.God
+		-- New Index 
+		local index = #God+1
+		
+		local newElement = {
 
-	local clicks = self.Properties.MousePlayerDataTable.defaultTable.clicks;
-	--self:PrintTable(clicks)
-	local clickDex = #clicks+1
-	Log("clickDex = %d", clickDex)
-	
-	local newElement = {
-		clickTable = {
-			Walls = { {x=0,y=0,z=0} },
-			Snakes = {
-				{x=0,y=0,z=0},
-			},
-			Traps = {
-				TrapType = "",
-				TrapLoc = {x=0,y=0,z=0},
-			},
-			Foods = {
-				FoodType = "",
-				FoodLoc = {x=0,y=0,z=0},
-			},
-			
 		}
-	}
-	table.insert(self.Properties.MousePlayerDataTable.defaultTable.clicks, clickDex, newElement)
-	
+
+	table.insert(self.Properties.MousePlayerDataTable.defaultTable.God, index, newElement)
+
 	local curTime = System.GetCurrTime()
 	local timeSinceLast = curTime - self.lastTime
 	self.lastTime = curTime
 	
-	clicks[clickDex].clickTable.Time = timeSinceLast
-	clicks[clickDex].clickTable.MouseLocCur = self:GetPos();
-	clicks[clickDex].clickTable.MouseLocTo = self.nextPos or {x=0,y=0,z=0}
-	
-	--self:PrintTable(clicks)
+	self.Properties.MousePlayerDataTable.defaultTable.God[index].Time = timeSinceLast
+	self.Properties.MousePlayerDataTable.defaultTable.God[index].MouseLocCur = self:GetPos();
+	self.Properties.MousePlayerDataTable.defaultTable.God[index].MouseLocTo = self.nextPos or {x=0,y=0,z=0}
+
+	local WallStr, SnakeStr, TrapStr, FoodStr = "", "", "", ""
 	
 	for x,y in ipairs(self.Wall) do 
-		clicks[clickDex].clickTable.Walls[#clicks[clickDex].clickTable.Walls + 1] = y:GetPos() or {x=0,y=0,z=0};
+		WallStr = WallStr..y:GetPos().x..","..y:GetPos().y..","..y:GetPos().z.."; "
 	end 
 	for x,y in ipairs(self.Snake) do 
-		clicks[clickDex].clickTable.Snakes[#clicks[clickDex].clickTable.Snakes + 1] = y:GetPos() or {x=0,y=0,z=0};
+		SnakeStr = SnakeStr..y:GetPos().x..","..y:GetPos().y..","..y:GetPos().z.."; "
 	end 		
 	for x,y in ipairs(self.Trap) do 
-		clicks[clickDex].clickTable.Traps[x] = {TrapLoc = y:GetPos() or {x=0,y=0,z=0}, TrapType = y.type or ""}--.TrapLoc = y:GetPos() or {x=0,y=0,z=0} ;
+		TrapStr = TrapStr..y:GetPos().x..","..y:GetPos().y..","..y:GetPos().z.." - "..y.type.."; "
+
+		--defT[clickDex].Traps[x].TrapType = y.type or ""--.TrapLoc = y:GetPos() or {x=0,y=0,z=0} ;
 		--clicks[clickDex].clickTable.Traps[x].TrapType = y.type or "";		
 	end 
 	for x,y in ipairs(self.Food) do 
-		clicks[clickDex].clickTable.Foods[x] = {FoodLoc = y:GetPos() or {x=0,y=0,z=0}, FoodType = y.Properties.esFoodType or ""}
-		--clicks[clickDex].clickTable.Foods[#clicks[clickDex].clickTable.Foods + 1] = y.Properties.esFoodType or "";		
+		--clicks[clickDex].clickTable.Foods[x] = {FoodLoc = y:GetPos() or {x=0,y=0,z=0}, FoodType = y.Properties.esFoodType or ""}
+		--defT[clickDex].Foods[x] = {}
+		--defT[clickDex].Foods[x].FoodType = y.type or ""
+		--clicks[clickDex].clickTable.Foods[#clicks[clickDex].clickTable.Foods + 1] = y.Properties.esFoodType or "";
+		FoodStr = FoodStr..y:GetPos().x..","..y:GetPos().y..","..y:GetPos().z.." - "..y.Properties.esFoodType.."; "
 	end 
 
+	self.Properties.MousePlayerDataTable.defaultTable.God[index].AllWalls = WallStr
+	self.Properties.MousePlayerDataTable.defaultTable.God[index].AllSnakes = SnakeStr
+	self.Properties.MousePlayerDataTable.defaultTable.God[index].AllTraps = TrapStr
+	self.Properties.MousePlayerDataTable.defaultTable.God[index].AllFoods = FoodStr
 
 
 --[==[
@@ -821,6 +816,7 @@ function MousePlayer:UpdateTable()
 	
 	self:SaveXMLData()
 --]==]
+self:SaveXMLData()
 end
 
 function MousePlayer:PrintTable(t)
