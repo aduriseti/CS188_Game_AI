@@ -2,12 +2,12 @@
 -- Globals
 
 --Mitchel's file path
---MousePlayer_Data_Definition_File = "Scripts/Entities/Custom/MousePlayer_Data_Definition_File.xml"
---MousePlayer_Default_Data_File = "Scripts/Entities/Custom/DataFiles/MousePlayer_Data_File.xml"
+MousePlayer_Data_Definition_File = "Scripts/Entities/Custom/MousePlayer_Data_Definition_File.xml"
+MousePlayer_Default_Data_File = "Scripts/Entities/Custom/DataFiles/MousePlayer_Data_File.xml"
 
 --Amal's file path
-MousePlayer_Data_Definition_File = "Scripts/Entities/userdef/MousePlayer_Data_Definition_File.xml"
-MousePlayer_Default_Data_File = "Scripts/Entities/userdef/DataFiles/MousePlayer_Data_File.xml"
+--MousePlayer_Data_Definition_File = "Scripts/Entities/userdef/MousePlayer_Data_Definition_File.xml"
+--MousePlayer_Default_Data_File = "Scripts/Entities/userdef/DataFiles/MousePlayer_Data_File.xml"
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -------------------------                    MousePlayer Player Table Declaration    ---------------------------------------------
@@ -184,6 +184,7 @@ MousePlayer.PlayerRecorder =
 				--self:GotoState("Eat")
 				target:DeleteThis()
 			elseif target.type == "Snake" or target.type == "Trap1" or target.type == "Trap2" then 
+				Log("fuck hit a trap/snake")
 				self:GotoState("Dead")
 			end 
 		end
@@ -238,13 +239,20 @@ MousePlayer.Player =
 				if foodType == "Cheese" or foodType == "0" then     -- Cheese
 					--Log("I am cheese")
 					self.toEat.Cheese = self.toEat.Cheese - 1
+					self:PrintTable(self.toEat)
 				elseif foodType == "Berry" or foodType == "1" then -- Berry
 					--Log("I am Berry")
 					self.toEat.Berry = self.toEat.Berry - 1
+										self:PrintTable(self.toEat)
+
 				elseif foodType == "Potato" or foodType == "2" then -- Potato
 					self.toEat.Potato = self.toEat.Potato - 1
+										self:PrintTable(self.toEat)
+
 				elseif foodType == "3" or foodType == "Grains" then -- Grains
 					self.toEat.Grains = self.toEat.Grains - 1
+										self:PrintTable(self.toEat)
+
 				elseif foodType == "4" or foodType == "PowerBall" then -- PowerBall
 					self:GotoState("PowerMode")
 				end
@@ -436,16 +444,16 @@ function MousePlayer:OnEat(userId, index)
 	Log("RIP MousePlayer")
 	--self.Properties.MousePlayerDataTable = self:LoadXMLData(MousePlayer_Default_Data_File);
 	
-	for i = 1, #self.Properties.MousePlayerDataTable.defaultTable.KnownDangerEnts do 
-		if self.Properties.MousePlayerDataTable.defaultTable.KnownDangerEnts[i] == tostring(userId.type) then
-			Log(tostring(userID.type) .. " already in data table");
+	--for i = 1, #self.Properties.MousePlayerDataTable.defaultTable.KnownDangerEnts do 
+		--if self.Properties.MousePlayerDataTable.defaultTable.KnownDangerEnts[i] == tostring(userId.type) then
+			--Log(tostring(userID.type) .. " already in data table");
 			self:GotoState("Dead")
-		end
-	end
-	Log("Adding " .. tostring(userID.type) .. " to data table");
-	self.Properties.MousePlayerDataTable.defaultTable.KnownDangerEnts[#self.Properties.MousePlayerDataTable.defaultTable.KnownDangerEnts + 1] = userID.type;
-	self:SaveXMLData(self.Properties.MousePlayerDataTable, MousePlayer_Default_Data_File);
-	self:GotoState("Dead")
+		--end
+	--end
+	--Log("Adding " .. tostring(userID.type) .. " to data table");
+	--self.Properties.MousePlayerDataTable.defaultTable.KnownDangerEnts[#self.Properties.MousePlayerDataTable.defaultTable.KnownDangerEnts + 1] = userID.type;
+	--self:SaveXMLData(self.Properties.MousePlayerDataTable, MousePlayer_Default_Data_File);
+	--self:GotoState("Dead")
 end
 
 
@@ -635,6 +643,7 @@ end
 
 function MousePlayer:Full()
 	local toDo = self.toEat
+	
 	if toDo.Cheese < 1 and toDo.Berry < 1 and toDo.Grains < 1 and toDo.Potato < 1 then 
 		return true 
 	end 
@@ -770,12 +779,12 @@ function MousePlayer:ChangeDir(sender, pos)
 end
 
 function MousePlayer:GetStats(sender, ent)
-	local table = self.toEat
+	--local table = self.toEat
 
-	self:ActivateOutput("ToEatCheese", table.Cheese)
-	self:ActivateOutput("ToEatBerry", table.Berry)
-	self:ActivateOutput("ToEatGrains", table.Grains)
-	self:ActivateOutput("ToEatPotato", table.Potato)
+	self:ActivateOutput("ToEatCheese", self.toEat.Cheese)
+	self:ActivateOutput("ToEatBerry", self.toEat.Berry)
+	self:ActivateOutput("ToEatGrains", self.toEat.Grains)
+	self:ActivateOutput("ToEatPotato", self.toEat.Potato)
 end
 
 MousePlayer.FlowEvents = 
