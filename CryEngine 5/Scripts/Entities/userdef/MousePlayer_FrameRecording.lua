@@ -217,11 +217,11 @@ MousePlayer.Player =
 	OnUpdate = function(self, time)
 		 --self:SetScale(5)
 		 self:OnUpdate()
-		 self:Observe()
+		 --self:Observe()
 		-- Ray trace and check for food, traps, snakes
-		 --if(self:Observe()) then 
-		 --	self:GotoState("PlayerRecorder");
-		-- end 
+		 if(self:Observe()) then 
+		 	self:GotoState("PlayerRecorder");
+		 end 
 		          
          -- Movement
          self:Move()
@@ -624,8 +624,6 @@ function MousePlayer:Observe()
 			self.Trap.type = trap.type
 			self.Trap.pos = trap:GetPos()
 			self.Trap.entity = trap;
-		else 
-			self.Trap.entity = nil;
 		end 
 	  
 		--enemy = self:ray_cast("Snake");
@@ -636,16 +634,11 @@ function MousePlayer:Observe()
 			self.Food.type = food.Properties.esFoodType
 			self.Food.pos = food:GetPos()
 			self.Food.entity = food;
-		else 
-			self.Food.entity = nil;
 		end 
-		
 		if(enemy ~= nil) then 
 			Log("Snake not nil")
 			self.Snake.pos = enemy:GetPos()
 			self.Snake.entity = enemy;
-		else 
-			self.Snake.entity = nil;
 		end 
 		
 		if(enemy ~= nil or trap ~= nil or food ~= nil) then 
@@ -725,7 +718,7 @@ function MousePlayer:UpdateTable()
 		locations[index].FoodType = self.Food.entity.Properties.esFoodType --or ""
 	end 
 	
-	self:SaveXMLData()
+	--self:SaveXMLData()
 
 end
 
@@ -789,7 +782,7 @@ function MousePlayer:NextMove(sender, pos)
 	--self:SetScale(5)
 	self.nextPos = pos;
     self.nextPos.z = 32;
-	self:UpdateTable();
+	--self:UpdateTable();
 end 
 
 function MousePlayer:ChangeDir(sender, pos)
