@@ -37,17 +37,17 @@ Mouse = {
 
 	},
 
-	t_m = 1,
+	t_m = 50,
 
 	t_b = 0.5,
 
-	s_m = 1,
+	s_m = 50,
 
 	s_b = 0.5,
 
 	d_t = 1,
 
-	f_m = 2,
+	f_m = 20,
 
 	f_b = 0.5,
 	
@@ -789,7 +789,8 @@ function Mouse:updateHeatMapBFS(class,pos)
 	end
 
 	local dq = List.new()
-	local item = {pos=pos, i=0}
+	local item = {pos={x=pos.x, y=pos.y}, i=0}
+	qV[item.pos.x][item.pos.y] = 1
 	List.pushright(dq,item)
 	local m = 0
 	local b = 0
@@ -815,35 +816,34 @@ function Mouse:updateHeatMapBFS(class,pos)
 	while p ~= nil do
 
 		if i <= 9 then
-			self:PrintTable(p)
+			--self:PrintTable(p)
 			i = i + 1
 		end
 		if p.i <= 9 then
 			local tt = p
-			tt.i = p.i + 1
 
-			local up = {pos = {x = tt.pos.x, y= tt.pos.y+1}, i=tt.i}
+			local up = {pos = {x = tt.pos.x, y= tt.pos.y+1}, i=tt.i+1}
 			--Log(up.pos.x.." "..up.pos.y)
 			if up.pos.y <= 21 and qV[up.pos.x][up.pos.y] == 0 then
 				List.pushright(dq,up)
 				qV[up.pos.x][up.pos.y] = 1
 			end
 
-			local down = {pos = {x = tt.pos.x, y= tt.pos.y-1}, i=tt.i}
+			local down = {pos = {x = tt.pos.x, y= tt.pos.y-1}, i=tt.i+1}
 			--Log(down.pos.x.." "..down.pos.y)
 			if down.pos.y >= 1 and qV[down.pos.x][down.pos.y] == 0 then
 				List.pushright(dq,down)
 				qV[down.pos.x][down.pos.y] = 1
 			end
 
-			local right = {pos = {x = tt.pos.x+1, y= tt.pos.y}, i=tt.i}
+			local right = {pos = {x = tt.pos.x+1, y= tt.pos.y}, i=tt.i+1}
 			--Log(right.pos.x.." "..right.pos.y)
 			if right.pos.x <= 21 and qV[right.pos.x][right.pos.y] == 0 then
 				List.pushright(dq,right)
 				qV[right.pos.x][right.pos.y] = 1
 			end
 
-			local left = {pos = {x = tt.pos.x-1, y= tt.pos.y}, i=tt.i}
+			local left = {pos = {x = tt.pos.x-1, y= tt.pos.y}, i=tt.i+1}
 			--Log(left.pos.x.." "..left.pos.y)
 
 			--Log(left.pos.x)
@@ -856,7 +856,7 @@ function Mouse:updateHeatMapBFS(class,pos)
 		end
 
 		local value = m * (b^p.i) * s
-		--Log(p.pos.x..","..p.pos.y)
+		--Log(class..p.pos.x..","..p.pos.y.."value:"..value..s)
 		self.heatmap[p.pos.x][p.pos.y] = self.heatmap[p.pos.x][p.pos.y] + value
 		--Log("m,b"..m..","..b.."; value:"..value)
 		--Log(self.heatmap[p.pos.x][p.pos.y])
