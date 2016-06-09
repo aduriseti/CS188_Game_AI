@@ -140,8 +140,8 @@ Mouse.Test =
 		  --Log(self.Move.impulseMag)
 		 -- LogVec("ImpulseDir", self.Move.impulseDir)
 		  --self:GotoState("Move")
-		  self:DisplayHeatmap()
 		  self:GreedyWalk(time)
+		  --self:DisplayHeatmap()
 	end,
 	
 	OnEndState = function(self)
@@ -861,7 +861,7 @@ function Mouse:updateHeatMapBFS(class,pos)
 		end
 
 		local value = m * (b^p.i) * s
-		Log(class..p.pos.x..","..p.pos.y.."value:"..value..s)
+		--Log(class..p.pos.x..","..p.pos.y.."value:"..value..s)
 		if( p.pos.x >= 1 and p.pos.x <= 21 and p.pos.y >= 1 and p.pos.y <= 21) then
 			self.heatmap[p.pos.x][p.pos.y] = self.heatmap[p.pos.x][p.pos.y] + value
 		end
@@ -912,20 +912,20 @@ function Mouse:calc_heatmap()
 			if(rpos.x > 1 and rpos.y < 21) then 
 				self.heatmap[rpos.x][rpos.y] = -math.huge
 				self.heatmap[rpos.x][rpos.y+1] = -math.huge
-				self.heatmap[rpos.x-1][rpos.y] = -math.huge
-				self.heatmap[rpos.x-1][rpos.y+1] = -math.huge
+				self.heatmap[rpos.x+1][rpos.y] = -math.huge
+				self.heatmap[rpos.x+1][rpos.y+1] = -math.huge
 			end
 
 		end
 
 
-		if(ent.class and ent.class == "Food") then
-			local pos = ent:GetPos()
-			local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-10), y = math.floor(pos.y+0.5) - (mpos.y-10), z = math.floor(pos.z+0.5)}
-			--Log("Food:"..rpos.x..","..rpos.y)
-			self:updateHeatMapBFS("Food",rpos)
+		--if(ent.class and ent.class == "Food") then
+		--	local pos = ent:GetPos()
+		--	local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-10), y = math.floor(pos.y+0.5) - (mpos.y-10), z = math.floor(pos.z+0.5)}
+		--	--Log("Food:"..rpos.x..","..rpos.y)
+		--	self:updateHeatMapBFS("Food",rpos)
 
-		end
+		--end
 
 
 		if(ent.class and ent.class == "Snake") then
@@ -950,73 +950,80 @@ function Mouse:calc_heatmap()
 
 	
 
-	Log("-------MousePos"..mpos.x.." "..mpos.y.." "..mpos.z)
+	--Log("-------MousePos"..mpos.x.." "..mpos.y.." "..mpos.z)
 
-	self:PrintTable(self.heatmap)
+	--self:PrintTable(self.heatmap)
 
 end
 
 function Mouse:GreedyWalk(frameTime)
 
 	self:calc_heatmap()
+	local maxVal = 0
+	local maxPos_x = 0;
+	local maxPos_y = 0;
 
-	local maxVal = self.heatmap[10][10];
-	local maxPos_x = 10;
-	local maxPos_y = 10;
-
+	if self.heatmap[10][10] > maxVal then
+		maxVal = self.heatmap[10][10];
+		maxPos_x = 10;
+		maxPos_y = 10;
+	end
+--Log(self.heatmap[10][10].." "..maxVal)
 	if self.heatmap[11][10] > maxVal then
 		maxVal = self.heatmap[11][10];
 		maxPos_x = 11;
 		maxPos_y = 10;
 	end
-
+--Log(self.heatmap[11][10].." "..maxVal)
 	if self.heatmap[12][10] > maxVal then
 		maxVal = self.heatmap[12][10];
 		maxPos_x = 12;
 		maxPos_y = 10;
 	end
-
+--Log(self.heatmap[12][10].." "..maxVal)
 	if self.heatmap[10][11] > maxVal then
 		maxVal = self.heatmap[10][11];
 		maxPos_x = 10;
 		maxPos_y = 11;
 	end
-
+--Log(self.heatmap[10][11].." "..maxVal)
 	if self.heatmap[11][11] > maxVal then
 		maxVal = self.heatmap[11][11];
 		maxPos_x = 11;
 		maxPos_y = 11;
 	end
-	
+--Log(self.heatmap[11][11].." "..maxVal)	
 	if self.heatmap[12][11] > maxVal then
 		maxVal = self.heatmap[12][11];
 		maxPos_x = 12;
 		maxPos_y = 11;
 	end
-
+--Log(self.heatmap[12][11].." "..maxVal)
 	if self.heatmap[10][12] > maxVal then
 		maxVal = self.heatmap[10][12];
 		maxPos_x = 10;
 		maxPos_y = 12;
 	end
-
+--Log(self.heatmap[10][12].." "..maxVal)
 	if self.heatmap[11][12] > maxVal then
 		maxVal = self.heatmap[11][12];
 		maxPos_x = 11;
 		maxPos_y = 12;
 	end
-
+--Log(self.heatmap[11][12].." "..maxVal)
 	if self.heatmap[12][12] > maxVal then
 		maxVal = self.heatmap[12][12];
 		maxPos_x = 12;
 		maxPos_y = 12;
 	end
-
+--Log(self.heatmap[12][12].." "..maxVal)
 	--	local newpos = self:heatmap_to_pos(maxPos_x, maxPos_y);
 
 	local newpos = {x = self.pos.x + maxPos_x - 10, y = self.pos.y + maxPos_y - 10, z= self.pos.z}
+	self:DisplayHeatmap()
 	self:updateDir(newpos)
 	self:Move_to_Pos(frameTime, newpos);
+	--System.DrawLabel(newpos, 3.0, tostring(maxVal), 0.6, 0.0, 0.0, 1);
 	
 
 end
