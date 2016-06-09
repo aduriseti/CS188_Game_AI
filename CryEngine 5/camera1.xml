@@ -137,7 +137,7 @@
    <ResizeBorder X="0" Y="0" Width="1590" Height="1010"/>
    <NodeSize Width="1590" Height="1051.5398"/>
   </Node>
-  <Node Id="52" Name="Check WASD input" Class="_commentbox" pos="-750,-84.656288,0" flags="0">
+  <Node Id="52" Name="Check WASD input" Class="_commentbox" pos="-750,-84.656273,0" flags="0">
    <Inputs TextSize="1" Color="0.715694,0.564712,0.863157" DisplayFilled="1" DisplayBox="1" SortPriority="16"/>
    <ResizeBorder X="0" Y="0" Width="850" Height="610"/>
    <NodeSize Width="850" Height="651.53986"/>
@@ -153,7 +153,7 @@
    <ResizeBorder X="0" Y="0" Width="470" Height="210"/>
    <NodeSize Width="470" Height="251.53986"/>
   </Node>
-  <Node Id="56" Name="Move using WASD" Class="_commentbox" pos="-750,572.98846,0" flags="0">
+  <Node Id="56" Name="Move using WASD" Class="_commentbox" pos="-750,572.98834,0" flags="0">
    <Inputs TextSize="1" Color="0.617207,0.863157,0.665387" DisplayFilled="1" DisplayBox="1" SortPriority="16"/>
    <ResizeBorder X="0" Y="0" Width="1650" Height="1050"/>
    <NodeSize Width="1650" Height="1091.5398"/>
@@ -199,7 +199,7 @@
   <Node Id="99" Class="String:Concat" pos="-2030,-160,0" flags="0">
    <Inputs String1="Cheese: " String2=""/>
   </Node>
-  <Node Id="100" Class="Time:Time" pos="-2710,-170,0" flags="0">
+  <Node Id="100" Class="Time:Time" pos="-2710,-170,0" flags="1">
    <Inputs paused="0"/>
   </Node>
   <Node Id="102" Class="entity:MousePlayer" pos="-2470,-310,0" flags="0" EntityGUID="{95A4E46A-8DED-47B9-A8B4-6281C39013B8}" EntityGUID_64="47B98DED95A4E46A">
@@ -208,7 +208,7 @@
   <Node Id="104" Class="entity:MousePlayer" pos="310,-1010,0" flags="0" EntityGUID="{95A4E46A-8DED-47B9-A8B4-6281C39013B8}" EntityGUID_64="47B98DED95A4E46A">
    <Inputs Coordinates="0,0,0" FacePos="0,0,0" Stats="0"/>
   </Node>
-  <Node Id="105" Class="Debug:InputKey" pos="-2870,-910,0" flags="1">
+  <Node Id="105" Class="Debug:InputKey" pos="-2870,-910,0" flags="0">
    <Inputs Key="z" NonDevMode="0"/>
   </Node>
   <Node Id="106" Class="Camera:View" pos="-1710,-880,0" flags="0" EntityGUID="{CD471443-B261-46EE-B54A-9F7F45024245}" EntityGUID_64="46EEB261CD471443">
@@ -311,18 +311,18 @@
   <Edge nodeIn="19" nodeOut="60" portIn="Activate" portOut="OutValue" enabled="1"/>
   <Edge nodeIn="104" nodeOut="83" portIn="Coordinates" portOut="OnTrue" enabled="1"/>
   <Edge nodeIn="92" nodeOut="89" portIn="CanvasID" portOut="CanvasID" enabled="1"/>
-  <Edge nodeIn="92" nodeOut="89" portIn="Activate" portOut="OnLoad" enabled="1"/>
   <Edge nodeIn="94" nodeOut="89" portIn="CanvasID" portOut="CanvasID" enabled="1"/>
-  <Edge nodeIn="94" nodeOut="89" portIn="Activate" portOut="OnLoad" enabled="1"/>
   <Edge nodeIn="95" nodeOut="89" portIn="CanvasID" portOut="CanvasID" enabled="1"/>
-  <Edge nodeIn="95" nodeOut="89" portIn="Activate" portOut="OnLoad" enabled="1"/>
   <Edge nodeIn="96" nodeOut="89" portIn="CanvasID" portOut="CanvasID" enabled="1"/>
-  <Edge nodeIn="96" nodeOut="89" portIn="Activate" portOut="OnLoad" enabled="1"/>
   <Edge nodeIn="92" nodeOut="93" portIn="Value" portOut="Out" enabled="1"/>
   <Edge nodeIn="95" nodeOut="97" portIn="Value" portOut="Out" enabled="1"/>
   <Edge nodeIn="94" nodeOut="98" portIn="Value" portOut="Out" enabled="1"/>
   <Edge nodeIn="96" nodeOut="99" portIn="Value" portOut="Out" enabled="1"/>
+  <Edge nodeIn="92" nodeOut="100" portIn="Activate" portOut="tick" enabled="1"/>
   <Edge nodeIn="93" nodeOut="100" portIn="Set" portOut="tick" enabled="1"/>
+  <Edge nodeIn="94" nodeOut="100" portIn="Activate" portOut="tick" enabled="1"/>
+  <Edge nodeIn="95" nodeOut="100" portIn="Activate" portOut="tick" enabled="1"/>
+  <Edge nodeIn="96" nodeOut="100" portIn="Activate" portOut="tick" enabled="1"/>
   <Edge nodeIn="97" nodeOut="100" portIn="Set" portOut="tick" enabled="1"/>
   <Edge nodeIn="98" nodeOut="100" portIn="Set" portOut="tick" enabled="1"/>
   <Edge nodeIn="99" nodeOut="100" portIn="Set" portOut="tick" enabled="1"/>
