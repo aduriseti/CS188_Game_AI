@@ -1,6 +1,7 @@
 <Definition root="Data">
  
     <Property name="version" type="string"/>
+<<<<<<< HEAD
  
     <Table name="defaultTable">
 
@@ -17,5 +18,22 @@
         </Array>
         
     </Table>
+=======
+    
+        <Table name="defaultTable">
+                
+            <Array name="God" elementName="Jesus">
+                <Property name="Time" type="float"/>
+                 <Property name="MouseLocCur" type="Vec3"/>
+                 <Property name="MouseLocTo" type="Vec3"/>
+                 <Property name="AllWalls" type="string"/>
+                 <Property name="AllSnakes" type="string"/>
+                 <Property name="AllTraps" type="string"/>
+                 <Property name="AllFoods" type="string"/>
+            </Array>    
+
+            
+        </Table>
+>>>>>>> 8b6970a3d449acf4ea73c68407c60e314733577e
      
 </Definition>
