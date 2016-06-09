@@ -1,0 +1,35 @@
+<Material MtlFlags="524544">
+	<SubMaterials>
+		<Material Name="RootNode.(unnamed)_1.VEER" Shininess="10" Opacity="1" MtlFlags="524416" Shader="Illum" GenMask="100000000" Diffuse="1,1,1" Specular="0,0,0">
+			<Textures/>
+		</Material>
+		<Material Name="RootNode.Empty_Mesh_2.VEER" Shininess="10" Opacity="1" MtlFlags="524416" Shader="Illum" GenMask="100000000" Diffuse="1,1,1" Specular="0,0,0">
+			<Textures/>
+		</Material>
+		<Material Name="RootNode.Empty_Mesh_3.VEER" Shininess="10" Opacity="1" MtlFlags="524416" Shader="Illum" GenMask="100000000" Diffuse="1,1,1" Specular="0,0,0">
+			<Textures/>
+		</Material>
+		<Material Name="RootNode.Empty_Mesh_1.FRQ;E" Shininess="10" Opacity="1" MtlFlags="524416" Shader="Illum" GenMask="100000000" Diffuse="1,1,1" Specular="0,0,0">
+			<Textures/>
+		</Material>
+		<Material Name="RootNode.Empty_Mesh.FRQ;E" Shininess="10" Opacity="1" MtlFlags="524416" Shader="Illum" GenMask="100000000" Diffuse="1,1,1" Specular="0,0,0">
+			<Textures/>
+		</Material>
+		<Material Name="RootNode.Empty_Mesh.houders" Shininess="10" Opacity="1" MtlFlags="524416" Shader="Illum" GenMask="100000000" Diffuse="1,1,1" Specular="0,0,0">
+			<Textures/>
+		</Material>
+		<Material Name="RootNode.Empty_Mesh_1.BODY" Shininess="10" Opacity="1" MtlFlags="524416" Shader="Illum" GenMask="100000000" Diffuse="1,1,1" Specular="0,0,0">
+			<Textures>
+				<Texture Map="Diffuse" File="../Textures/BETTER-BLOOD-SPLATTER-psd11647.png"/>
+			</Textures>
+		</Material>
+		<Material Name="RootNode.Empty_Mesh.BODY" Shininess="10" Opacity="1" MtlFlags="524416" Shader="Illum" GenMask="100000000" Diffuse="1,1,1" Specular="0,0,0">
+			<Textures>
+				<Texture Map="Diffuse" File="../Textures/BETTER-BLOOD-SPLATTER-psd11647.png"/>
+			</Textures>
+		</Material>
+		<Material Name="RootNode.(unnamed).plane" Shininess="10" Opacity="1" MtlFlags="524416" Shader="Illum" GenMask="100000000" Diffuse="1,1,1" Specular="0,0,0">
+			<Textures/>
+		</Material>
+	</SubMaterials>
+</Material>

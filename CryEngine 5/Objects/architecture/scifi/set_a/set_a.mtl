@@ -1,0 +1,147 @@
+<Material MtlFlags="524544" vertModifType="0">
+ <SubMaterials>
+  <Material Name="proxy" MtlFlags="524416" Shader="Illum" GenMask="80000001" StringGenMask="%ALLOW_SILHOUETTE_POM%SUBSURFACE_SCATTERING" SurfaceType="" MatTemplate="" Diffuse="1,1,1" Specular="0.50888133,0.50888133,0.50888133" Emissive="0,0,0" Opacity="0.15000001" Shininess="123" vertModifType="0" LayerAct="1">
+   <Textures />
+   <PublicParams SSSIndex="0" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+  <Material Name="trim_metal" MtlFlags="524416" Shader="Illum" GenMask="C9000001" StringGenMask="%ALLOW_SILHOUETTE_POM%NORMAL_MAP%PARALLAX_OCCLUSION_MAPPING%SPECULAR_MAP%SUBSURFACE_SCATTERING" SurfaceType="" MatTemplate="" Diffuse="0.18447502,0.22322798,0.59061897" Specular="1,1,1" Emissive="0,0,0" Opacity="1" Shininess="228" vertModifType="0" LayerAct="1">
+   <Textures>
+    <Texture Map="Diffuse" File="textures/generic/base_colors/white_diff.tif"/>
+    <Texture Map="Bumpmap" File="objects/architecture/scifi/set_a/textures/trims_a_ddna.tif"/>
+    <Texture Map="Specular" File="objects/architecture/scifi/set_a/textures/trims_a_spec.tif"/>
+    <Texture Map="Heightmap" File="objects/architecture/scifi/set_a/textures/trims_a_displ.tif"/>
+   </Textures>
+   <PublicParams PomDisplacement="0.025" SSSIndex="0" SelfShadowStrength="3" HeightBias="1" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+  <Material Name="panels" MtlFlags="524416" Shader="Illum" GenMask="81000001" StringGenMask="%ALLOW_SILHOUETTE_POM%NORMAL_MAP%SUBSURFACE_SCATTERING" SurfaceType="" MatTemplate="" Diffuse="0.72305524,0.72305524,0.72305524" Specular="0.19806935,0.19806935,0.19806935" Emissive="0,0,0" Opacity="1" Shininess="150" vertModifType="0" LayerAct="1">
+   <Textures>
+    <Texture Map="Diffuse" File="textures/generic/base_colors/white_diff.tif"/>
+    <Texture Map="Bumpmap" File="objects/architecture/scifi/set_a/textures/panels_a_ddna.tif"/>
+    <Texture Map="Heightmap" File="objects/architecture/scifi/set_a/textures/panels_a_displ.tif"/>
+   </Textures>
+   <PublicParams SSSIndex="0" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+  <Material Name="base" MtlFlags="524416" Shader="Illum" GenMask="81000001" StringGenMask="%ALLOW_SILHOUETTE_POM%NORMAL_MAP%SUBSURFACE_SCATTERING" SurfaceType="" MatTemplate="" Diffuse="1,1,1" Specular="0.04518621,0.04518621,0.04518621" Emissive="0,0,0" Opacity="1" Shininess="235" vertModifType="0" LayerAct="1">
+   <Textures>
+    <Texture Map="Diffuse" File="textures/generic/base_colors/white_diff.tif"/>
+    <Texture Map="Bumpmap" File="objects/pbs_reference/gloss80_ddna.tif"/>
+   </Textures>
+   <PublicParams SSSIndex="0" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+  <Material Name="glow" MtlFlags="524416" Shader="Illum" GenMask="80000001" StringGenMask="%ALLOW_SILHOUETTE_POM%SUBSURFACE_SCATTERING" SurfaceType="" MatTemplate="" Diffuse="1,1,1" Specular="0,0,0" Emissive="0,0,0" Opacity="1" Shininess="10" GlowAmount="1.2" vertModifType="0" LayerAct="1">
+   <Textures>
+    <Texture Map="Diffuse" File="textures/generic/base_colors/white_diff.tif"/>
+   </Textures>
+   <PublicParams SSSIndex="0" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+  <Material Name="panels_light" MtlFlags="524416" Shader="Illum" GenMask="81000001" StringGenMask="%ALLOW_SILHOUETTE_POM%NORMAL_MAP%SUBSURFACE_SCATTERING" SurfaceType="" MatTemplate="" Diffuse="1,1,1" Specular="0.19806935,0.19806935,0.19806935" Emissive="0,0,0" Opacity="1" Shininess="166" vertModifType="0" LayerAct="1">
+   <Textures>
+    <Texture Map="Diffuse" File="textures/generic/base_colors/white_diff.tif"/>
+    <Texture Map="Bumpmap" File="objects/pbs_reference/gloss80_ddna.tif"/>
+   </Textures>
+   <PublicParams SSSIndex="0" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+  <Material Name="pillow" MtlFlags="524416" Shader="Illum" GenMask="81000001" StringGenMask="%ALLOW_SILHOUETTE_POM%NORMAL_MAP%SUBSURFACE_SCATTERING" SurfaceType="" MatTemplate="" Diffuse="0.588,0.588,0.588" Specular="0,0,0" Emissive="0,0,0" Opacity="1" Shininess="10" vertModifType="0" LayerAct="1">
+   <Textures>
+    <Texture Map="Diffuse" File="textures/generic/base_colors/white_diff.tif"/>
+    <Texture Map="Bumpmap" File="objects/pbs_reference/gloss80_ddna.tif"/>
+   </Textures>
+   <PublicParams SSSIndex="0" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+  <Material Name="metal_panels" MtlFlags="524416" Shader="Illum" GenMask="80000001" StringGenMask="%ALLOW_SILHOUETTE_POM%SUBSURFACE_SCATTERING" SurfaceType="" MatTemplate="" Diffuse="0.588,0.588,0.588" Specular="0,0,0" Emissive="0,0,0" Opacity="1" Shininess="10" vertModifType="0" LayerAct="1">
+   <Textures>
+    <Texture Map="Diffuse" File="textures/generic/base_colors/white_diff.tif"/>
+   </Textures>
+   <PublicParams SSSIndex="0" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+  <Material Name="grate01" MtlFlags="524416" Shader="Illum" GenMask="81000001" StringGenMask="%ALLOW_SILHOUETTE_POM%NORMAL_MAP%SUBSURFACE_SCATTERING" SurfaceType="" MatTemplate="" Diffuse="1,1,1" Specular="0.54572457,0.54572457,0.54572457" Emissive="0,0,0" Opacity="1" Shininess="235" vertModifType="0" LayerAct="1">
+   <Textures>
+    <Texture Map="Diffuse" File="textures/generic/base_colors/white_diff.tif"/>
+    <Texture Map="Bumpmap" File="objects/architecture/sci_fi/grate02_ddn.tif"/>
+   </Textures>
+   <PublicParams SSSIndex="0" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+  <Material Name="grate02" MtlFlags="524416" Shader="Illum" GenMask="89000001" StringGenMask="%ALLOW_SILHOUETTE_POM%NORMAL_MAP%PARALLAX_OCCLUSION_MAPPING%SUBSURFACE_SCATTERING" SurfaceType="" MatTemplate="" Diffuse="0,0,0" Specular="0.54572457,0.54572457,0.54572457" Emissive="0,0,0" Opacity="1" Shininess="135" AlphaTest="0.18000001" vertModifType="0" LayerAct="1">
+   <Textures>
+    <Texture Map="Diffuse" File="textures/generic/base_colors/white_diff.tif"/>
+    <Texture Map="Bumpmap" File="objects/architecture/scifi/set_a/textures/grate_cross_ddna.tif"/>
+    <Texture Map="Heightmap" File="objects/architecture/scifi/set_a/textures/grate_cross_displ.tif"/>
+   </Textures>
+   <PublicParams PomDisplacement="0.039799999" SSSIndex="0" SelfShadowStrength="3" HeightBias="0.5" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+  <Material Name="grate03" MtlFlags="524416" Shader="Illum" GenMask="89000001" StringGenMask="%ALLOW_SILHOUETTE_POM%NORMAL_MAP%PARALLAX_OCCLUSION_MAPPING%SUBSURFACE_SCATTERING" SurfaceType="" MatTemplate="" Diffuse="0,0,0" Specular="0.54572457,0.54572457,0.54572457" Emissive="0,0,0" Opacity="1" Shininess="135" AlphaTest="0.18000001" vertModifType="0" LayerAct="1">
+   <Textures>
+    <Texture Map="Diffuse" File="objects/architecture/scifi/set_a/textures/grate_stripes_diff.tif"/>
+    <Texture Map="Bumpmap" File="objects/architecture/scifi/set_a/textures/grate_stripes_ddna.tif"/>
+    <Texture Map="Heightmap" File="objects/architecture/scifi/set_a/textures/grate_stripes_displ.tif"/>
+   </Textures>
+   <PublicParams PomDisplacement="0.039799999" SSSIndex="0" SelfShadowStrength="3" HeightBias="0.5" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+  <Material Name="white_paint" MtlFlags="524416" Shader="Illum" GenMask="81000001" StringGenMask="%ALLOW_SILHOUETTE_POM%NORMAL_MAP%SUBSURFACE_SCATTERING" SurfaceType="" MatTemplate="" Diffuse="0.81484669,0.81484669,0.81484669" Specular="0.04518621,0.04518621,0.04518621" Emissive="0,0,0" Opacity="1" Shininess="176" vertModifType="0" LayerAct="1">
+   <Textures>
+    <Texture Map="Diffuse" File="textures/generic/base_colors/white_diff.tif"/>
+    <Texture Map="Bumpmap" File="objects/pbs_reference/gloss80_ddna.tif"/>
+   </Textures>
+   <PublicParams SSSIndex="0" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+  <Material Name="black_paint" MtlFlags="524416" Shader="Illum" GenMask="81000001" StringGenMask="%ALLOW_SILHOUETTE_POM%NORMAL_MAP%SUBSURFACE_SCATTERING" SurfaceType="" MatTemplate="" Diffuse="0.064803272,0.064803272,0.064803272" Specular="0.04518621,0.04518621,0.04518621" Emissive="0,0,0" Opacity="1" Shininess="170" vertModifType="0" LayerAct="1">
+   <Textures>
+    <Texture Map="Diffuse" File="textures/generic/base_colors/white_diff.tif"/>
+    <Texture Map="Bumpmap" File="objects/pbs_reference/gloss80_ddna.tif"/>
+   </Textures>
+   <PublicParams SSSIndex="0" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+  <Material Name="orange_paint" MtlFlags="524418" Shader="Illum" GenMask="81000001" StringGenMask="%ALLOW_SILHOUETTE_POM%NORMAL_MAP%SUBSURFACE_SCATTERING" SurfaceType="" MatTemplate="" Diffuse="0.62396049,0.1221388,0.013702084" Specular="0.04518621,0.04518621,0.04518621" Emissive="0,0,0" Opacity="1" Shininess="228" vertModifType="0" LayerAct="1">
+   <Textures>
+    <Texture Map="Diffuse" File="textures/generic/base_colors/white_diff.tif"/>
+    <Texture Map="Bumpmap" File="objects/pbs_reference/gloss80_ddna.tif"/>
+   </Textures>
+   <PublicParams SSSIndex="0" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+  <Material Name="iron" MtlFlags="524416" Shader="Illum" GenMask="C1000001" StringGenMask="%ALLOW_SILHOUETTE_POM%NORMAL_MAP%SPECULAR_MAP%SUBSURFACE_SCATTERING" SurfaceType="mat_metal" MatTemplate="" Diffuse="0,0,0" Specular="1,1,1" Emissive="0,0,0" Opacity="1" Shininess="233" vertModifType="0" LayerAct="1">
+   <Textures>
+    <Texture Map="Bumpmap" File="objects/pbs_reference/gloss70_ddna.tif"/>
+    <Texture Map="Specular" File="objects/pbs_reference/iron_spec.tif"/>
+   </Textures>
+   <PublicParams SSSIndex="0" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+  <Material Name="glass" MtlFlags="2623618" Shader="Glass" GenMask="10" StringGenMask="%BILINEAR_FP16" SurfaceType="mat_glass_breakable_thin_large" MatTemplate="" Diffuse="0,0,0" Specular="0.3185468,0.3185468,0.3185468" Emissive="0,0,0" Opacity="1" Shininess="255" vertModifType="0" LayerAct="1">
+   <Textures />
+   <PublicParams BumpMapTile="1" TintColor="1,1,1" TintCloudiness="0.211" BackLightScale="0.34200001" BumpScale="0.1" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+  <Material Name="holo_display_moving" MtlFlags="526466" Shader="Monitor" GenMask="0" StringGenMask="" SurfaceType="" MatTemplate="" Diffuse="1,1,1" Specular="0,0,0" Emissive="0,0,0" Opacity="1" Shininess="10" GlowAmount="2" AlphaTest="0.18000001" vertModifType="0" LayerAct="1">
+   <Textures>
+    <Texture Map="Diffuse" File="objects/architecture/scifi/set_a/textures/holo_display_diff.tif">
+     <TexMod TexMod_RotateType="3" TexMod_TexGenType="0" TexMod_bTexGenProjected="0" TexMod_UOscillatorType="2" TexMod_UOscillatorRate="1" TexMod_UOscillatorPhase="1" TexMod_UOscillatorAmplitude="0.0099999998"/>
+    </Texture>
+   </Textures>
+   <PublicParams GrainAmount="0.64200002" DeformAmount="0" DeformTillingY="1" GrainTilling="8.5299997" ResolutionX="1132" ResolutionY="902" InterlacingTilling="2.5699999" Contrast="7.5599999" Saturation="10.08" DeformTillingX="1" GrainSaturation="0.74699998" FresnelScale="27" InterlacingAmount="0" VSyncFreq="0" PixelVisibility="0.56400001" FresnelBias="0.67900002" ChromaShift="0" ViewAngle="180" DeformFreq="-8.3000002"/>
+  </Material>
+  <Material Name="holo_display_fix" MtlFlags="524418" Shader="Illum" GenMask="80000001" StringGenMask="%ALLOW_SILHOUETTE_POM%SUBSURFACE_SCATTERING" SurfaceType="" MatTemplate="" Diffuse="0,0.035601322,0.44520122" Specular="0,0,0" Emissive="0,0,0" Opacity="1" GlowAmount="3" AlphaTest="0.15000001" vertModifType="0" LayerAct="1">
+   <Textures>
+    <Texture Map="Diffuse" File="objects/architecture/scifi/set_a/textures/holo_display_diff.tif">
+     <TexMod TexMod_RotateType="0" TexMod_TexGenType="0" TexMod_bTexGenProjected="0" TexMod_UOscillatorRate="1" TexMod_UOscillatorPhase="1" TexMod_UOscillatorAmplitude="0.0099999998"/>
+    </Texture>
+   </Textures>
+   <PublicParams SSSIndex="0" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+  <Material Name="chemichal" MtlFlags="524416" Shader="Illum" GenMask="80000001" StringGenMask="%ALLOW_SILHOUETTE_POM%SUBSURFACE_SCATTERING" SurfaceType="" MatTemplate="" Diffuse="0,0.92158198,1" Specular="0,0,0" Emissive="0,0,0" Opacity="1" Shininess="255" GlowAmount="0.60000002" vertModifType="0" LayerAct="1">
+   <Textures>
+    <Texture Map="Diffuse" File="objects/architecture/scifi/set_a/textures/chemichal_diff.tif">
+     <TexMod TexMod_RotateType="0" TexMod_TexGenType="0" TexMod_bTexGenProjected="0" TileU="0.69999999" TexMod_UOscillatorType="2" TexMod_UOscillatorRate="1" TexMod_UOscillatorPhase="1" TexMod_UOscillatorAmplitude="0.2" TileV="0.69999999" TexMod_WRotateRate="0.99975586" TexMod_WRotateAmplitude="0.0054931641"/>
+    </Texture>
+    <Texture Map="Decal" File="objects/architecture/scifi/set_a/textures/chemichal_diff.tif">
+     <TexMod TexMod_RotateType="0" TexMod_TexGenType="0" TexMod_bTexGenProjected="0" TileU="4" TexMod_UOscillatorType="2" TexMod_UOscillatorRate="1" TexMod_UOscillatorAmplitude="0.5" TileV="4"/>
+    </Texture>
+   </Textures>
+   <PublicParams SSSIndex="0" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+  <Material Name="signs" MtlFlags="524416" Shader="Illum" GenMask="80000801" StringGenMask="%ALLOW_SILHOUETTE_POM%DECAL%SUBSURFACE_SCATTERING" SurfaceType="" MatTemplate="" Diffuse="1,1,1" Specular="0,0,0" Emissive="0,0,0" Opacity="1" Shininess="10" AlphaTest="0.039999999" CloakAmount="0" vertModifType="0" LayerAct="1">
+   <Textures>
+    <Texture Map="Diffuse" File="objects/architecture/scifi/set_a/textures/decal_signs_a_diff.tif"/>
+   </Textures>
+   <PublicParams DecalDiffuseOpacity="1" DecalFalloff="1" DecalAlphaMult="1" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+ </SubMaterials>
+ <PublicParams SSSIndex="0" IndirectColor="0.25,0.25,0.25"/>
+</Material>

@@ -1,0 +1,15 @@
+<Material MtlFlags="524544">
+ <SubMaterials>
+  <Material Name="proxy_mat" MtlFlags="525440" Shader="Nodraw" GenMask="0" StringGenMask="" SurfaceType="mat_nodraw" MatTemplate="" Diffuse="1,0,0" Specular="0.5,0.5,0.5" Emissive="0,0,0" Shininess="10" Opacity="1" LayerAct="1">
+   <Textures />
+  </Material>
+  <Material Name="firehydrant_mat" MtlFlags="524416" Shader="Illum" GenMask="2080000081" StringGenMask="%ALLOW_SILHOUETTE_POM%BUMP_MAP%SUBSURFACE_SCATTERING%VERTCOLORS" SurfaceType="mat_metal_thick" MatTemplate="" Diffuse="0.5,0.5,0.5" Specular="0.064803272,0.056128494,0.056128494" Emissive="0,0,0" Shininess="255" Opacity="1" AlphaTest="0.56" LayerAct="1">
+   <Textures>
+    <Texture Map="Diffuse" File="objects/beachcity/props/firehydrant/firehydrant_01_diff.tif"/>
+    <Texture Map="Bumpmap" File="objects/beachcity/props/firehydrant/firehydrant_01_ddna.tif"/>
+   </Textures>
+   <PublicParams SSSIndex="0" IndirectColor="0.25,0.25,0.25"/>
+  </Material>
+ </SubMaterials>
+ <PublicParams SSSIndex="0" IndirectColor="0.25,0.25,0.25"/>
+</Material>
