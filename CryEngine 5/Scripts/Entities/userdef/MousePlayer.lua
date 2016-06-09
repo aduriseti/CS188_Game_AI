@@ -27,6 +27,7 @@ MousePlayer = {
 	    
     angles = 0,
     pos = {},
+	lastTime = 0,
     
     --moveQueue = {},
     nextPos,
@@ -674,6 +675,9 @@ function MousePlayer:UpdateTable()
     
 	locations[index].MouseLocCur = self:GetPos() --or {x=0,y=0,z=0}
     
+	local timeSinceLast = System.GetCurrTime() - self.lastTime
+	locations[index].Time = timeSinceLast
+	
 	if self.nextPos == nil then 
 		locations[index].MouseLocTo = {x=0,y=0,z=0}
 	else 

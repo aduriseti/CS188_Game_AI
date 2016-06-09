@@ -6,6 +6,7 @@
 
         <!-- My Locations -->
         <Array name="Locations" elementName="frame">
+            <Property name="Time" type="float"/>
             <Property name="MouseLocCur" type="Vec3"/>
             <Property name="MouseLocTo" type="Vec3" />
             <Property name="SnakeLoc" type="Vec3"/>
