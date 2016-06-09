@@ -997,10 +997,27 @@ end
 -- Display heat map labels on screen
 function Mouse:DisplayHeatmap()
 
+	local r = 0.0
+	local g = 0.0
+	local b = 0.0
+
 	for row=1, 21 do
 		for col=1, 21 do
-			local pos = {x=self.pos.x + col-11, y= self.pos.y + row -11, z=self.pos.z};
-			System.DrawLabel(pos, 1.7, tostring(self.heatmap[col][row]), 0.6, 0, 0, 1);
+			local pos = {x = self:GetPos().x + col - 11, y = self:GetPos().y + row - 11, z = self:GetPos().z}
+			r = 0.0
+			g = 0.0
+			b = 0.0
+
+			if self.heatmap[col][row] < -10 then
+				r = 0.6
+			elseif self.heatmap[col][row] > -10 and self.heatmap[col][row] < 10 then
+				g = 0.6
+			else
+				b = 0.6
+			end
+
+			System.DrawLabel(pos, 1.7, tostring(self.heatmap[col][row]), r, g, b, 1);
+
 		end
 	end
 
