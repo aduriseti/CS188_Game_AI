@@ -982,6 +982,12 @@ function Mouse:GreedyWalk(frameTime)
 		maxPos_y = 11;
 	end
 
+	if self.heatmap[11][11] > maxVal then
+		maxVal = self.heatmap[11][11];
+		maxPos_x = 11;
+		maxPos_y = 11;
+	end
+	
 	if self.heatmap[12][11] > maxVal then
 		maxVal = self.heatmap[12][11];
 		maxPos_x = 12;
