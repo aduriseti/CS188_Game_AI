@@ -1,15 +1,7 @@
 <Data version="Test 1.0">
-<<<<<<< HEAD
  <defaultTable>
   <Locations>
    <frame Time="0.0", MouseLocCur="0,0,0" MouseLocTo="0,0,0" SnakeLoc="0,0,0" TrapLoc="0,0,0" TrapType="Trap1" FoodLoc="0,0,0" FoodType="Cheese"/>
   </Locations>
  </defaultTable>
-=======
-      <defaultTable >
-        <God>
-          <Jesus Time="0.0" MouseLocCur="0,0,0" MouseLocTo="0,0,0" AllWalls="" AllSnakes="" AllTraps="" AllFoods="" />
-        </God>
-      </defaultTable>
->>>>>>> 8b6970a3d449acf4ea73c68407c60e314733577e
 </Data>

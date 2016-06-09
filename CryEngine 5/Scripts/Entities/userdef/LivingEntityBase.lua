@@ -719,8 +719,16 @@ function LivingEntityBase:bounce(frameTime)
 	--choose random starting direction
 	--Log("choose rand initial direction");
 	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
-	local rnd_idx = random(#empty_neighbors);
+	local rNum = #empty_neighbors
+	if rNum == 1 then
+		local rnd_idx = 0
+		self.direction = empty_neighbors[rnd_idx].direction;
+	elseif rNum >= 2 then
+		local rnd_idx = random(rNum);
 	self.direction = empty_neighbors[rnd_idx].direction;
+
+	end
+
 end	
 
 function LivingEntityBase:directionalWalk(frameTime)

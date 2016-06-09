@@ -141,7 +141,7 @@ Mouse.Test =
 		 -- LogVec("ImpulseDir", self.Move.impulseDir)
 		  --self:GotoState("Move")
 		  self:DisplayHeatmap()
-		  --self:GreedyWalk(time)
+		  self:GreedyWalk(time)
 	end,
 	
 	OnEndState = function(self)
@@ -861,8 +861,10 @@ function Mouse:updateHeatMapBFS(class,pos)
 		end
 
 		local value = m * (b^p.i) * s
-		--Log(class..p.pos.x..","..p.pos.y.."value:"..value..s)
-		self.heatmap[p.pos.x][p.pos.y] = self.heatmap[p.pos.x][p.pos.y] + value
+		Log(class..p.pos.x..","..p.pos.y.."value:"..value..s)
+		if( p.pos.x >= 1 and p.pos.x <= 21 and p.pos.y >= 1 and p.pos.y <= 21) then
+			self.heatmap[p.pos.x][p.pos.y] = self.heatmap[p.pos.x][p.pos.y] + value
+		end
 		--Log("m,b"..m..","..b.."; value:"..value)
 		--Log(self.heatmap[p.pos.x][p.pos.y])
 		
@@ -1047,8 +1049,13 @@ function Mouse:DisplayHeatmap()
 
 			if self.heatmap[col][row] < -10 then
 				r = 0.6
-			elseif self.heatmap[col][row] > -10 and self.heatmap[col][row] < 10 then
+			elseif self.heatmap[col][row] > -10 and self.heatmap[col][row] <= 10 then
+				r = 1
+				b = 0
 				g = 0.6
+			elseif self.heatmap[col][row] > 10 and self.heatmap[col][row] < 20 then
+				g = 0.6
+
 			else
 				b = 0.6
 			end
