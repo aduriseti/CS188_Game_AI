@@ -395,8 +395,8 @@ function LivingEntityBase:getUnoccupiedNeighbors(loc_row, loc_col)
 		local col_index = value.col_inc + loc_col
 
 		if row_index > 0 and col_index > 0 and row_index <= #grid and col_index <= #grid[1] then 
-			Log("loc_row = %d, loc_col = %d", loc_row, loc_col)
-			Log("row_index = %d, col_index = %d", row_index, col_index)
+			--Log("loc_row = %d, loc_col = %d", loc_row, loc_col)
+			--Log("row_index = %d, col_index = %d", row_index, col_index)
 			if grid[row_index][col_index].occupied == false then
 			
 				try_pos = self.Maze_Properties.ID:rowcol_to_pos(row_index, col_index);
@@ -656,14 +656,12 @@ function LivingEntityBase:demoWalk()
 	--local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
 	--Lumberyard
 	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+	local cell_rowcol = self.Maze_Properties.ID:rowcol_to_cellrowcol(rowcol.row, rowcol.col);
+	Log("cell_rowcol.row: " .. tostring(cell_rowcol.row));
+	Log("cell_rowcol.col: " .. tostring(cell_rowcol.col));
 
 	local row = rowcol.row;
 	local col = rowcol.col;
-	
-	Log("Self.pos" .. Vec2Str(self.pos));
-	Log("GetPos()" .. Vec2Str(self:GetPos()));
-	
-	Log("row = %d, col = %d", row, col)
 	
 	for i = col-1, col + 1 do
 		for j = row - 1, row + 1 do
