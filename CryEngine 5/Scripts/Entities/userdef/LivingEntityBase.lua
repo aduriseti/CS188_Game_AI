@@ -662,7 +662,7 @@ function LivingEntityBase:demoWalk()
 	for i = col-1, col + 1 do
 		for j = row - 1, row + 1 do
 			local pos = self.Maze_Properties.ID:rowcol_to_pos(j, i);
-			System.DrawLabel(pos, 5, tostring(self.Maze_Properties.grid[j][i].n_visited), 0, 1,0, 1);
+			System.DrawLabel(pos, 3, tostring(self.Maze_Properties.grid[j][i].n_visited), 0, 1,0, 1);
 		end
 	end
 
@@ -673,12 +673,15 @@ function LivingEntityBase:demoWalk()
 
 	local prev_pos = self.Previous_Loc
 	--if we haven't moved out of a grid space yet, continue as before
+	
+	
 	if row == prev_pos.row and col == prev_pos.col and (loc_row_inc ~= 0 or loc_col_inc ~= 0) then
 		Log("STAY ON COURSE");
 		--local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
 		--self:Move_to_Pos(frameTime, target_pos);
 		return;
 	end
+	
 
 	--else change our behavior
 	self.Previous_Loc.col = col;
@@ -704,7 +707,7 @@ function LivingEntityBase:demoWalk()
 	
 	end
 	
-	local min_val = 10000;
+	local min_val = 1000000;
 	local min_key = 0
 
 	for key, value in pairs(empty_neighbors) do
@@ -780,6 +783,7 @@ function LivingEntityBase:bounce(frameTime)
 	--Log("choose rand initial direction");
 	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
 	local rNum = #empty_neighbors
+	--Log("rNum" .. tostring(rNum));
 	if rNum == 1 then
 		local rnd_idx = 0
 		self.direction = empty_neighbors[rnd_idx].direction;
@@ -950,4 +954,4 @@ function LivingEntityBase:PrintTable(t)
     else
         sub_print_r(t,"  ")
     end
-end    
+end

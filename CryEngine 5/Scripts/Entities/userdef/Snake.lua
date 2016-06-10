@@ -130,7 +130,7 @@ Snake.Patrol =
 				end
 			end 
 		  end 
-		  --[[
+		  
 		  local hitData = {}-- = --System.GetEntitiesInSphereByClass(self:GetPos(), 10, "MousePlayer")
 		  local dir = self:GetDirectionVector();
 			dir = vecScale(dir, 20);
