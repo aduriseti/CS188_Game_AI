@@ -123,6 +123,9 @@ function Maze2:OnInit()
     self.Traps = self.Properties.iM_Traps
     self.Snakes = self.Properties.iM_Snakes
     
+	local pos = self:GetPos();
+	rounded_pos = {x = math.floor(pos.x + 0.5), y = math.floor(pos.y + 0.5), z = pos.z};
+	self:SetPos(rounded_pos);
     self.Origin = self:GetPos()
     --self:OnReset()
     
@@ -629,9 +632,9 @@ function Maze2:New()
    end
    
    self:SpawnMice()
-   self:SpawnSnakes(self.Snakes)
-   self:SpawnFood(self.Foods)
-   self:SpawnTraps(self.Traps)
+   --self:SpawnSnakes(self.Snakes)
+   --self:SpawnFood(self.Foods)
+   --self:SpawnTraps(self.Traps)
   
 end
 

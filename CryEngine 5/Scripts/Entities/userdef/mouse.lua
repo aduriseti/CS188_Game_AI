@@ -910,7 +910,8 @@ function Mouse:calc_heatmap()
 		if(ent.class and ent.class == "Maze_Wall") then
 			local pos = ent:GetPos()
 			local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-10), y = math.floor(pos.y+0.5) - (mpos.y-10), z = math.floor(pos.z+0.5)}
-			--Log("Wall:"..rpos.x..","..rpos.y)
+			--Log("Wall pos " .. Vec2Str(pos));
+			--Log("Wall rounded pos " .. Vec2Str(rpos));
 			
 			if(rpos.x > 1 and rpos.x < 21 and rpos.y > 1 and rpos.y < 21) then 
 				self.heatmap[rpos.x][rpos.y] = -math.huge
