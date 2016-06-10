@@ -52,6 +52,9 @@ Mouse = {
 	f_b = 0.5,
 
 	dir = "up",
+	
+	heatmap_radius = 10;
+	mouse_offset = heatmap_radius + 1;
 
 	
 	mouseDataTable = {},
@@ -879,7 +882,7 @@ end
 
 function Mouse:calc_heatmap()
 
-	local ents = System.GetEntitiesInSphere(self.pos,10)
+	local ents = System.GetEntitiesInSphere(self.pos,self.heatmap_radius)
 	self.pos = self:GetPos();
 	local mpos = {x = math.floor(self.pos.x+0.5), y = math.floor(self.pos.y+0.5), z = math.floor(self.pos.z+0.5)}
 	--Log("Mpos " .. Vec2Str(mpos));
@@ -909,7 +912,7 @@ function Mouse:calc_heatmap()
 
 		if(ent.class and ent.class == "Maze_Wall") then
 			local pos = ent:GetPos()
-			local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-10), y = math.floor(pos.y+0.5) - (mpos.y-10), z = math.floor(pos.z+0.5)}
+			local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-self.mouse_offset), y = math.floor(pos.y+0.5) - (mpos.y-self.mouse_offset), z = math.floor(pos.z+0.5)}
 			--Log("Wall pos " .. Vec2Str(pos));
 			--Log("Wall rounded pos " .. Vec2Str(rpos));
 			
@@ -925,7 +928,7 @@ function Mouse:calc_heatmap()
 
 		--if(ent.class and ent.class == "Food") then
 		--	local pos = ent:GetPos()
-		--	local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-10), y = math.floor(pos.y+0.5) - (mpos.y-10), z = math.floor(pos.z+0.5)}
+		--	local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-self.mouse_offset), y = math.floor(pos.y+0.5) - (mpos.y-self.mouse_offset), z = math.floor(pos.z+0.5)}
 		--	--Log("Food:"..rpos.x..","..rpos.y)
 		--	self:updateHeatMapBFS("Food",rpos)
 
@@ -934,7 +937,7 @@ function Mouse:calc_heatmap()
 
 		if(ent.class and ent.class == "Snake") then
 			local pos = ent:GetPos()
-			local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-10), y = math.floor(pos.y+0.5) - (mpos.y-10), z = math.floor(pos.z+0.5)}
+			local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-self.mouse_offset), y = math.floor(pos.y+0.5) - (mpos.y-self.mouse_offset), z = math.floor(pos.z+0.5)}
 			--Log("Snake:"..rpos.x..","..rpos.y)
 			self:updateHeatMapBFS("Snake",rpos)
 
@@ -943,7 +946,7 @@ function Mouse:calc_heatmap()
 
 		if(ent.class and (ent.class == "Trap1" or ent.class == "Trap2")) then
 			local pos = ent:GetPos()
-			local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-10), y = math.floor(pos.y+0.5) - (mpos.y-10), z = math.floor(pos.z+0.5)}
+			local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-self.mouse_offset), y = math.floor(pos.y+0.5) - (mpos.y-self.mouse_offset), z = math.floor(pos.z+0.5)}
 			--Log("Trap:"..rpos.x..","..rpos.y)
 			self:updateHeatMapBFS("Trap",rpos)
 
@@ -971,8 +974,7 @@ function Mouse:GreedyWalk(frameTime)
 	
 	local rounded_pos = {x = math.floor(self.pos.x + 0.5), y = math.floor(self.pos.y + 0.5), z = self.pos.z};
 	
-	heatmap_radius = 10;
-	mouse_offset = heatmap_radius;
+	mouse_offset = self.mouse_offset;
 	for i = mouse_offset - 1, mouse_offset + 1 do	
 		for j = mouse_offset - 1, mouse_offset + 1 do
 			local trypos = {x = rounded_pos.x + i - mouse_offset, y = rounded_pos.y + j - mouse_offset, z= rounded_pos.z}
@@ -1048,7 +1050,7 @@ function Mouse:DisplayHeatmap()
 
 	for row=1, 21 do
 		for col=1, 21 do
-			local pos = {x = math.floor(self:GetPos().x + 0.5) + col - 10, y = math.floor(self:GetPos().y +0.5) + row - 10, z = self:GetPos().z}
+			local pos = {x = math.floor(self:GetPos().x + 0.5) + col - self.mouse_offset, y = math.floor(self:GetPos().y +0.5) + row - self.mouse_offset, z = 32}
 			r = 0.0
 			g = 0.0
 			b = 0.0
