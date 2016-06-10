@@ -78,12 +78,14 @@ Snake.Patrol =
   end,
   
   OnEnterArea = function(self, entity, areaId)
+	--[[
   		Log("Entered snake area")
 		  if(entity.type == "Mouse") then 
 		  	self.Player = entity 
 			self.Player.pos = entity:GetPos()
 			self:GotoState("EatPlayer")
 		end 
+		--]]
   end, 
 
   OnUpdate = function(self,time)
