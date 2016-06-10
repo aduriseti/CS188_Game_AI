@@ -39,7 +39,7 @@ Mouse = {
 
 	t_m = 100,
 
-	t_b = 0.5,
+	t_b = 0.1,
 
 	s_m = 100,
 
@@ -54,7 +54,7 @@ Mouse = {
 	dir = "up",
 	
 	heatmap_radius = 10;
-	mouse_offset = heatmap_radius + 1;
+	mouse_offset = 11;
 
 	
 	mouseDataTable = {},
@@ -907,50 +907,55 @@ function Mouse:calc_heatmap()
 
 
 	for i, ent in pairs(ents) do
-
-		--self:PrintTable(ent)
-
-		if(ent.class and ent.class == "Maze_Wall") then
-			local pos = ent:GetPos()
-			local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-self.mouse_offset), y = math.floor(pos.y+0.5) - (mpos.y-self.mouse_offset), z = math.floor(pos.z+0.5)}
-			--Log("Wall pos " .. Vec2Str(pos));
-			--Log("Wall rounded pos " .. Vec2Str(rpos));
 			
-			if(rpos.x > 1 and rpos.x < 21 and rpos.y > 1 and rpos.y < 21) then 
-				self.heatmap[rpos.x][rpos.y] = -math.huge
-				self.heatmap[rpos.x][rpos.y+1] = -math.huge
-				self.heatmap[rpos.x+1][rpos.y] = -math.huge
-				self.heatmap[rpos.x+1][rpos.y+1] = -math.huge
+		if self:can_see_obj(ent) then
+			
+			if(ent.class and ent.class == "Maze_Wall") then
+				local pos = ent:GetPos()
+				local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-self.mouse_offset), y = math.floor(pos.y+0.5) - (mpos.y-self.mouse_offset), z = math.floor(pos.z+0.5)}
+				--Log("Wall pos " .. Vec2Str(pos));
+				--Log("Wall rounded pos " .. Vec2Str(rpos));
+				
+				if(rpos.x > 1 and rpos.x < 21 and rpos.y > 1 and rpos.y < 21) then 
+					self.heatmap[rpos.x][rpos.y] = -math.huge
+					self.heatmap[rpos.x][rpos.y+1] = -math.huge
+					self.heatmap[rpos.x+1][rpos.y] = -math.huge
+					self.heatmap[rpos.x+1][rpos.y+1] = -math.huge
+				end
+
 			end
 
+
+			--if(ent.class and ent.class == "Food") then
+			--	local pos = ent:GetPos()
+			--	local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-self.mouse_offset), y = math.floor(pos.y+0.5) - (mpos.y-self.mouse_offset), z = math.floor(pos.z+0.5)}
+			--	--Log("Food:"..rpos.x..","..rpos.y)
+			--	self:updateHeatMapBFS("Food",rpos)
+
+			--end
+
+
+			if(ent.class and ent.class == "Snake") then
+				local pos = ent:GetPos()
+				local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-self.mouse_offset), y = math.floor(pos.y+0.5) - (mpos.y-self.mouse_offset), z = math.floor(pos.z+0.5)}
+				--Log("Snake:"..rpos.x..","..rpos.y)
+				self:updateHeatMapBFS("Snake",rpos)
+
+			end
+
+
+			if(ent.class and (ent.class == "Trap1" or ent.class == "Trap2")) then
+				local pos = ent:GetPos()
+				local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-self.mouse_offset), y = math.floor(pos.y+0.5) - (mpos.y-self.mouse_offset), z = math.floor(pos.z+0.5)}
+				--Log("Trap:"..rpos.x..","..rpos.y)
+				self:updateHeatMapBFS("Trap",rpos)
+
+			end
+		
+			--self:PrintTable(ent)
 		end
 
-
-		--if(ent.class and ent.class == "Food") then
-		--	local pos = ent:GetPos()
-		--	local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-self.mouse_offset), y = math.floor(pos.y+0.5) - (mpos.y-self.mouse_offset), z = math.floor(pos.z+0.5)}
-		--	--Log("Food:"..rpos.x..","..rpos.y)
-		--	self:updateHeatMapBFS("Food",rpos)
-
-		--end
-
-
-		if(ent.class and ent.class == "Snake") then
-			local pos = ent:GetPos()
-			local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-self.mouse_offset), y = math.floor(pos.y+0.5) - (mpos.y-self.mouse_offset), z = math.floor(pos.z+0.5)}
-			--Log("Snake:"..rpos.x..","..rpos.y)
-			self:updateHeatMapBFS("Snake",rpos)
-
-		end
-
-
-		if(ent.class and (ent.class == "Trap1" or ent.class == "Trap2")) then
-			local pos = ent:GetPos()
-			local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-self.mouse_offset), y = math.floor(pos.y+0.5) - (mpos.y-self.mouse_offset), z = math.floor(pos.z+0.5)}
-			--Log("Trap:"..rpos.x..","..rpos.y)
-			self:updateHeatMapBFS("Trap",rpos)
-
-		end
+		
 		
 
 	end
@@ -975,7 +980,9 @@ function Mouse:GreedyWalk(frameTime)
 	local rounded_pos = {x = math.floor(self.pos.x + 0.5), y = math.floor(self.pos.y + 0.5), z = self.pos.z};
 	
 	mouse_offset = self.mouse_offset;
-	for i = mouse_offset - 1, mouse_offset + 1 do	
+	--[[
+	for i = mouse_offset - 1, mouse_offset + 1 do
+		i_mod = 
 		for j = mouse_offset - 1, mouse_offset + 1 do
 			local trypos = {x = rounded_pos.x + i - mouse_offset, y = rounded_pos.y + j - mouse_offset, z= rounded_pos.z}
 			System.DrawLine(self.pos, {trypos.x, trypos.y, self.pos.z}, 1, 0, 0, 1);
@@ -986,7 +993,21 @@ function Mouse:GreedyWalk(frameTime)
 			end
 		end
 	end
-
+	--]]
+	
+	for i = 0, 2 do
+		i_mod = mouse_offset - 1 + (1 + i) % 3;
+		for j = 0, 2 do
+			j_mod = mouse_offset - 1 + (1 + j) % 3;
+			local trypos = {x = rounded_pos.x + i_mod - mouse_offset, y = rounded_pos.y + j_mod - mouse_offset, z= rounded_pos.z}
+			System.DrawLine(self.pos, {trypos.x, trypos.y, self.pos.z}, 1, 0, 0, 1);
+			if self.heatmap[i_mod][j_mod] > maxVal then
+				maxVal = self.heatmap[i_mod][j_mod];
+				maxPos_x = i_mod;
+				maxPos_y = j_mod;
+			end
+		end
+	end
 
 	--Log("Max_pos_x " .. tostring(maxPos_x));
 	--Log("Max_pos_y " .. tostring(maxPos_y));

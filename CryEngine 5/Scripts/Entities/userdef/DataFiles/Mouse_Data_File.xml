@@ -10,6 +10,8 @@
   <KnownDangerEnts>
    <Killer value="Snake"/>
    <Killer value="Trap"/>
+   <Killer value="Trap_Spring"/>
+   <Killer value="Trap_Spring"/>
   </KnownDangerEnts>
   <Allies>
    <Mouse value="Mouse_2"/>

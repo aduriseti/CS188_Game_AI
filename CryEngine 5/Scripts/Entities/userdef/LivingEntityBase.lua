@@ -292,6 +292,17 @@ function LivingEntityBase:SetupMaze()
         end
     end	
 	
+	
+	
+	self.Maze_Properties.cell_grid = {};
+	
+	for cell_row = 1, self.Maze_Properties.cell_height do
+		self.Maze_Properties.cell_grid[cell_row] = {};
+		for cell_col = 1, self.Maze_Properties.cell_width do
+			self.Maze_Properties.cell_grid[cell_row][cell_col] = {n_visited = 0};
+		end
+	end
+	
 	self.Previous_Loc = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos())
 	--self:PrintTable(self.Maze_Properties.grid);
 
@@ -401,9 +412,14 @@ function LivingEntityBase:getUnoccupiedNeighbors(loc_row, loc_col)
 			
 				try_pos = self.Maze_Properties.ID:rowcol_to_pos(row_index, col_index);
 			
-				System.DrawLine(self.pos, {try_pos.x, try_pos.y, self.pos.z}, 0, 1, 0, 1);
+				--System.DrawLine(self.pos, {try_pos.x, try_pos.y, self.pos.z}, 0, 1, 0, 1);
 
-				empty_neighbors[#empty_neighbors+1] = {row =row_index, col = col_index, n_visited = grid[row_index][col_index].n_visited, direction = value};
+				empty_neighbors[#empty_neighbors+1] = {
+					row = row_index, 
+					col = col_index, 
+					n_visited = grid[row_index][col_index].n_visited, 
+					direction = value
+				};
 
 				--Log(tostring(#empty_neighbors));
 			end
@@ -412,6 +428,34 @@ function LivingEntityBase:getUnoccupiedNeighbors(loc_row, loc_col)
 
 	return empty_neighbors;
 
+end
+
+function LivingEntityBase:getVisibleCells(cell_row_arg, cell_col_arg)
+	
+	local maze_height = self.Maze_Properties.cell_height;
+	local maze_width = self.Maze_Properties.cell_width;
+	local visible_cells = {};
+	
+	for key,value in pairs(self.directions) do
+		local cell_row_index = value.row_inc + cell_row_arg;
+		local cell_col_index = value.col_inc + cell_col_arg;
+		
+		if cell_row_index > 0 and cell_row_index <= maze_height and cell_col_index > 0 and cell_col_index < maze_width then
+			local cell_pos = self.Maze_Properties.ID:cellrowcol_to_pos(cell_row_index, cell_col_index);
+			
+			if self:can_see_pos(cell_pos) then
+				System.DrawLine(self.pos, {cell_pos.x, cell_pos.y, self.pos.z}, 0, 1, 0, 1);
+				visible_cells[#visible_cells + 1] = {
+					cell_row = cell_row_index,
+					cell_col = cell_col_index, 
+					n_visited = self.Maze_Properties.cell_grid[cell_row_index][cell_col_index].n_visited, 
+					direction = value
+				};
+			end
+		end
+	end
+	
+	return visible_cells;
 end
 
 
@@ -657,29 +701,41 @@ function LivingEntityBase:demoWalk()
 	--Lumberyard
 	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
 	local cell_rowcol = self.Maze_Properties.ID:rowcol_to_cellrowcol(rowcol.row, rowcol.col);
+	local cell_row = cell_rowcol.row;
+	local cell_col = cell_rowcol.col;
+	
+	
 	Log("cell_rowcol.row: " .. tostring(cell_rowcol.row));
 	Log("cell_rowcol.col: " .. tostring(cell_rowcol.col));
-
+	
+	if cell_rowcol.row == -1 or cell_rowcol.col == -1 then 
+		return
+	end
+	--[[
 	local row = rowcol.row;
 	local col = rowcol.col;
+	--]]
 	
-	for i = col-1, col + 1 do
-		for j = row - 1, row + 1 do
-			local pos = self.Maze_Properties.ID:rowcol_to_pos(j, i);
-			System.DrawLabel(pos, 3, tostring(self.Maze_Properties.grid[j][i].n_visited), 0, 1,0, 1);
+	for i = cell_col-1, cell_col + 1 do
+		for j = cell_row - 1, cell_row + 1 do
+			if i > 0 and i <= self.Maze_Properties.cell_height and j > 0 and j < self.Maze_Properties.cell_width then
+				local pos = self.Maze_Properties.ID:cellrowcol_to_pos(j, i);
+				System.DrawLabel(pos, 5, tostring(self.Maze_Properties.cell_grid[j][i].n_visited), 0, 1,0, 1);
+			end
 		end
 	end
 
+	
 	local loc_row_inc = self.direction.row_inc;
 	local loc_col_inc = self.direction.col_inc;
 	
-	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
+	local visible_cells = self:getVisibleCells(cell_rowcol.row, cell_rowcol.col);
+	
+	
 
 	local prev_pos = self.Previous_Loc
 	--if we haven't moved out of a grid space yet, continue as before
-	
-	
-	if row == prev_pos.row and col == prev_pos.col and (loc_row_inc ~= 0 or loc_col_inc ~= 0) then
+	if cell_row == prev_pos.row and cell_col == prev_pos.col and (loc_row_inc ~= 0 or loc_col_inc ~= 0) then
 		Log("STAY ON COURSE");
 		--local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
 		--self:Move_to_Pos(frameTime, target_pos);
@@ -688,23 +744,22 @@ function LivingEntityBase:demoWalk()
 	
 
 	--else change our behavior
-	self.Previous_Loc.col = col;
-	self.Previous_Loc.row = row;
+	self.Previous_Loc.col = cell_col;
+	self.Previous_Loc.row = cell_row;
 	
-	--Log(tostring(self.Maze_Properties.grid));
-
 	--increment visit counter of current grid space
-	self.Maze_Properties.grid[row][col].n_visited = self.Maze_Properties.grid[row][col].n_visited + 1;
+	--self.Maze_Properties.grid[row][col].n_visited = self.Maze_Properties.grid[row][col].n_visited + 1;
+	self.Maze_Properties.cell_grid[cell_row][cell_col].n_visited = self.Maze_Properties.cell_grid[cell_row][cell_col].n_visited + 1;
 	
 	
 	-- if there are more options than backwards
-	if #empty_neighbors >=2 then
+	if #visible_cells >=2 then
 		--remove backtracking as an option
-		for key, value in pairs(empty_neighbors) do
-			try_dir = empty_neighbors[key].direction;
+		for key, value in pairs(visible_cells) do
+			try_dir = visible_cells[key].direction;
 			if try_dir.row_inc ==  -self.direction.row_inc and try_dir.col_inc == -self.direction.col_inc then
 				--Log("REMOVE BACKTRACKING AS OPTION");
-				empty_neighbors[key] = nil;
+				visible_cells[key] = nil;
 			end
 		end
 	else 
@@ -714,7 +769,7 @@ function LivingEntityBase:demoWalk()
 	local min_val = 1000000;
 	local min_key = 0
 
-	for key, value in pairs(empty_neighbors) do
+	for key, value in pairs(visible_cells) do
 		--Log(tostring(value.n_visited));
 		if value.n_visited < min_val then
 			min_val = value.n_visited;
@@ -722,8 +777,11 @@ function LivingEntityBase:demoWalk()
 		end
 	end
 	
+	Log("Min_val: " .. tostring(min_val));
+	
 	--select minimally visited neighbor
-	self.direction = empty_neighbors[min_key].direction;
+	self.direction = visible_cells[min_key].direction;
+	Log(tostring(self.direction.name));
 end
 
 
@@ -912,6 +970,54 @@ function LivingEntityBase:ray_cast(target_class)
 	
 	
 	return target;
+end
+
+function LivingEntityBase:can_see_pos(pos_arg) 
+	
+	local diff = {x = pos_arg.x - self.pos.x, y = pos_arg.y - self.pos.y, z = 0};
+
+ 	local fucker = {};
+
+
+
+ 	Physics.RayWorldIntersection(self.pos, diff, 1, ent_all, self.id, nil, fucker);--, self:GetRawId(), target_mouse:GetRawId());
+
+	local n_hits = 0;
+
+	for key, value in pairs(fucker) do
+		n_hits = n_hits + 1
+	end
+
+	if (n_hits > 0) then
+		return nil;
+	end
+	
+	return 1; --return true
+end
+
+function LivingEntityBase:can_see_obj(obj) 
+
+	local pos_arg = obj:GetPos();
+	
+	local diff = {x = pos_arg.x - self.pos.x, y = pos_arg.y - self.pos.y, z = 0};
+
+ 	local fucker = {};
+
+
+
+ 	Physics.RayWorldIntersection(self.pos, diff, 1, ent_all, self.id, obj.id, fucker);--, self:GetRawId(), target_mouse:GetRawId());
+
+	local n_hits = 0;
+
+	for key, value in pairs(fucker) do
+		n_hits = n_hits + 1
+	end
+
+	if (n_hits > 0) then
+		return nil;
+	end
+	
+	return 1; --return true
 end
 
 

@@ -503,7 +503,7 @@ function Maze2:rowcol_to_cellrowcol(row, col)
 	Log("cell_row_dec" .. tostring(cell_row_dec) .. "," .. tostring(math.floor(cell_row_dec)));
 	Log("cell_col_dec" .. tostring(cell_col_dec) .. "," .. tostring(math.floor(cell_col_dec)));
 
-	if math.floor(cell_col_dec) == cell_row_dec or math.floor(cell_row_dec) == cell_row_dec then
+	if math.floor(cell_col_dec) == cell_col_dec or math.floor(cell_row_dec) == cell_row_dec then
 		return {row = -1, col = -1};
 	else
 		return {row = cell_row, col = cell_col}
@@ -511,17 +511,17 @@ function Maze2:rowcol_to_cellrowcol(row, col)
 end
 
 function Maze2:cellrowcol_to_rowcol(cell_row_arg, cell_col_arg)
-	local cell_row = cell_row_arg - 1 + math.floor(self:corridorSize()/2 + 0.5);
-	cell_row = cell_row * (self:corridorSize() + 1) + 1;
-	local cell_col = cell_col_arg - 1 + math.floor(self:corridorSize()/2 + 0.5);
-	cell_col = cell_col * (self:corridorSize() + 1) + 1;
+	local cell_row = cell_row_arg - 1;
+	cell_row = cell_row * (self:corridorSize() + 1) + 1 + math.floor(self:corridorSize()/2 + 0.5);
+	local cell_col = cell_col_arg - 1;
+	cell_col = cell_col * (self:corridorSize() + 1) + 1 + math.floor(self:corridorSize()/2 + 0.5);
 	return {row = cell_row, col = cell_col};
 end
 
-function Maze2:cellrowcol_to_pos(cell_row, cell_col) {
+function Maze2:cellrowcol_to_pos(cell_row, cell_col) 
 	local rowcol = self:cellrowcol_to_rowcol(cell_row, cell_col);
 	return self:rowcol_to_pos(rowcol.row, rowcol.col); 
-}
+end
 
 -- Spawn a wall at coordinates (w,h)
 function Maze2:Wall(w, h)
@@ -655,9 +655,9 @@ function Maze2:New()
    end
    
    self:SpawnMice()
-   --self:SpawnSnakes(self.Snakes)
-   --self:SpawnFood(self.Foods)
-   --self:SpawnTraps(self.Traps)
+   self:SpawnSnakes(self.Snakes)
+   self:SpawnFood(self.Foods)
+   self:SpawnTraps(self.Traps)
   
 end
 
