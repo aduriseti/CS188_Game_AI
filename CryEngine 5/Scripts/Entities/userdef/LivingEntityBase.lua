@@ -389,13 +389,13 @@ function LivingEntityBase:getUnoccupiedNeighbors(loc_row, loc_col)
 	local empty_neighbors = {};
 
 	for key,value in pairs(self.directions) do
-		Log(tostring(key));
-		self:PrintTable(value);
+		--Log(tostring(key));
+		--self:PrintTable(value);
 		local row_index = value.row_inc + loc_row
 		local col_index = value.col_inc + loc_col
 
 		if row_index > 0 and col_index > 0 and row_index <= #grid and col_index <= #grid[1] then 
-			Log("row_index = %d, col_index = %d", row_index, col_index)
+			--Log("row_index = %d, col_index = %d", row_index, col_index)
 			if grid[row_index][col_index].occupied == false then
 			
 				try_pos = self.Maze_Properties.ID:rowcol_to_pos(row_index, col_index);
@@ -654,10 +654,17 @@ function LivingEntityBase:demoWalk()
 	--Cryengine
 	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
 	--Lumberyard
-	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+	--local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
 
 	local row = rowcol.row;
 	local col = rowcol.col;
+	
+	for i = col-1, col + 1 do
+		for j = row - 1, row + 1 do
+			local pos = self.Maze_Properties.ID:rowcol_to_pos(j, i);
+			System.DrawLabel(pos, 5, tostring(self.Maze_Properties.grid[j][i].n_visited), 0, 1,0, 1);
+		end
+	end
 
 	local loc_row_inc = self.direction.row_inc;
 	local loc_col_inc = self.direction.col_inc;
@@ -666,8 +673,8 @@ function LivingEntityBase:demoWalk()
 
 	local prev_pos = self.Previous_Loc
 	--if we haven't moved out of a grid space yet, continue as before
-	if row == prev_pos.row and col == prev_pos.col and (loc_row_inc ~= 0 or loc_col_inc) ~= 0 then
-		--Log("STAY ON COURSE");
+	if row == prev_pos.row and col == prev_pos.col and (loc_row_inc ~= 0 or loc_col_inc ~= 0) then
+		Log("STAY ON COURSE");
 		--local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
 		--self:Move_to_Pos(frameTime, target_pos);
 		return;
@@ -943,4 +950,4 @@ function LivingEntityBase:PrintTable(t)
     else
         sub_print_r(t,"  ")
     end
-end
+end    

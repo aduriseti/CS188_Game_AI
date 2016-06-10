@@ -967,66 +967,35 @@ function Mouse:GreedyWalk(frameTime)
 	local maxVal = 0
 	local maxPos_x = 0;
 	local maxPos_y = 0;
+	
+	local rounded_pos = {x = math.floor(self.pos.x + 0.5), y = math.floor(self.pos.y + 0.5), z = self.pos.z};
+	
+	heatmap_radius = 10;
+	mouse_offset = heatmap_radius;
+	for i = mouse_offset - 1, mouse_offset + 1 do	
+		for j = mouse_offset - 1, mouse_offset + 1 do
+			local trypos = {x = rounded_pos.x + i - mouse_offset, y = rounded_pos.y + j - mouse_offset, z= rounded_pos.z}
+			System.DrawLine(self.pos, {trypos.x, trypos.y, self.pos.z}, 1, 0, 0, 1);
+			if self.heatmap[i][j] > maxVal then
+				maxVal = self.heatmap[i][j];
+				maxPos_x = i;
+				maxPos_y = j;
+			end
+		end
+	end
 
-	if self.heatmap[10][10] > maxVal then
-		maxVal = self.heatmap[10][10];
-		maxPos_x = 10;
-		maxPos_y = 10;
-	end
---Log(self.heatmap[10][10].." "..maxVal)
-	if self.heatmap[11][10] > maxVal then
-		maxVal = self.heatmap[11][10];
-		maxPos_x = 11;
-		maxPos_y = 10;
-	end
---Log(self.heatmap[11][10].." "..maxVal)
-	if self.heatmap[12][10] > maxVal then
-		maxVal = self.heatmap[12][10];
-		maxPos_x = 12;
-		maxPos_y = 10;
-	end
---Log(self.heatmap[12][10].." "..maxVal)
-	if self.heatmap[10][11] > maxVal then
-		maxVal = self.heatmap[10][11];
-		maxPos_x = 10;
-		maxPos_y = 11;
-	end
---Log(self.heatmap[10][11].." "..maxVal)
-	if self.heatmap[11][11] > maxVal then
-		maxVal = self.heatmap[11][11];
-		maxPos_x = 11;
-		maxPos_y = 11;
-	end
---Log(self.heatmap[11][11].." "..maxVal)	
-	if self.heatmap[12][11] > maxVal then
-		maxVal = self.heatmap[12][11];
-		maxPos_x = 12;
-		maxPos_y = 11;
-	end
---Log(self.heatmap[12][11].." "..maxVal)
-	if self.heatmap[10][12] > maxVal then
-		maxVal = self.heatmap[10][12];
-		maxPos_x = 10;
-		maxPos_y = 12;
-	end
---Log(self.heatmap[10][12].." "..maxVal)
-	if self.heatmap[11][12] > maxVal then
-		maxVal = self.heatmap[11][12];
-		maxPos_x = 11;
-		maxPos_y = 12;
-	end
---Log(self.heatmap[11][12].." "..maxVal)
-	if self.heatmap[12][12] > maxVal then
-		maxVal = self.heatmap[12][12];
-		maxPos_x = 12;
-		maxPos_y = 12;
-	end
---Log(self.heatmap[12][12].." "..maxVal)
-	--	local newpos = self:heatmap_to_pos(maxPos_x, maxPos_y);
 
-	local newpos = {x = self.pos.x + maxPos_x - 10, y = self.pos.y + maxPos_y - 10, z= self.pos.z}
+	--Log("Max_pos_x " .. tostring(maxPos_x));
+	--Log("Max_pos_y " .. tostring(maxPos_y));
+	local newpos = {x = rounded_pos.x + maxPos_x - mouse_offset, y = rounded_pos.y + maxPos_y - mouse_offset, z= rounded_pos.z}
+	--Log("New pos: " .. Vec2Str(newpos));
+	--Log("Self pos: " .. Vec2Str(self.pos));
+	
+	Log("HEATMAP_VAL_AT_CUR_POS" .. tostring(self.heatmap[mouse_offset][mouse_offset]));
+	
 	self:DisplayHeatmap()
 	--self:updateDir(newpos)
+	--System.DrawLine(self.pos, {newpos.x, newpos.y, self.pos.z}, 0, 1, 0, 1);
 	self:Move_to_Pos(frameTime, newpos);
 	--System.DrawLabel(newpos, 3.0, tostring(maxVal), 0.6, 0.0, 0.0, 1);
 	
@@ -1037,32 +1006,16 @@ function Mouse:updateDir()
 
 	local dir = self.dir;
 
-	Log(tostring(self));
+	--Log(tostring(self));
 	self:demoWalk();
 	Log("This direction: " .. tostring(self.direction.name));
 
-	self:PrintTable(self.direction);
+	--self:PrintTable(self.direction);
 	self.dir = self.direction.name;
-
-	--[[
-	if self.direction.name == self.directions.up.name then
-		Log("Going up");
-		dir = "up";
-	elseif self.direction.name == self.directions.down.name then
-		Log("Going down");
-		--dir = self.direction.name;
-	elseif self.direction.name == self.directions.left.name then
-		Log("Going left");
-		dir = "left";
-	elseif self.direction.name == self.directions.right.name then
-		Log("Going right");
-		dir = "right";
-	else
-		--leave dir unchanged
+	if self.dir == "down" then
+		--self.dir = "up"
 	end
-	--]]
 
-	--self.dir = dir;
 end
 
 --[[
@@ -1094,7 +1047,7 @@ function Mouse:DisplayHeatmap()
 
 	for row=1, 21 do
 		for col=1, 21 do
-			local pos = {x = self:GetPos().x + col - 10, y = self:GetPos().y + row - 10, z = self:GetPos().z}
+			local pos = {x = math.floor(self:GetPos().x + 0.5) + col - 10, y = math.floor(self:GetPos().y +0.5) + row - 10, z = self:GetPos().z}
 			r = 0.0
 			g = 0.0
 			b = 0.0
