@@ -880,7 +880,10 @@ end
 function Mouse:calc_heatmap()
 
 	local ents = System.GetEntitiesInSphere(self.pos,10)
+	self.pos = self:GetPos();
 	local mpos = {x = math.floor(self.pos.x+0.5), y = math.floor(self.pos.y+0.5), z = math.floor(self.pos.z+0.5)}
+	--Log("Mpos " .. Vec2Str(mpos));
+	--Log("Self.pos ".. Vec2Str(self.pos));
 	--self:PrintTable(surEnt)
 
 	--initialize heatmap
@@ -909,7 +912,7 @@ function Mouse:calc_heatmap()
 			local rpos = {x = math.floor(pos.x+0.5) - (mpos.x-10), y = math.floor(pos.y+0.5) - (mpos.y-10), z = math.floor(pos.z+0.5)}
 			--Log("Wall:"..rpos.x..","..rpos.y)
 			
-			if(rpos.x > 1 and rpos.y < 21) then 
+			if(rpos.x > 1 and rpos.x < 21 and rpos.y > 1 and rpos.y < 21) then 
 				self.heatmap[rpos.x][rpos.y] = -math.huge
 				self.heatmap[rpos.x][rpos.y+1] = -math.huge
 				self.heatmap[rpos.x+1][rpos.y] = -math.huge
@@ -957,6 +960,8 @@ function Mouse:calc_heatmap()
 end
 
 function Mouse:GreedyWalk(frameTime)
+
+	self:updateDir();
 
 	self:calc_heatmap()
 	local maxVal = 0
@@ -1021,13 +1026,46 @@ function Mouse:GreedyWalk(frameTime)
 
 	local newpos = {x = self.pos.x + maxPos_x - 10, y = self.pos.y + maxPos_y - 10, z= self.pos.z}
 	self:DisplayHeatmap()
-	self:updateDir(newpos)
+	--self:updateDir(newpos)
 	self:Move_to_Pos(frameTime, newpos);
 	--System.DrawLabel(newpos, 3.0, tostring(maxVal), 0.6, 0.0, 0.0, 1);
 	
 
 end
 
+function Mouse:updateDir()
+
+	local dir = self.dir;
+
+	Log(tostring(self));
+	self:demoWalk();
+	Log("This direction: " .. tostring(self.direction.name));
+
+	self:PrintTable(self.direction);
+	self.dir = self.direction.name;
+
+	--[[
+	if self.direction.name == self.directions.up.name then
+		Log("Going up");
+		dir = "up";
+	elseif self.direction.name == self.directions.down.name then
+		Log("Going down");
+		--dir = self.direction.name;
+	elseif self.direction.name == self.directions.left.name then
+		Log("Going left");
+		dir = "left";
+	elseif self.direction.name == self.directions.right.name then
+		Log("Going right");
+		dir = "right";
+	else
+		--leave dir unchanged
+	end
+	--]]
+
+	--self.dir = dir;
+end
+
+--[[
 function Mouse:updateDir(newpos)
 	local dir = self.dir
 	local xx = newpos.x - self:GetPos().x 
@@ -1044,6 +1082,7 @@ function Mouse:updateDir(newpos)
 	end
 	self.dir = dir
 end
+--]]
 
 
 -- Display heat map labels on screen

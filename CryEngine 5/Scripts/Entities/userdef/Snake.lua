@@ -90,7 +90,7 @@ Snake.Patrol =
   
 		  --Log("FUCKERS")
 		  --self:myPatrol(time)
-
+		  --[[
 		  local target = self:ray_cast("Mouse");
 		  if target ~= nil then
 		  	self:GotoState("Eat");
@@ -148,7 +148,9 @@ Snake.Patrol =
 
 		  if target2 ~= nil then
 		  	self:GotoState("EatPlayer");
-		  end--]]
+		  end
+
+		  --]]
 
 		  self:bounce(time);
 

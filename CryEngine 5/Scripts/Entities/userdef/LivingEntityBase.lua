@@ -389,11 +389,13 @@ function LivingEntityBase:getUnoccupiedNeighbors(loc_row, loc_col)
 	local empty_neighbors = {};
 
 	for key,value in pairs(self.directions) do
+		Log(tostring(key));
+		self:PrintTable(value);
 		local row_index = value.row_inc + loc_row
 		local col_index = value.col_inc + loc_col
 
 		if row_index > 0 and col_index > 0 and row_index <= #grid and col_index <= #grid[1] then 
-			--Log("row_index = %d, col_index = %d", row_index, col_index)
+			Log("row_index = %d, col_index = %d", row_index, col_index)
 			if grid[row_index][col_index].occupied == false then
 			
 				try_pos = self.Maze_Properties.ID:rowcol_to_pos(row_index, col_index);
@@ -411,21 +413,7 @@ function LivingEntityBase:getUnoccupiedNeighbors(loc_row, loc_col)
 
 end
 
-function LivingEntityBase:getLeftRight()
-	local dir = self.direction;
-	local dirs = self.directions;
-	if dir.name == "up" then
-		return dirs.left, dirs.right;
-	elseif dir.name == "down" then
-		return dirs.right, dirs.left;
-	elseif dir.name == "left" then 
-		return dirs.up, dirs.down;
-	elseif dir.name == "right" then
-		return dirs.down, dirs.up;
-	else
-		return nil;
-	end
-end
+
 
 function LivingEntityBase:runFrom(target, frameTime)
 	--Cryengine
@@ -661,6 +649,71 @@ function LivingEntityBase:exploratoryWalk(frameTime)
 	--select minimally visited neighbor
 	self.direction = empty_neighbors[min_key].direction;
 end
+
+function LivingEntityBase:demoWalk()
+	--Cryengine
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self.pos);
+	--Lumberyard
+	local rowcol = self.Maze_Properties.ID:pos_to_rowcol(self:GetPos());
+
+	local row = rowcol.row;
+	local col = rowcol.col;
+
+	local loc_row_inc = self.direction.row_inc;
+	local loc_col_inc = self.direction.col_inc;
+	
+	local empty_neighbors = self:getUnoccupiedNeighbors(row, col);
+
+	local prev_pos = self.Previous_Loc
+	--if we haven't moved out of a grid space yet, continue as before
+	if row == prev_pos.row and col == prev_pos.col and (loc_row_inc ~= 0 or loc_col_inc) ~= 0 then
+		--Log("STAY ON COURSE");
+		--local target_pos = self.Maze_Properties.ID:rowcol_to_pos(row+loc_row_inc, col + loc_col_inc);
+		--self:Move_to_Pos(frameTime, target_pos);
+		return;
+	end
+
+	--else change our behavior
+	self.Previous_Loc.col = col;
+	self.Previous_Loc.row = row;
+	
+	--Log(tostring(self.Maze_Properties.grid));
+
+	--increment visit counter of current grid space
+	self.Maze_Properties.grid[row][col].n_visited = self.Maze_Properties.grid[row][col].n_visited + 1;
+	
+	
+	-- if there are more options than backwards
+	if #empty_neighbors >=2 then
+		--remove backtracking as an option
+		for key, value in pairs(empty_neighbors) do
+			try_dir = empty_neighbors[key].direction;
+			if try_dir.row_inc ==  -self.direction.row_inc and try_dir.col_inc == -self.direction.col_inc then
+				--Log("REMOVE BACKTRACKING AS OPTION");
+				empty_neighbors[key] = nil;
+			end
+		end
+	else 
+	
+	end
+	
+	local min_val = 10000;
+	local min_key = 0
+
+	for key, value in pairs(empty_neighbors) do
+		--Log(tostring(value.n_visited));
+		if value.n_visited < min_val then
+			min_val = value.n_visited;
+			min_key = key;
+		end
+	end
+	
+	--select minimally visited neighbor
+	self.direction = empty_neighbors[min_key].direction;
+end
+
+
+
 
 function LivingEntityBase:randomDirectionalWalk(frameTime)
 	--Cryengine
